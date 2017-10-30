@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.com.arvid.dtuguide.coordinates;
 
 /**
  * Created by arvid on 23-10-2017.
