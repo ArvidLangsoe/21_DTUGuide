@@ -1,5 +1,8 @@
-package dao;
+package com.arvid.dtuguide.data;
 
+
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import java.util.Hashtable;
 
@@ -50,6 +53,7 @@ public class LocationDAO {
 		return updateData();
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.N)
 	public boolean updateLocation(Location newLocation){
 		locations.replace(newLocation.getName(), newLocation);
 		return updateData();

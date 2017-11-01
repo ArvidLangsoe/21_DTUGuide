@@ -1,4 +1,4 @@
-package controller;
+package com.arvid.dtuguide.data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,16 +9,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Hashtable;
 
-import dto.Location;
-
-
 public class FileManager {
 
 	final static String PATH = "";
 
 	/**
 	 * Writes the object data on a specific file.
-	 * @param Hashtable<Double, Location>
+	 * @param Hashtable<String, Location>
 	 * 			Data object which shall be stored
 	 */
 	public static void writeData(Hashtable<String, Location> dto){
