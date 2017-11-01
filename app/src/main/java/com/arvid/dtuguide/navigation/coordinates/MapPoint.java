@@ -1,6 +1,4 @@
-package com.arvid.dtuguide.com.arvid.dtuguide.coordinates;
-
-import java.util.Map;
+package com.arvid.dtuguide.navigation.coordinates;
 
 /**
  * Created by arvid on 23-10-2017.

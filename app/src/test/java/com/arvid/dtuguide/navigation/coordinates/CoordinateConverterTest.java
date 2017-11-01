@@ -1,4 +1,4 @@
-package com.arvid.dtuguide.com.arvid.dtuguide.coordinates;
+package com.arvid.dtuguide.navigation.coordinates;
 
 import org.junit.Test;
 
