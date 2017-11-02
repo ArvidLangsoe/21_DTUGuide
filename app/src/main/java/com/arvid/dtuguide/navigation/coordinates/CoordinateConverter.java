@@ -94,34 +94,26 @@ public class CoordinateConverter {
         mercator1=geoToMercator(geo1);
         mercator2=geoToMercator(geo2);
 
-        mercatorDistance=calculateDistance(mercator1.getX(),mercator2.getX(),mercator1.getY(),mercator2.getY());
-        mapDistance=calculateDistance(map1.getX(),map2.getX(),map1.getY(),map2.getY());
+        double mercatorAngle=calculateAngle(mercator1.getX(),mercator2.getX(),mercator1.getY(),mercator2.getY());
+        double mapAngle = calculateAngle(map1.getX(),map2.getX(),map1.getY(),map2.getY());
+
+        mercatorToMapAngle=mapAngle-mercatorAngle;
 
         mercXDistance =mercator2.getX()-mercator1.getX();
         mercYDistance =mercator2.getY()-mercator1.getY();
 
         mapXDistance=map2.getX()-map1.getX();
         mapYDistance=map2.getY()-map1.getY();
-
-        double mercatorAngle=calculateAngle(mercator1.getX(),mercator2.getX(),mercator1.getY(),mercator2.getY());
-        double mapAngle = calculateAngle(map1.getX(),map2.getX(),map1.getY(),map2.getY());
-
-        mercatorToMapAngle=mapAngle-mercatorAngle;
     }
 
     public MapPoint geoToMap(GeoPoint gP){
         MapPoint mercator=geoToMercator(gP);
 
-        System.out.println("Mercator:" + mercator);
         MapPoint mercTrans = new MapPoint(mercator.getX()-mercator1.getX(),mercator.getY()-mercator1.getY());
-        System.out.println("Mercator translated:" +mercTrans);
 
+        //MapPoint mercRot= rotatePoint(mercTrans,mercatorToMapAngle);
 
-        MapPoint mercRot= rotatePoint(mercTrans,mercatorToMapAngle);
-        System.out.println("Mercator rotated:" +mercRot);
-
-        MapPoint mapPointTrans = scalePoint(mercRot,mapXDistance/mercXDistance,mapYDistance/mercYDistance);
-        System.out.println("Mercator scaled:" +mapPointTrans);
+        MapPoint mapPointTrans = scalePoint(mercTrans,mapXDistance/mercXDistance,mapYDistance/mercYDistance);
 
         return new MapPoint(mapPointTrans.getX()+map1.getX(),mapPointTrans.getY()+map1.getY());
     }

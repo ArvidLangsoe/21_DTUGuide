@@ -1,9 +1,8 @@
 package com.arvid.dtuguide.navigation;
 
-import com.arvid.dtuguide.MapChangeObserver;
+import com.arvid.dtuguide.navigation.coordinates.CoordinateConverter;
+import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.arvid.dtuguide.navigation.coordinates.MapPoint;
-
-import java.util.ArrayList;
 
 /**
  * Created by arvid on 01-11-2017.
@@ -11,19 +10,23 @@ import java.util.ArrayList;
 
 public class NavigationController implements Navigation{
 
-    private MapPoint myLocation=new MapPoint(50,50);
+    private GeoPoint myLocation=new GeoPoint(12.395167,55.732010);
 
-    private ArrayList<MapChangeObserver> myObservers= new ArrayList<MapChangeObserver>();
+    private CoordinateConverter coorconv;
 
+    public NavigationController(){
+    }
+
+    public void calibrate(GeoPoint g1, GeoPoint g2,MapPoint m1, MapPoint m2){
+        coorconv= new CoordinateConverter(g1,g2,m1,m2);
+    }
 
     @Override
     public MapPoint getMyLocation() {
-        return myLocation;
-    }
+        MapPoint m =coorconv.geoToMap(myLocation);
+        System.out.println(m);
+        return m;
 
-    public void setRandomMyLocation(){
-        myLocation=new MapPoint((int)(Math.random()*4000+100),(int)(Math.random()*1000+500));
-        System.out.println(myLocation);
     }
 
 }

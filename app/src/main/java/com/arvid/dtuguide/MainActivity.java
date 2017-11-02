@@ -21,13 +21,21 @@ import android.widget.ImageView;
 import com.alexvasilkov.gestures.views.interfaces.GestureView;
 import com.arvid.dtuguide.navigation.Navigation;
 import com.arvid.dtuguide.navigation.NavigationController;
+import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.arvid.dtuguide.navigation.coordinates.MapPoint;
 
-public class MainActivity extends AppCompatActivity implements MapChangeObserver {
+public class MainActivity extends AppCompatActivity {
     private GestureView map;
     private LocationManager locationManager;
     private ImageView mapImage;
     private NavigationController nc;
+
+    private MapPoint cmp1 = new MapPoint(291,337);
+    private MapPoint cmp2 = new MapPoint(62,1013);
+
+    private GeoPoint cgp1 = new GeoPoint(12.395167,55.732010);
+    private GeoPoint cgp2 = new GeoPoint(12.397372,55.730977);
+
 
     Handler handler = new Handler() {
         @Override
@@ -46,11 +54,13 @@ public class MainActivity extends AppCompatActivity implements MapChangeObserver
 
         nc =new NavigationController();
 
+        nc.calibrate(cgp1,cgp2,cmp1,cmp2);
+
         Bitmap dtuMap = BitmapFactory.decodeResource(getResources(), R.drawable.kort_v2);
 
-        writeImageWithLocation(new MapPoint(400,400));
+        writeImageWithLocation(nc.getMyLocation());
 
-
+/* //This will be needed later for updating map when different events happen.
         Thread background=new Thread(new Runnable() {
 
             @Override
@@ -69,7 +79,9 @@ public class MainActivity extends AppCompatActivity implements MapChangeObserver
         });
 
         background.start();
+    */
     }
+
 
 
     public void writeImageWithLocation(MapPoint location){
@@ -79,21 +91,14 @@ public class MainActivity extends AppCompatActivity implements MapChangeObserver
         Canvas c = new Canvas(resultBitmap);
 
         c.drawBitmap(dtuMap, 0, 0, null);
-
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint p = new Paint();
         p.setColor(Color.CYAN);
-        c.drawCircle((int)location.getX(),(int)location.getY(),dtuMap.getWidth()/40,p);
+        c.drawCircle(((int)location.getX()*(dtuMap.getWidth()/560)),(int)location.getY()*(dtuMap.getHeight()/1920),dtuMap.getWidth()/40,p);
         c.save();
 
         mapImage.setImageDrawable(new BitmapDrawable(getResources(), resultBitmap));
 
     }
-
-    @Override
-    public void updateMap() {
-        writeImageWithLocation(nc.getMyLocation());
-    }
-
 
 
 }

@@ -8,6 +8,15 @@ public class GeoPoint {
     private double latitude;
     private double longtitude;
 
+    public GeoPoint(){
+
+    }
+
+    public GeoPoint(double longtitude,double latitude){
+        this.latitude=latitude;
+        this.longtitude= longtitude;
+    }
+
     public double getLat() {
         return latitude;
     }
