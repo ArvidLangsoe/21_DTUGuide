@@ -12,10 +12,12 @@ public class GeoPoint implements Serializable {
     private double latitude;
     private double longtitude;
 
-    public GeoPoint(double latitude, double longtitude){
+
+    public GeoPoint(double longtitude,double latitude){
         this.latitude=latitude;
-        this.longtitude=longtitude;
+        this.longtitude= longtitude;
     }
+
 
     public GeoPoint(){}
 

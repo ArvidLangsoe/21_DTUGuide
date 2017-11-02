@@ -32,6 +32,8 @@ public class CoordinateConverterTest {
         MapPoint map2 = new MapPoint();
         map2.setX(496);
         map2.setY(51);
+        //map2.setX(800);
+        //map2.setY(51);
 
         MapPoint map3 = new MapPoint();
         map3.setX(725);
