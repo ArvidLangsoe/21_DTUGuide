@@ -31,45 +31,49 @@ public class GPS implements LocationListener{
     protected String latitude,longitude;
     protected boolean gps_enabled,network_enabled;
 
-    private String position;
+    private GeoPoint position;
 
 
     public void addObserver(IGPSObserver observer){
-        Log.d("MY CURRENT LOCATION ", "Observer added");
+        Log.d("GPS", "Observer added");
 
         observers.add(observer);
     }
 
 
-    public String getPosition(){
-         return this.position;
+    public GeoPoint getPosition(){
+         return position;
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("MY CURRENT LOCATION ", "Location changed called");
-        String loc = "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude();
-        Log.d("MY CURRENT LOCATION ", loc);
+        GeoPoint geoLoc = new GeoPoint(location.getLongitude(), location.getLatitude());
 
-        this.position = loc;
+        this.position = geoLoc;
 
         for(IGPSObserver obs:observers){
-            obs.updateGPSLocation(loc);
+            obs.updateGPSLocation(geoLoc);
         }
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-    Log.d("Latitude","status");
+        for(IGPSObserver obs:observers){
+            obs.notifyStatusChanged(provider, status, extras);
+        }
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.d("Latitude","enable");
+        for(IGPSObserver obs:observers){
+            obs.notifyProviderStatus(true);
+        }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        Log.d("Latitude","disable");
+        for (IGPSObserver obs : observers) {
+            obs.notifyProviderStatus(false);
+        }
     }
 }

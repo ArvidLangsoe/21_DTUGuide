@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.arvid.dtuguide.R;
+import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 
 public class DataTestActivity extends AppCompatActivity implements IGPSObserver {
 
@@ -42,11 +43,19 @@ public class DataTestActivity extends AppCompatActivity implements IGPSObserver 
 
         gps.addObserver(this);
 
-            Log.d("MY CURRENT LOCATION: ", " TEST6");
-
     }
 
-    public void updateGPSLocation(String position) {
-        Log.d("MY CURRENT LOCATION: ", position);
+    public void updateGPSLocation(GeoPoint position) {
+        Log.d("MY CURRENT LOCATION: ", position+"");
+    }
+
+    @Override
+    public void notifyProviderStatus(boolean newStatus) {
+        Log.d("GPS: ", newStatus+"");
+    }
+
+    @Override
+    public void notifyStatusChanged(String provider, int status, Bundle extras) {
+
     }
 }
