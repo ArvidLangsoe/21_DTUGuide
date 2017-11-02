@@ -7,10 +7,20 @@ import android.support.annotation.RequiresApi;
 import java.util.HashMap;
 
 public class LocationDAO {
+
+	public class DAOException extends Exception{
+		public DAOException(String message){super(message);}
+		public String toString(){return getMessage();}
+	}
+
 	private HashMap<String, LocationDTO> locations;
-	
+
 	public LocationDAO(){
-		locations = new HashMap<String, LocationDTO>();
+		try {
+			getLocations();
+		} catch (Exception e) {
+			setLocations(new HashMap<String, LocationDTO>());
+		}
 	}
 
 	private boolean updateData(){
@@ -25,9 +35,12 @@ public class LocationDAO {
 		}
 	}
 
-	public HashMap<String, LocationDTO> getLocations() {
+	public HashMap<String, LocationDTO> getLocations() throws DAOException {
 		locations = FileManager.retrieveData();
-		return locations;
+		if(locations !=null)
+			return locations;
+		else
+			throw new DAOException("Locations can not be found (Null value).");
 	}
 
 	public boolean setLocations(HashMap<String, LocationDTO> locations) {
@@ -35,9 +48,13 @@ public class LocationDAO {
 		return updateData();
 	}
 
-	public LocationDTO getLocation(String name){
-		getLocations();
-		return locations.get(name);
+	public LocationDTO getLocation(String name) throws DAOException {
+		LocationDTO location = locations.get(name);
+
+		if(location!=null)
+			return location;
+		else
+			throw new DAOException("Location "+name+" can not be found (Null value)");
 	}
 
 	public boolean saveLocation(LocationDTO newLocation){

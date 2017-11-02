@@ -63,7 +63,7 @@ public class LocationDTO implements Serializable {
     }
 
     public String toString(){
-        return position+", "+name;
+        return "(Name:"+name+" - Pos:"+position+" - Stage:"+stage+" - Desc:'"+description+"' - Type:"+type+"\n";
     }
 
     public int getStage() {
