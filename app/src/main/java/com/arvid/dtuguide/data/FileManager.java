@@ -1,4 +1,4 @@
-package controller;
+package com.arvid.dtuguide.data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,21 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Hashtable;
-
-import dto.Location;
-
+import java.util.HashMap;
 
 public class FileManager {
 
 	final static String PATH = "";
 
-	/**
-	 * Writes the object data on a specific file.
-	 * @param Hashtable<Double, Location>
-	 * 			Data object which shall be stored
-	 */
-	public static void writeData(Hashtable<String, Location> dto){
+	public static void writeData(HashMap<String, LocationDTO> dto){
 		FileOutputStream f = null;
 		ObjectOutputStream o = null;
 
@@ -55,7 +47,7 @@ public class FileManager {
 	 * Retrieves Data from a specific file.
 	 * @return Retrieved Data
 	 */
-	public static Hashtable<String, Location> retrieveData(){
+	public static HashMap<String, LocationDTO> retrieveData(){
 
 		FileInputStream fi = null;
 		ObjectInputStream oi = null;
@@ -65,7 +57,7 @@ public class FileManager {
 			oi = new ObjectInputStream(fi);
 
 			@SuppressWarnings("unchecked")
-			Hashtable<String, Location> dto = (Hashtable<String, Location>) oi.readObject();
+			HashMap<String, LocationDTO> dto = (HashMap<String, LocationDTO>) oi.readObject();
 
 			return dto;
 
