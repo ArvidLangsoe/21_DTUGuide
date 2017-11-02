@@ -33,12 +33,6 @@ public class GPS implements LocationListener{
 
     private String position;
 
-    @SuppressLint("MissingPermission")
-    public GPS(LocationManager locationManager) {
-        this.locationManager = locationManager;
-
-    }
-
 
     public void addObserver(IGPSObserver observer){
         Log.d("MY CURRENT LOCATION ", "Observer added");
@@ -51,6 +45,7 @@ public class GPS implements LocationListener{
          return this.position;
     }
 
+    @Override
     public void onLocationChanged(Location location) {
         Log.d("MY CURRENT LOCATION ", "Location changed called");
         String loc = "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude();
@@ -63,14 +58,17 @@ public class GPS implements LocationListener{
         }
     }
 
+    @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
     Log.d("Latitude","status");
     }
 
+    @Override
     public void onProviderEnabled(String provider) {
         Log.d("Latitude","enable");
     }
 
+    @Override
     public void onProviderDisabled(String provider) {
         Log.d("Latitude","disable");
     }
