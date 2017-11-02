@@ -4,16 +4,13 @@ package com.arvid.dtuguide.data;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import java.util.Hashtable;
-
-import controller.FileManager;
-import dto.Location;
+import java.util.HashMap;
 
 public class LocationDAO {
-	private Hashtable<String, Location> locations;
+	private HashMap<String, LocationDTO> locations;
 	
 	public LocationDAO(){
-		locations = new Hashtable<String, Location>();
+		locations = new HashMap<String, LocationDTO>();
 	}
 
 	private boolean updateData(){
@@ -28,22 +25,22 @@ public class LocationDAO {
 		}
 	}
 
-	public Hashtable<String, Location> getLocations() {
+	public HashMap<String, LocationDTO> getLocations() {
 		locations = FileManager.retrieveData();
 		return locations;
 	}
 
-	public boolean setLocations(Hashtable<String, Location> locations) {
+	public boolean setLocations(HashMap<String, LocationDTO> locations) {
 		this.locations = locations;
 		return updateData();
 	}
 
-	public Location getLocation(String name){
+	public LocationDTO getLocation(String name){
 		getLocations();
 		return locations.get(name);
 	}
 
-	public boolean saveLocation(Location newLocation){
+	public boolean saveLocation(LocationDTO newLocation){
 		locations.put(newLocation.getName(), newLocation);
 		return updateData();
 	}
@@ -54,7 +51,7 @@ public class LocationDAO {
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.N)
-	public boolean updateLocation(Location newLocation){
+	public boolean updateLocation(LocationDTO newLocation){
 		locations.replace(newLocation.getName(), newLocation);
 		return updateData();
 	}
