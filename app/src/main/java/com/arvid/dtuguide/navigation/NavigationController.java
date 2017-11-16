@@ -1,5 +1,7 @@
 package com.arvid.dtuguide.navigation;
 
+import android.location.Location;
+
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.coordinates.CoordinateConverter;
@@ -9,6 +11,8 @@ import com.arvid.dtuguide.navigation.coordinates.MapPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Created by arvid on 01-11-2017.
@@ -21,6 +25,7 @@ public class NavigationController implements Navigation{
     private CoordinateConverter coorconv;
 
     private LocationDAO dao;
+    private PriorityQueue<LocationDTO> history = new PriorityQueue<LocationDTO>();
 
     public NavigationController(){
     }
@@ -42,6 +47,15 @@ public class NavigationController implements Navigation{
 
     }
 
+    public LocationDTO getLocation(String name) throws LocationDAO.DAOException {
+        LocationDTO dto = dao.getLocation(name);
+
+        history.remove(dto);
+        history.add(dto);
+        
+        return dto;
+    }
+
     public List<LocationDTO> searchMatch(String matchString) throws LocationDAO.DAOException {
         List<LocationDTO> locations = new ArrayList<LocationDTO>();
 
@@ -52,6 +66,16 @@ public class NavigationController implements Navigation{
         }
 
         Collections.sort(locations);
+        return locations;
+    }
+
+    public List<LocationDTO> getHistoryList(){
+        List<LocationDTO> locations = new ArrayList<LocationDTO>();
+
+        for(LocationDTO dto : history){
+            locations.add(dto);
+        }
+
         return locations;
     }
 

@@ -63,5 +63,16 @@ public class NavigationControllerTest {
         } catch (LocationDAO.DAOException e) {
             e.printStackTrace();
         }
+
+        try {
+            controller.getLocation("X 1.84");
+            controller.getLocation("X 1.89");
+            controller.getLocation("X 1.80");
+            controller.getLocation("X 1.80");
+            controller.getLocation("X 1.80");
+            print(controller.getHistoryList()+"");
+        } catch (LocationDAO.DAOException e) {
+            e.printStackTrace();
+        }
     }
 }
