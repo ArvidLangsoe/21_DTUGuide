@@ -1,8 +1,14 @@
 package com.arvid.dtuguide.navigation;
 
+import com.arvid.dtuguide.data.LocationDAO;
+import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.coordinates.CoordinateConverter;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.arvid.dtuguide.navigation.coordinates.MapPoint;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by arvid on 01-11-2017.
@@ -14,8 +20,15 @@ public class NavigationController implements Navigation{
 
     private CoordinateConverter coorconv;
 
+    private LocationDAO dao;
+
     public NavigationController(){
     }
+
+    public NavigationController(LocationDAO dao){
+        this.dao = dao;
+    }
+
 
     public void calibrate(GeoPoint g1, GeoPoint g2,MapPoint m1, MapPoint m2){
         coorconv= new CoordinateConverter(g1,g2,m1,m2);
@@ -28,5 +41,19 @@ public class NavigationController implements Navigation{
         return m;
 
     }
+
+    public List<LocationDTO> searchMatch(String matchString) throws LocationDAO.DAOException {
+        List<LocationDTO> locations = new ArrayList<LocationDTO>();
+
+        for(LocationDTO dto : dao.getLocations().values()){
+            if(dto.getName().matches("(.*)"+matchString+"(.*)")){
+                locations.add(dto);
+            }
+        }
+
+        Collections.sort(locations);
+        return locations;
+    }
+
 
 }
