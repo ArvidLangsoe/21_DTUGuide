@@ -20,6 +20,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!-- START Content Providers -->
+        <provider
+            android:name=".RecentSearchSuggestionProvider"
+            android:authorities="com.arvid.dtuguide.RecentSearchSuggestionProvider" />
+        <provider
+            android:name=".SearchSuggestionProvider"
+            android:authorities="com.arvid.dtuguide.SearchSuggestionProvider" />
+        <!-- END Content Providers -->
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".data.DataTestActivity" />
         <activity
@@ -27,11 +35,14 @@
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme">
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Start Searchable Meta -->
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+            <!-- END Searchable Meta -->
         </activity>
         <activity
             android:name=".BottomNavigationActivity"

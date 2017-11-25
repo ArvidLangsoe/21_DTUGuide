@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         //getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         //getSupportActionBar().setDisplayUseLogoEnabled(true);
 
-        map = (GestureFrameLayout) findViewById(R.id.mapGFL);
+        //map = (GestureFrameLayout) findViewById(R.id.mapGFL);
         map.getController().getSettings()
             .setDoubleTapEnabled(false)
             .setMaxZoom(10f)    ; // Falls back to max zoom level
