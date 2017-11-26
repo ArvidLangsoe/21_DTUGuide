@@ -3,8 +3,10 @@ package com.arvid.dtuguide;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.AppBarLayout;
@@ -22,6 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
+import android.widget.CursorAdapter;
+
+import android.support.v4.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
 
@@ -30,7 +35,6 @@ public class Main2Activity extends AppCompatActivity
     //private Cursor databaseData;
     private String[] columns = new String[] { "_id", "text" };
     private ArrayList<String> rooms;
-    private SearchCursorAdapter sca;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +50,13 @@ public class Main2Activity extends AppCompatActivity
         //databaseHelper.addRoom("X.11");
         //databaseHelper.addRoom("X.12");
         //databaseData = databaseHelper.getRooms();
+
         rooms = new ArrayList<String>();
         rooms.add("X.101");
         rooms.add("V.100");
         rooms.add("U.208");
         rooms.add("Y.319");
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -91,9 +97,10 @@ public class Main2Activity extends AppCompatActivity
         //EditText searchViewPlaceholder = (EditText)
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
+        SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
+
 
         Object[] temp = new Object[] { 0, "default" };
         final MatrixCursor cursor = new MatrixCursor(columns);
@@ -102,14 +109,14 @@ public class Main2Activity extends AppCompatActivity
             temp[1] = rooms.get(i);
             cursor.addRow(temp);
         }
-        sca = new SearchCursorAdapter(this, cursor, rooms);
+        final SearchCursorAdapter sca = new SearchCursorAdapter(this, cursor, rooms);
 
         searchView.setSuggestionsAdapter(sca);
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
         //searchEditText.setDropDownAnchor(R.id.toolbar);
-        //final View dropDownAnchor = findViewById(R.id.anchor_dropdown);
-        //searchEditText.setDropDownWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        searchEditText.setDropDownWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
 
         final View dropDownAnchor = searchView.findViewById(searchEditText.getDropDownAnchor());
 
@@ -144,7 +151,6 @@ public class Main2Activity extends AppCompatActivity
                 return false;
             }
         });
-
         // When suggestion is clicked do something:
         //searchView.setOnSuggestionListener();
 

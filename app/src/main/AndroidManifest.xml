@@ -24,9 +24,11 @@
         <provider
             android:name=".RecentSearchSuggestionProvider"
             android:authorities="com.arvid.dtuguide.RecentSearchSuggestionProvider" />
-        <provider
+        <!--<provider
             android:name=".SearchSuggestionProvider"
             android:authorities="com.arvid.dtuguide.SearchSuggestionProvider" />
+        -->
+
         <!-- END Content Providers -->
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".data.DataTestActivity" />

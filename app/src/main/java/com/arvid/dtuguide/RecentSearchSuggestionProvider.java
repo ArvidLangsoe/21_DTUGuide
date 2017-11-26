@@ -1,6 +1,10 @@
 package com.arvid.dtuguide;
 
+
 import android.content.SearchRecentSuggestionsProvider;
+import android.database.Cursor;
+import android.database.MergeCursor;
+import android.net.Uri;
 
 /**
  * Created by Jeppe on 23-11-2017.
@@ -13,4 +17,6 @@ public class RecentSearchSuggestionProvider extends SearchRecentSuggestionsProvi
     public RecentSearchSuggestionProvider() {
         setupSuggestions(AUTHORITY, MODE);
     }
+
+
 }

@@ -12,10 +12,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME="MyTestDatabase";
-
-    public MyDatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+    public MyDatabaseHelper(Context context, String DatabaseName) {
+        super(context, DatabaseName, null, 1);
     }
 
     @Override
