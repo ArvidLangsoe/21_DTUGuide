@@ -3,14 +3,9 @@ package com.arvid.dtuguide;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,23 +14,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
-import android.widget.CursorAdapter;
-
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.widget.TextView;
-
-import java.util.ArrayList;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    //private Cursor databaseData;
-    private String[] columns = new String[] { "_id", "text" };
-    private ArrayList<String> rooms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,15 +70,28 @@ public class Main2Activity extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
-
-        Intent intent = getIntent();
-        String query = intent.getStringExtra(SearchManager.QUERY);
-        Cursor c = getContentResolver().query(SearchSuggestionProvider.URI, null, null, new String[] { query }, null);
+        Cursor c = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //c.moveToFirst();
 
-        searchView.setSuggestionsAdapter(new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c,0));
+        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
-        //searchView.setOnQueryTextListener();
+        searchView.setSuggestionsAdapter(adapter);
+
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                adapter.runQueryOnBackgroundThread(query.toString());
+                return true;
+            }
+        });
 
         return true;
     }

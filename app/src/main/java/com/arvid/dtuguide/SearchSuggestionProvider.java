@@ -15,24 +15,24 @@ import android.provider.BaseColumns;
 public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
     public static final String AUTHORITY = "com.arvid.dtuguide.SearchSuggestionProvider";
     public static final int MODE = DATABASE_MODE_QUERIES;
-    public static final Uri URI = Uri.parse("content://" + SearchSuggestionProvider.AUTHORITY + "/" + SearchManager.SUGGEST_URI_PATH_QUERY);
+    public static final Uri CONTENT_URI = Uri.parse("content://" + SearchSuggestionProvider.AUTHORITY + "/" + SearchManager.SUGGEST_URI_PATH_QUERY);
     public String[] customSearchResults;
 
     public SearchSuggestionProvider() {
         setupSuggestions(AUTHORITY, MODE);
 
-        customSearchResults = new String[] { "X.101" };
+        customSearchResults = new String[] { "X.101", "X.102", "V.242", "V.100" };
     }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         final Cursor recentsCursor = super.query(uri, projection, selection, selectionArgs, sortOrder);
-        final Cursor customResultsCursor = queryCache(recentsCursor, selectionArgs[0]);
+        final Cursor customResultsCursor = queryCache(recentsCursor);
         return new MergeCursor(new Cursor[]{recentsCursor, customResultsCursor});
     }
 
-    private Cursor queryCache(Cursor recentsCursor, String userQuery) {
+    private Cursor queryCache(Cursor recentsCursor) {
         final MatrixCursor arrayCursor = new MatrixCursor(recentsCursor.getColumnNames());
 
         final int formatColumnIndex = recentsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_FORMAT);
