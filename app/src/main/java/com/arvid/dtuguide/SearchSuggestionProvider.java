@@ -2,11 +2,13 @@ package com.arvid.dtuguide;
 
 import android.app.SearchManager;
 import android.content.SearchRecentSuggestionsProvider;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.net.Uri;
-import android.provider.BaseColumns;
+import android.provider.SearchRecentSuggestions;
+import android.util.Log;
 
 /**
  * Created by Jeppe on 25-11-2017.
@@ -16,12 +18,13 @@ public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
     public static final String AUTHORITY = "com.arvid.dtuguide.SearchSuggestionProvider";
     public static final int MODE = DATABASE_MODE_QUERIES;
     public static final Uri CONTENT_URI = Uri.parse("content://" + SearchSuggestionProvider.AUTHORITY + "/" + SearchManager.SUGGEST_URI_PATH_QUERY);
-    public String[] customSearchResults;
+    private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    public String[] customSearchSuggestions;
 
     public SearchSuggestionProvider() {
         setupSuggestions(AUTHORITY, MODE);
 
-        customSearchResults = new String[] { "X.101", "X.102", "V.242", "V.100" };
+        customSearchSuggestions = new String[] { "X 101", "X 102", "V 242", "V 100", "A 371" };
     }
 
     @Override
@@ -29,6 +32,14 @@ public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
                         String[] selectionArgs, String sortOrder) {
         final Cursor recentsCursor = super.query(uri, projection, selection, selectionArgs, sortOrder);
         final Cursor customResultsCursor = queryCache(recentsCursor);
+
+        String query = selectionArgs[0];
+        /*
+        if (query == null || query.length() == 0) {
+            return recentsCursor;
+        }
+        */
+
         return new MergeCursor(new Cursor[]{recentsCursor, customResultsCursor});
     }
 
@@ -46,12 +57,12 @@ public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
         // Populate data here
         int startId = Integer.MAX_VALUE;
 
-        for (String customSearchResult : customSearchResults) {
+        for (String dataContent : customSearchSuggestions) {
             final Object[] newRow = new Object[columnCount];
             if (formatColumnIndex >= 0) newRow[formatColumnIndex] = 0;
             if (iconColumnIndex >= 0) newRow[iconColumnIndex] = null;
-            if (textColumnIndex >= 0) newRow[textColumnIndex] = customSearchResult;
-            if (queryColumnIndex >= 0) newRow[queryColumnIndex] = customSearchResult;
+            if (textColumnIndex >= 0) newRow[textColumnIndex] = dataContent;
+            //if (queryColumnIndex >= 0) newRow[queryColumnIndex] = dataContent;
             newRow[idIndex] = startId--;
             arrayCursor.addRow(newRow);
         }

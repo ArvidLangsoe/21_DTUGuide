@@ -23,12 +23,12 @@ import java.util.List;
 public class SearchCursorAdapter extends ResourceCursorAdapter {
 
     private Context context;
-    private Cursor cursor;
+    //private Cursor cursor;
 
     public SearchCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
         super(context, layout, cursor, flags);
         this.context = context;
-        this.cursor = cursor;
+        //this.cursor = cursor;
     }
 
 
@@ -52,6 +52,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
 
+        /*
         StringBuilder buffer = null;
         String[] args = null;
         if (constraint != null) {
@@ -63,12 +64,22 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
 
         }
+        */
+        String[] projection = { "_id", SearchManager.SUGGEST_COLUMN_TEXT_1 };
 
         //return context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null,
         //        buffer == null ? null : buffer.toString(), args, null);
 
-        return context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null,
-                null, new String[] { constraint.toString().toLowerCase() }, null);
+        Cursor cursor = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null,
+                SearchManager.SUGGEST_COLUMN_TEXT_1 + " MATCH ?", new String[] { constraint.toString().toLowerCase() }, null);
+
+        if (cursor == null) {
+            return null;
+        } else if (!cursor.moveToFirst()) {
+            cursor.close();
+            return null;
+        }
+        return cursor;
 
         //return cursor;
     }
