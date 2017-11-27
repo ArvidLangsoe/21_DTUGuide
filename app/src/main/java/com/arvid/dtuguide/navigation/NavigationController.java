@@ -25,7 +25,7 @@ public class NavigationController implements Navigation{
     private CoordinateConverter coorconv;
 
     private LocationDAO dao;
-    private PriorityQueue<LocationDTO> history = new PriorityQueue<LocationDTO>();
+    private List<LocationDTO> locations = new ArrayList<LocationDTO>();
 
     public NavigationController(){
     }
@@ -50,9 +50,14 @@ public class NavigationController implements Navigation{
     public LocationDTO getLocation(String name) throws LocationDAO.DAOException {
         LocationDTO dto = dao.getLocation(name);
 
-        history.remove(dto);
-        history.add(dto);
-        
+        if(locations.contains(dto))
+            locations.remove(dto);
+
+        else if(locations.size()==10)
+            locations.remove(locations.get(0));
+
+        locations.add(dto);
+
         return dto;
     }
 
@@ -70,11 +75,7 @@ public class NavigationController implements Navigation{
     }
 
     public List<LocationDTO> getHistoryList(){
-        List<LocationDTO> locations = new ArrayList<LocationDTO>();
-
-        for(LocationDTO dto : history){
-            locations.add(dto);
-        }
+        Collections.reverse(locations);
 
         return locations;
     }

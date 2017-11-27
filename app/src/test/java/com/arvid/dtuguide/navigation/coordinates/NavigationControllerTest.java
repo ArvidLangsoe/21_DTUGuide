@@ -37,11 +37,6 @@ public class NavigationControllerTest {
                 .description("This is a simple Canteen")
         ));
 
-        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
-                "X 1.89",
-                new GeoPoint(32332.32323, 991132.35556),
-                0)
-        ));
 
         dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
                 "X 1.80",
@@ -51,9 +46,80 @@ public class NavigationControllerTest {
         ));
 
         dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.81",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.82",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.83",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
                 "X 1.84",
                 new GeoPoint(32332.32323, 991132.35556),
                 0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.85",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.86",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.87",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.88",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.89",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.90",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
+        ));
+
+        dao.saveLocation(new LocationDTO(new LocationDTO.LocationBuilder(
+                "X 1.91",
+                new GeoPoint(32332.32323, 991132.35556),
+                0)
+                .description("Aud X1.80")
         ));
 
         NavigationController controller = new NavigationController(dao);
@@ -65,12 +131,22 @@ public class NavigationControllerTest {
         }
 
         try {
+            controller.getLocation("X 1.80");
+            controller.getLocation("X 1.81");
+            controller.getLocation("X 1.82");
+            controller.getLocation("X 1.83");
             controller.getLocation("X 1.84");
+            controller.getLocation("X 1.85");
+            controller.getLocation("X 1.86");
+            controller.getLocation("X 1.87");
+            controller.getLocation("X 1.88");
             controller.getLocation("X 1.89");
-            controller.getLocation("X 1.80");
-            controller.getLocation("X 1.80");
-            controller.getLocation("X 1.80");
+            controller.getLocation("X 1.90");
+            controller.getLocation("X 1.91");
+            controller.getLocation("X 1.85");
+            controller.getLocation("X 1.90");
             print(controller.getHistoryList()+"");
+            print(""+controller.getHistoryList().size());
         } catch (LocationDAO.DAOException e) {
             e.printStackTrace();
         }
