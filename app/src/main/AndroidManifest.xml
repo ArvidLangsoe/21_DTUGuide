@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <!-- START Content Providers -->
-
+        <provider android:name=".SearchSuggestionProvider"
+            android:authorities="com.arvid.dtuguide.SearchSuggestionProvider" />
 
         <!-- END Content Providers -->
         <activity android:name=".data.DataTestActivity" />

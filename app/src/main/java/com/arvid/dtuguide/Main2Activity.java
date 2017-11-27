@@ -44,19 +44,14 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Test Database
-        //MyDatabaseHelper databaseHelper = new MyDatabaseHelper(this);
-        //databaseHelper.deleteAll();
-        //databaseHelper.addRoom("X.10");
-        //databaseHelper.addRoom("X.11");
-        //databaseHelper.addRoom("X.12");
-        //databaseData = databaseHelper.getRooms();
+        Intent intent  = getIntent();
 
-        rooms = new ArrayList<String>();
-        rooms.add("X.101");
-        rooms.add("V.100");
-        rooms.add("U.208");
-        rooms.add("Y.319");
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
+        }
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -67,26 +62,6 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Uri uri = getIntent().getData();
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-
-        if (cursor == null) {
-            finish();
-        } else {
-            cursor.moveToFirst();
-
-            TextView word = (TextView) findViewById(R.id.textView1);
-            TextView definition = (TextView) findViewById(R.id.textView2);
-
-            int wIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_WORD);
-            int dIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_DEFINITION);
-
-            word.setText(cursor.getString(wIndex));
-            definition.setText(cursor.getString(dIndex));
-        }
-
-
     }
 
     @Override
@@ -110,6 +85,16 @@ public class Main2Activity extends AppCompatActivity
         SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
+
+
+        Intent intent = getIntent();
+        String query = intent.getStringExtra(SearchManager.QUERY);
+        Cursor c = getContentResolver().query(SearchSuggestionProvider.URI, null, null, new String[] { query }, null);
+        //c.moveToFirst();
+
+        searchView.setSuggestionsAdapter(new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c,0));
+
+        //searchView.setOnQueryTextListener();
 
         return true;
     }
