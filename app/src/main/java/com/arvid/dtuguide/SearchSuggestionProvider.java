@@ -20,66 +20,17 @@ public class SearchSuggestionProvider extends ContentProvider {
     public static final String AUTHORITY = "com.arvid.dtuguide.SearchSuggestionProvider";
     public static final Uri ROOMS_URI = Uri.parse("content://" + AUTHORITY + "/rooms");
 
-    private static final UriMatcher MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-
-    private static HashMap<String, String> ROOMS_PROJECTION_MAP;
-
-    private static final int CODE_ROOMS_DIR = 1;
-    private static final int CODE_ROOMS_ITEM = 2;
-
-    static {
-        MATCHER.addURI(AUTHORITY, "rooms", CODE_ROOMS_DIR);
-        MATCHER.addURI(AUTHORITY, "rooms/#", CODE_ROOMS_ITEM);
-    }
-
-    /* Database variables */
-    private MyDatabaseHelper databaseHelper;
-    private static final String DBNAME = "places";
-    private SQLiteDatabase db;
-    private static final String ROOMS_TABLE_NAME = "rooms";
 
     @Override
     public boolean onCreate() {
-        databaseHelper = new MyDatabaseHelper(
-                getContext(),
-                DBNAME
-        );
-        databaseHelper.addRoom("X.101");
-        databaseHelper.addRoom("X.102");
-        databaseHelper.addRoom("V.101");
-        databaseHelper.addRoom("V.102");
+
         return true;
     }
 
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(ROOMS_TABLE_NAME);
-
-        switch (MATCHER.match(uri)) {
-            case CODE_ROOMS_DIR:
-                //qb.setProjectionMap(ROOMS_PROJECTION_MAP);
-                break;
-            case CODE_ROOMS_ITEM:
-                //qb.appendWhere("_id=" + uri.getPathSegments().get(1));
-                break;
-            default:
-                // error handling
-                break;
-        }
-
-        if (sortOrder == null || sortOrder == ""){
-            /**
-             * By default sort on student names
-             */
-            sortOrder = "name";
-        }
-
-        Cursor cursor = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder);
-
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
-        return cursor;
+        return null;
     }
 
     @Nullable

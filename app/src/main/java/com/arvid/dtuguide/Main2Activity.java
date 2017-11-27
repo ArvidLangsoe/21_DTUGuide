@@ -27,6 +27,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CursorAdapter;
 
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -66,15 +67,24 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        /*
-        Intent intent  = getIntent();
 
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                    RecentSearchSuggestionProvider.AUTHORITY, RecentSearchSuggestionProvider.MODE);
-            suggestions.saveRecentQuery(query, null);
-        }*/
+        Uri uri = getIntent().getData();
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+
+        if (cursor == null) {
+            finish();
+        } else {
+            cursor.moveToFirst();
+
+            TextView word = (TextView) findViewById(R.id.textView1);
+            TextView definition = (TextView) findViewById(R.id.textView2);
+
+            int wIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_WORD);
+            int dIndex = cursor.getColumnIndexOrThrow(DictionaryDatabase.KEY_DEFINITION);
+
+            word.setText(cursor.getString(wIndex));
+            definition.setText(cursor.getString(dIndex));
+        }
 
 
     }
@@ -100,59 +110,6 @@ public class Main2Activity extends AppCompatActivity
         SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
-
-
-        Object[] temp = new Object[] { 0, "default" };
-        final MatrixCursor cursor = new MatrixCursor(columns);
-        for (int i = 0; i < rooms.size(); i++) {
-            temp[0] = i;
-            temp[1] = rooms.get(i);
-            cursor.addRow(temp);
-        }
-        final SearchCursorAdapter sca = new SearchCursorAdapter(this, cursor, rooms);
-
-        searchView.setSuggestionsAdapter(sca);
-        int searchEditTextId = R.id.search_src_text;
-        final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
-        //searchEditText.setDropDownAnchor(R.id.toolbar);
-
-        searchEditText.setDropDownWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        final View dropDownAnchor = searchView.findViewById(searchEditText.getDropDownAnchor());
-
-        if (dropDownAnchor != null) {
-            dropDownAnchor.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom,
-                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
-
-                    int width = findViewById(R.id.anchor_dropdown).getWidth();
-                    searchEditText.setDropDownWidth(width);
-
-                }
-            });
-        }
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (!TextUtils.isEmpty(query)) {
-                    sca.getFilter().filter(query.toString());
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (!TextUtils.isEmpty(newText)) {
-                    sca.getFilter().filter(newText.toString());
-                    return true;
-                }
-                return false;
-            }
-        });
-        // When suggestion is clicked do something:
-        //searchView.setOnSuggestionListener();
 
         return true;
     }
