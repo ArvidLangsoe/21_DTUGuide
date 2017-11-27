@@ -22,6 +22,8 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
         <activity android:name=".data.DataTestActivity">
+        </activity>
+        <activity android:name=".data.FireBaseActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

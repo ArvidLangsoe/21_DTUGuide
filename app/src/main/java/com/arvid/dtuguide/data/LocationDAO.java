@@ -4,6 +4,8 @@ package com.arvid.dtuguide.data;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
+
 import java.util.HashMap;
 
 public class LocationDAO {
@@ -21,6 +23,35 @@ public class LocationDAO {
 		} catch (Exception e) {
 			setLocations(new HashMap<String, LocationDTO>());
 		}
+	}
+
+	public LocationDTO parseToDTO(String string){
+		LocationDTO dto;
+
+		String[] info = string.split(";");
+		String name = info[0];
+		double l1 = Double.parseDouble((info[1].split("-"))[0]);
+		double l2 = Double.parseDouble((info[1].split("-"))[1]);
+		GeoPoint position = new GeoPoint(l1, l2);
+		int stage = Integer.parseInt(info[2]);
+		String description = info[3];
+
+		LocationDTO.MARKTYPE type;
+
+		if(!info[4].equals("null"))
+			type = LocationDTO.MARKTYPE.valueOf(info[4]);
+		else
+			type = null;
+
+		dto = new LocationDTO(new LocationDTO.LocationBuilder(
+				name,
+				position,
+				stage)
+				.description(description)
+				.type(type));
+
+
+		return dto;
 	}
 
 	private boolean updateData(){
