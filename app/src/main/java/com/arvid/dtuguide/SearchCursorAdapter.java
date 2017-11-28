@@ -71,17 +71,9 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         //        buffer == null ? null : buffer.toString(), args, null);
 
         Cursor cursor = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null,
-                SearchManager.SUGGEST_COLUMN_TEXT_1 + " MATCH ?", new String[] { constraint.toString().toLowerCase() }, null);
+                null, new String[] { constraint.toString().toLowerCase() }, null);
 
-        if (cursor == null) {
-            return null;
-        } else if (!cursor.moveToFirst()) {
-            cursor.close();
-            return null;
-        }
         return cursor;
-
-        //return cursor;
     }
 
     /*

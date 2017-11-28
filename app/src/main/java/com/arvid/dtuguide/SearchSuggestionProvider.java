@@ -59,10 +59,10 @@ public class SearchSuggestionProvider extends SearchRecentSuggestionsProvider {
 
         for (String dataContent : customSearchSuggestions) {
             final Object[] newRow = new Object[columnCount];
-            if (formatColumnIndex >= 0) newRow[formatColumnIndex] = 0;
-            if (iconColumnIndex >= 0) newRow[iconColumnIndex] = null;
-            if (textColumnIndex >= 0) newRow[textColumnIndex] = dataContent;
-            //if (queryColumnIndex >= 0) newRow[queryColumnIndex] = dataContent;
+            newRow[formatColumnIndex] = 0;
+            newRow[iconColumnIndex] = null;
+            newRow[textColumnIndex] = dataContent;
+            newRow[queryColumnIndex] = dataContent;
             newRow[idIndex] = startId--;
             arrayCursor.addRow(newRow);
         }
