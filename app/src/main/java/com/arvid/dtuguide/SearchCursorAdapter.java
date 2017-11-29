@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,19 +36,17 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         TextView name = (TextView) view.findViewById(R.id.textView2);
         //name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-        //name.setText(cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_TEXT_1)));
-        name.setText("-");
+        name.setText(cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_TEXT_1)));
+        //name.setText("-");
 
         ImageView image = (ImageView) view.findViewById(R.id.imageView1);
-        //image.setImageResource(cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1)));
-        /*
-        if((cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1))) == null) {
-            image.setImageResource(R.drawable.ic_room_black_24dp);
-        }
-        else {
+        image.setImageResource(cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1)));
+
+
+        if((cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1))) == 0) {
             image.setImageResource(R.drawable.ic_history_black_24dp);
         }
-        */
+
     }
 
     @Override
@@ -63,6 +62,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
         return mergedCursor;
     }
+
 
     /*
     @Override

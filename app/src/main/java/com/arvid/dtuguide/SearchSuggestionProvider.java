@@ -94,9 +94,31 @@ public class SearchSuggestionProvider extends ContentProvider {
         }
 
         //TODO: Ændre nuværende cursor til en cursor magen til SearchRecentSuggestionsProvider
+        Cursor recentsCursor = getContext().getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, projection, suggestSelection, new String[] { "" }, null);
+
+        String[] columnNames = recentsCursor.getColumnNames();
+        int columnCount = recentsCursor.getColumnCount();
+        MatrixCursor newCursor = new MatrixCursor(columnNames , 1);
+
+
+        Cursor roomsCursor = db.query("rooms", projection, suggestSelection, myArgs, null, null, "name COLLATE NOCASE", null);
+
+        final int textColumnIndex = recentsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1);
+        //final int queryColumnIndex = recentsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY);
+        final int iconColumnIndex = recentsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_ICON_1);
+        final int idIndex = recentsCursor.getColumnIndex("_id");
+        int startId = Integer.MAX_VALUE;
+
+        while (roomsCursor.moveToNext()) {
+            Object[] newRow = new Object[columnCount];
+            newRow[textColumnIndex] = roomsCursor.getString(roomsCursor.getColumnIndex("name"));
+            newRow[iconColumnIndex] = R.drawable.ic_room_black_24dp;
+            newRow[idIndex] = startId--;
+            newCursor.addRow(newRow);
+        }
 
         // call the code to actually do the query
-        return db.query("rooms", projection, suggestSelection, myArgs, null, null, "name COLLATE NOCASE", null);
+        return newCursor;
     }
 
     @Nullable
