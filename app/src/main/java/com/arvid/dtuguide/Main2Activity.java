@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
@@ -33,7 +34,7 @@ public class Main2Activity extends AppCompatActivity
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                    SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
+                    RecentSearchSuggestionProvider.AUTHORITY, RecentSearchSuggestionProvider.MODE);
             suggestions.saveRecentQuery(query, null);
         }
 
@@ -70,10 +71,11 @@ public class Main2Activity extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
-        Cursor c = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
-        //c.moveToFirst();
+        Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
+        //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
+        //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
 
-        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
+        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, cursorRecent, 0);
 
         searchView.setSuggestionsAdapter(adapter);
 
@@ -88,7 +90,7 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String query) {
-                adapter.runQueryOnBackgroundThread(query.toString());
+                adapter.runQueryOnBackgroundThread(query);
                 return true;
             }
         });

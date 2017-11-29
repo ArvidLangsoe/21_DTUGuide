@@ -3,6 +3,7 @@ package com.arvid.dtuguide;
 import android.app.SearchManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.LayoutInflater;
@@ -23,57 +24,44 @@ import java.util.List;
 public class SearchCursorAdapter extends ResourceCursorAdapter {
 
     private Context context;
-    //private Cursor cursor;
 
     public SearchCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
         super(context, layout, cursor, flags);
         this.context = context;
-        //this.cursor = cursor;
     }
 
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView name = (TextView) view.findViewById(R.id.textView2);
-        name.setText(cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_TEXT_1)));
+        //name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+        //name.setText(cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_TEXT_1)));
+        name.setText("-");
 
         ImageView image = (ImageView) view.findViewById(R.id.imageView1);
         //image.setImageResource(cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1)));
-
+        /*
         if((cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1))) == null) {
             image.setImageResource(R.drawable.ic_room_black_24dp);
         }
         else {
             image.setImageResource(R.drawable.ic_history_black_24dp);
         }
+        */
     }
 
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
 
-        /*
-        StringBuilder buffer = null;
-        String[] args = null;
-        if (constraint != null) {
+        Cursor cursorRecent = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
+        Cursor cursorRooms = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
+        Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
 
-            buffer = new StringBuilder();
-            //buffer.append(query);
-            //buffer.append(constraint.toString());
-            args = new String[] { constraint.toString().toLowerCase() };
+        //Cursor cursor = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null,
+            //    null, new String[] { constraint.toString().toLowerCase() }, null);
 
-
-        }
-        */
-        String[] projection = { "_id", SearchManager.SUGGEST_COLUMN_TEXT_1 };
-
-        //return context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null,
-        //        buffer == null ? null : buffer.toString(), args, null);
-
-        Cursor cursor = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null,
-                null, new String[] { constraint.toString().toLowerCase() }, null);
-
-        return cursor;
+        return mergedCursor;
     }
 
     /*
