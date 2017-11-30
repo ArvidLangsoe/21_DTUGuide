@@ -47,6 +47,7 @@ public class Main2Activity extends AppCompatActivity
     private LocationDAO dao;
     private NavigationController controller;
     private MatrixCursor roomsCursor;
+    private List<String> historyList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +66,6 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dao = new LocationDAO();
-        controller = new NavigationController(dao);
-
-        updateData();
-
     }
 
     public void extraFunc(){
@@ -85,15 +81,7 @@ public class Main2Activity extends AppCompatActivity
             //throw new RuntimeException(e);
         }
 
-        List<String> historyList = controller.getHistoryList();
-        int id = 0;
-        roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
-        for(String name : historyList) {
-            Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-            Object[] obj = { id, name };
-            id++;
-            roomsCursor.addRow(obj);
-        }
+
     }
 
     public void updateData(){
@@ -137,6 +125,19 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        dao = new LocationDAO();
+        controller = new NavigationController(dao);
+
+        updateData();
+        historyList = controller.getHistoryList();
+        int id = 0;
+        roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
+        for(String name : historyList) {
+            Object[] obj = { id, name };
+            id++;
+            roomsCursor.addRow(obj);
+        }
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.topbar, menu);
 
@@ -150,8 +151,8 @@ public class Main2Activity extends AppCompatActivity
         //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-
-        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, roomsCursor, 0);
+        System.out.println("CURSORMENU" + roomsCursor);
+        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, roomsCursor, historyList, 0);
 
         searchView.setSuggestionsAdapter(adapter);
         /*
@@ -163,11 +164,12 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String query) {
-                adapter.runQueryOnBackgroundThread(query);
+                adapter.getFilter().filter(query);
                 return true;
             }
         });
         */
+
 
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);

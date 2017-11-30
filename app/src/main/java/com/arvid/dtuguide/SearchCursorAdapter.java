@@ -25,11 +25,12 @@ import java.util.List;
 
 public class SearchCursorAdapter extends ResourceCursorAdapter {
 
-    private Context context;
+    List<String> list;
+    List<String> items;
 
-    public SearchCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
+    public SearchCursorAdapter(Context context, int layout, Cursor cursor, List<String> list, int flags) {
         super(context, layout, cursor, flags);
-        this.context = context;
+        this.list = list;
     }
 
 
@@ -57,25 +58,27 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
                 constraint = constraint.toString().toLowerCase();
                 FilterResults result = new FilterResults();
 
-                /*
+
                 if (constraint != null
                         && constraint.toString().length() > 0) {
                     List<String> founded = new ArrayList<String>();
-                    for (int i = 0, l = orig.size(); i < l; i++) {
-                        if (orig.get(i)
+                    int i = 0;
+                    for (String s : list) {
+                        if (list.get(i)
                                 .toString()
                                 .toLowerCase()
-                                .startsWith(
+                                .contains(
                                         constraint.toString().toLowerCase()))
-                            founded.add(orig.get(i));
+                            founded.add(list.get(i));
+                        i++;
                     }
 
                     result.values = founded;
                     result.count = founded.size();
                 } else {
                     synchronized (this) {
-                        result.values = orig;
-                        result.count = orig.size();
+                        result.values = list;
+                        result.count = list.size();
                     }
 
                 }
@@ -87,11 +90,11 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
             @Override
             protected void publishResults(CharSequence constraint,
                                           FilterResults results) {
-                /*
-                items.clear();
+
+                //items.clear();
                 //items = new ArrayList<String>();
                 //items = (ArrayList<String>) results.values;
-                items.addAll((ArrayList<String>) results.values);
+                //items.addAll((ArrayList<String>) results.values);
                 notifyDataSetChanged();
 
             }
