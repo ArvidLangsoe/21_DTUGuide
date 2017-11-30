@@ -21,6 +21,19 @@ import android.widget.TextView;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.navigation.NavigationController;
+import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -29,7 +42,12 @@ import org.w3c.dom.Text;
 import java.util.List;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
+
+    private GoogleMap mMap;
+
+    private Marker currentMarker;
+    private GroundOverlay ballerupMap;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
@@ -57,7 +75,9 @@ public class Main2Activity extends AppCompatActivity
 
         MapActivity fragment = new MapActivity();
 
-        //getSupportFragmentManager().beginTransaction().add(R,fragment).commit();
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -183,5 +203,46 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+
+        //Delete this for drawn map
+        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setIndoorEnabled(false);
+
+        mMap.setMinZoomPreference(16);
+        mMap.setMaxZoomPreference(20);
+
+        // Add a marker in Sydney and move the camera
+        LatLng ballerupSW = new LatLng(55.730327, 12.393678);
+        LatLng ballerupNE = new LatLng(55.732781, 12.401019);
+
+        LatLng ballerupCenter = new LatLng(55.731543, 12.396680);
+
+
+        LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW,ballerupNE);
+
+        currentMarker=mMap.addMarker(new MarkerOptions().position(ballerupCenter).title("Ballerup Campus"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter,16f));
+
+        GroundOverlayOptions options =new GroundOverlayOptions();
+        options.image(BitmapDescriptorFactory.fromResource(R.drawable.low_res_dtu_map)).positionFromBounds(ballerupBounds);
+        ballerupMap = googleMap.addGroundOverlay(options);
+
+
+        showLocation(new GeoPoint(12.395511,55.731598));
+    }
+
+    public void showLocation(GeoPoint point){
+        currentMarker.remove();
+        LatLng myPoint = new LatLng(point.getLat(),point.getLong());
+        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title("Some Point"));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
+
     }
 }
