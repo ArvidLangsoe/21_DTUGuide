@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
@@ -33,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Main2Activity extends AppCompatActivity
@@ -110,20 +112,28 @@ public class Main2Activity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.topbar, menu);
 
         //EditText searchViewPlaceholder = (EditText)
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
         SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
         //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
-        Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
+        //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
+        List<LocationDTO> historyList = controller.getHistoryList();
+        int id = 0;
+        MatrixCursor roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
+        for(LocationDTO dto : historyList) {
+            Object[] obj = { id, dto.getName() };
+            id++;
+            roomsCursor.addRow(obj);
+        }
 
-        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, cursorRooms, 0);
+        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, roomsCursor, 0);
 
         searchView.setSuggestionsAdapter(adapter);
-
+        /*
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -136,6 +146,7 @@ public class Main2Activity extends AppCompatActivity
                 return true;
             }
         });
+        */
 
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);

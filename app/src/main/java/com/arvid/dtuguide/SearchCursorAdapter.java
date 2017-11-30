@@ -37,20 +37,17 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         TextView name = (TextView) view.findViewById(R.id.textView2);
         //name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-        name.setText(cursor.getString(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_TEXT_1)));
+        name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
         //name.setText("-");
 
-        ImageView image = (ImageView) view.findViewById(R.id.imageView1);
-        image.setImageResource(cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1)));
 
+        //ImageView image = (ImageView) view.findViewById(R.id.imageView1);
+        //image.setImageResource(cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1)));
 
-        if((cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1))) == 0) {
-            image.setImageResource(R.drawable.ic_history_black_24dp);
-        }
 
     }
 
-
+    /*
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -82,7 +79,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
                     }
 
                 }
-                */
+
                 return result;
 
             }
@@ -96,9 +93,10 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
                 //items = (ArrayList<String>) results.values;
                 items.addAll((ArrayList<String>) results.values);
                 notifyDataSetChanged();
-                */
+
             }
 
         };
     }
+    */
 }
