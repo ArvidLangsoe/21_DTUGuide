@@ -46,7 +46,6 @@ public class NavigationController implements Navigation{
 
     public NavigationController(LocationDAO dao){
         this.dao = dao;
-
         updateDataFromFireBase();
     }
 
@@ -106,7 +105,7 @@ public class NavigationController implements Navigation{
         List<String> locations = new ArrayList<String>();
 
         for(LocationDTO dto : dao.getLocations().values()){
-            if(dto.getName().matches("(.*)"+matchString+"(.*)")){
+            if(dto.getName().toLowerCase().matches("(.*)"+matchString+"(.*)")){
                 locations.add(dto.getName());
             }
         }

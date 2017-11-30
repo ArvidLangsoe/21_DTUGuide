@@ -24,9 +24,11 @@ import java.util.List;
  */
 
 public class SearchCursorAdapter extends ResourceCursorAdapter {
+    private Context context;
 
     public SearchCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
         super(context, layout, cursor, flags);
+        this.context = context;
     }
 
 
@@ -43,6 +45,22 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
 
     }
+
+    @Override
+    public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+        if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
+
+        //Cursor cursorRecent = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
+        //Cursor cursorRooms = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
+        //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
+
+        //Cursor cursor = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null,
+        //    null, new String[] { constraint.toString().toLowerCase() }, null);
+        Cursor cursor = context.getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase()}, null);
+
+        return cursor;
+    }
+
 
     /*
     @Override

@@ -2,6 +2,7 @@ package com.arvid.dtuguide;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
@@ -29,7 +30,9 @@ import java.util.List;
 
 public class Provider extends ContentProvider {
     public static final String AUTHORITY = "com.arvid.dtuguide.Provider";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/rooms");
+    public static final String CONTENT_URL = "content://" + AUTHORITY + "/rooms/";
+    public static final Uri CONTENT_URI = Uri.parse(CONTENT_URL);
+
 
     private static final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private static DatabaseReference myRef = database.getReference("Locations");
@@ -38,28 +41,32 @@ public class Provider extends ContentProvider {
     private static NavigationController controller;
     private List<String> historyList;
 
+
     @Override
     public boolean onCreate() {
         dao = new LocationDAO();
         controller = new NavigationController(dao);
-        updateData();
-        try {
-
-            controller.getLocation("X1.81");
-            System.out.println("HISTORY:"+ controller.getHistoryList());
-        } catch (LocationDAO.DAOException e) {
-            e.printStackTrace();
-        }
-        historyList = controller.getHistoryList();
         return true;
     }
 
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        try {
+            controller.getLocation("X1.81");
+        } catch (LocationDAO.DAOException e) {
+            e.printStackTrace();
+        }
         historyList = controller.getHistoryList();
 
-        String search=uri.getPath();
+/*
+        historyList = new ArrayList<String>();
+        historyList.add("room1");
+        historyList.add("room2");
+*/
+        System.out.println("LISTX: "+ historyList);
+        String search=selectionArgs[0];
+
         int id = 0;
         MatrixCursor roomsCursor = new MatrixCursor(new String[]{"_id", "name"});
 
@@ -73,6 +80,7 @@ public class Provider extends ContentProvider {
         else{
             try {
                 List<String> myList =controller.searchMatch(search);
+
                 for (String name :  myList) {
                     Object[] obj = {id, name};
                     id++;
@@ -108,29 +116,5 @@ public class Provider extends ContentProvider {
         return 0;
     }
 
-    public void updateData(){
 
-        myRef.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
-
-                dao.setLocations(new HashMap<String, LocationDTO>());
-
-                for(String location : map){
-                    dao.saveLocation((dao.parseToDTO(location)));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
@@ -94,13 +95,11 @@ public class Main2Activity extends AppCompatActivity
         //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-        Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, null, null);
-        c.moveToNext();
-        System.out.println("CURSOR_C "+ c.getString(1));
+        Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] {""}, null);
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
-        /*
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -109,11 +108,11 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public boolean onQueryTextChange(String query) {
-                adapter.getFilter().filter(query);
+                adapter.runQueryOnBackgroundThread(query);
                 return true;
             }
         });
-        */
+
 
 
         int searchEditTextId = R.id.search_src_text;
