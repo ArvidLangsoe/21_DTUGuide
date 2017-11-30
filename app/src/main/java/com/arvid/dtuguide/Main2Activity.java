@@ -21,8 +21,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 
+import com.arvid.dtuguide.data.LocationDAO;
+import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.navigation.NavigationController;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference("Locations");
+    public static final String TAG = "";
+    private LocationDAO dao;
+    private NavigationController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +60,38 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        dao = new LocationDAO();
+        controller = new NavigationController(dao);
+
+        updateData();
+    }
+
+    public void updateData(){
+
+        myRef.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+
+                GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
+                ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
+
+                dao.setLocations(new HashMap<String, LocationDTO>());
+
+                for(String location : map){
+                    dao.saveLocation((dao.parseToDTO(location)));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
     }
 
     @Override
