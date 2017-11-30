@@ -25,7 +25,7 @@ public class NavigationController implements Navigation{
     private CoordinateConverter coorconv;
 
     private LocationDAO dao;
-    private List<LocationDTO> historyList = new ArrayList<LocationDTO>();
+    private List<String> historyList = new ArrayList<String>();
 
     public NavigationController(){
     }
@@ -50,23 +50,23 @@ public class NavigationController implements Navigation{
     public LocationDTO getLocation(String name) throws LocationDAO.DAOException {
         LocationDTO dto = dao.getLocation(name);
 
-        if(historyList.contains(dto))
-            historyList.remove(dto);
+        if(historyList.contains(dto.getName()))
+            historyList.remove(dto.getName());
 
         else if(historyList.size()==10)
             historyList.remove(historyList.get(0));
 
-        historyList.add(dto);
+        historyList.add(dto.getName());
 
         return dto;
     }
 
-    public List<LocationDTO> searchMatch(String matchString) throws LocationDAO.DAOException {
-        List<LocationDTO> locations = new ArrayList<LocationDTO>();
+    public List<String> searchMatch(String matchString) throws LocationDAO.DAOException {
+        List<String> locations = new ArrayList<String>();
 
         for(LocationDTO dto : dao.getLocations().values()){
             if(dto.getName().matches("(.*)"+matchString+"(.*)")){
-                locations.add(dto);
+                locations.add(dto.getName());
             }
         }
 
@@ -74,7 +74,7 @@ public class NavigationController implements Navigation{
         return locations;
     }
 
-    public List<LocationDTO> getHistoryList(){
+    public List<String> getHistoryList(){
         Collections.reverse(historyList);
 
         return historyList;
