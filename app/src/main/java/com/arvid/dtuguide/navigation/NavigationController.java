@@ -56,7 +56,6 @@ public class NavigationController implements Navigation{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
                 ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
 
                 dao.setLocations(new HashMap<String, LocationDTO>());
