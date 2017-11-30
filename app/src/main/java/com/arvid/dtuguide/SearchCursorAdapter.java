@@ -3,6 +3,7 @@ package com.arvid.dtuguide;
 import android.app.SearchManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
@@ -49,22 +50,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
     }
 
-    @Override
-    public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-        if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
 
-        Cursor cursorRecent = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
-        Cursor cursorRooms = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
-        Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-
-        //Cursor cursor = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null,
-            //    null, new String[] { constraint.toString().toLowerCase() }, null);
-
-        return mergedCursor;
-    }
-
-
-    /*
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -74,6 +60,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
                 constraint = constraint.toString().toLowerCase();
                 FilterResults result = new FilterResults();
 
+                /*
                 if (constraint != null
                         && constraint.toString().length() > 0) {
                     List<String> founded = new ArrayList<String>();
@@ -95,6 +82,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
                     }
 
                 }
+                */
                 return result;
 
             }
@@ -102,16 +90,15 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
             @Override
             protected void publishResults(CharSequence constraint,
                                           FilterResults results) {
-
+                /*
                 items.clear();
                 //items = new ArrayList<String>();
                 //items = (ArrayList<String>) results.values;
                 items.addAll((ArrayList<String>) results.values);
                 notifyDataSetChanged();
-
+                */
             }
 
         };
     }
-    */
 }

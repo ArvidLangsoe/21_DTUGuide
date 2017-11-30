@@ -28,18 +28,9 @@ public class Main2Activity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Intent intent  = getIntent();
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                    RecentSearchSuggestionProvider.AUTHORITY, RecentSearchSuggestionProvider.MODE);
-            suggestions.saveRecentQuery(query, null);
-        }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
