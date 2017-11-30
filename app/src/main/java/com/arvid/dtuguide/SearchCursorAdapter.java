@@ -1,23 +1,10 @@
 package com.arvid.dtuguide;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.database.MergeCursor;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.ResourceCursorAdapter;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jeppe on 27-11-2017.
@@ -25,6 +12,7 @@ import java.util.List;
 
 public class SearchCursorAdapter extends ResourceCursorAdapter {
     private Context context;
+    private Cursor cursor;
 
     public SearchCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
         super(context, layout, cursor, flags);
@@ -34,7 +22,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView name = (TextView) view.findViewById(R.id.textView2);
+        TextView name = (TextView) view.findViewById(R.id.room_name);
         //name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
         //name.setText("-");
@@ -56,9 +44,14 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
         //Cursor cursor = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null,
         //    null, new String[] { constraint.toString().toLowerCase() }, null);
-        Cursor cursor = context.getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase()}, null);
+        cursor = context.getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase()}, null);
 
         return cursor;
+    }
+
+    public String getItemName(int position) {
+        cursor.moveToPosition(position);
+        return cursor.getString(cursor.getColumnIndex("name"));
     }
 
 

@@ -52,11 +52,7 @@ public class Provider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        try {
-            controller.getLocation("X1.81");
-        } catch (LocationDAO.DAOException e) {
-            e.printStackTrace();
-        }
+
         historyList = controller.getHistoryList();
 
 /*

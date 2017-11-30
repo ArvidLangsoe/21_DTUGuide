@@ -36,7 +36,7 @@ public class NavigationController implements Navigation{
     private CoordinateConverter coorconv;
 
     private LocationDAO dao;
-    private List<String> historyList = new ArrayList<String>();
+    private static List<String> historyList = new ArrayList<String>();
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
@@ -97,7 +97,7 @@ public class NavigationController implements Navigation{
             historyList.remove(historyList.get(0));
 
         historyList.add(dto.getName());
-
+        System.out.println("HISTORYLIST: " + historyList);
         return dto;
     }
 
