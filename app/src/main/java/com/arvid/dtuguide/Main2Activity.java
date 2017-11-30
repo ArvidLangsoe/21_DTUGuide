@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
@@ -45,6 +46,7 @@ public class Main2Activity extends AppCompatActivity
     public static final String TAG = "";
     private LocationDAO dao;
     private NavigationController controller;
+    private MatrixCursor roomsCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,21 @@ public class Main2Activity extends AppCompatActivity
         controller = new NavigationController(dao);
 
         updateData();
+        try {
+            controller.getLocation("X1.81");
+        } catch (LocationDAO.DAOException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<String> historyList = controller.getHistoryList();
+        int id = 0;
+        roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
+        for(String name : historyList) {
+            Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+            Object[] obj = { id, name };
+            id++;
+            roomsCursor.addRow(obj);
+        }
     }
 
     public void updateData(){
@@ -112,23 +129,15 @@ public class Main2Activity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.topbar, menu);
 
         //EditText searchViewPlaceholder = (EditText)
-        //SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
         SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
-        //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
         //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-        List<LocationDTO> historyList = controller.getHistoryList();
-        int id = 0;
-        MatrixCursor roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
-        for(LocationDTO dto : historyList) {
-            Object[] obj = { id, dto.getName() };
-            id++;
-            roomsCursor.addRow(obj);
-        }
 
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, roomsCursor, 0);
 

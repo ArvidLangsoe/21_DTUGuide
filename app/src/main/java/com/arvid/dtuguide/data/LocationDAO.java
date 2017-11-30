@@ -54,18 +54,6 @@ public class LocationDAO {
 		return dto;
 	}
 
-	private boolean updateData(){
-		try{
-			FileManager.writeData(locations);
-
-			return true;
-
-		}catch(Exception e){
-
-			return false;
-		}
-	}
-
 	public HashMap<String, LocationDTO> getLocations() throws DAOException {
 		if(locations !=null)
 			return locations;
@@ -75,7 +63,7 @@ public class LocationDAO {
 
 	public boolean setLocations(HashMap<String, LocationDTO> locations) {
 		this.locations = locations;
-		return updateData();
+		return true;
 	}
 
 	public LocationDTO getLocation(String name) throws DAOException {
@@ -89,17 +77,13 @@ public class LocationDAO {
 
 	public boolean saveLocation(LocationDTO newLocation){
 		locations.put(newLocation.getName(), newLocation);
-		return updateData();
+		return true;
 	}
 
-	public boolean deleteLocation(String name){
-		locations.remove(name);
-		return updateData();
-	}
 
 	@RequiresApi(api = Build.VERSION_CODES.N)
 	public boolean updateLocation(LocationDTO newLocation){
 		locations.replace(newLocation.getName(), newLocation);
-		return updateData();
+		return true;
 	}
 }
