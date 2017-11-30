@@ -48,7 +48,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         }
 
     }
-
+    
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
