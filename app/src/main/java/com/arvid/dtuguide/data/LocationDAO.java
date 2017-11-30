@@ -67,7 +67,6 @@ public class LocationDAO {
 	}
 
 	public HashMap<String, LocationDTO> getLocations() throws DAOException {
-		locations = FileManager.retrieveData();
 		if(locations !=null)
 			return locations;
 		else

@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class FireBaseActivity extends AppCompatActivity {
 
     public static final String TAG = "";
     private TextView text;
+
+    private LocationDAO dao;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
@@ -30,15 +33,16 @@ public class FireBaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fire_base);
 
+        dao = new LocationDAO();
+
         text = (TextView) findViewById(R.id.firebasetext);
 
         text.setText("Ini");
 
-        printData();
+        updateData();
     }
 
-    public void printData(){
-        Log.d(TAG, "Test");
+    public void updateData(){
 
         myRef.addValueEventListener(new ValueEventListener() {
 
@@ -48,9 +52,17 @@ public class FireBaseActivity extends AppCompatActivity {
                 // whenever data at this location is updated.
 
                 GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
-                Map<String, String> map = dataSnapshot.getValue(genericTypeIndicator );
+                ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
 
-                text.setText(map.toString());
+                for(String location : map){
+                    dao.saveLocation((dao.parseToDTO(location)));
+                }
+
+                try {
+                    text.setText(dao.getLocations()+"");
+                } catch (LocationDAO.DAOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
