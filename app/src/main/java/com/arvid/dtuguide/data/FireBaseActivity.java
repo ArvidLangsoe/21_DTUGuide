@@ -54,6 +54,8 @@ public class FireBaseActivity extends AppCompatActivity {
                 GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
                 ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
 
+                dao.setLocations(new HashMap<String, LocationDTO>());
+
                 for(String location : map){
                     dao.saveLocation((dao.parseToDTO(location)));
                 }
