@@ -20,6 +20,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import com.arvid.dtuguide.data.LocationDAO;
+import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -134,7 +135,9 @@ public class Main2Activity extends AppCompatActivity
             public boolean onSuggestionClick(int position) {
                 String roomName = adapter.getItemName(position);
                 try {
-                    controller.getLocation(roomName);
+                    LocationDTO location = controller.getLocation(roomName);
+
+                    showLocation(location.getPosition());
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
@@ -186,8 +189,8 @@ public class Main2Activity extends AppCompatActivity
         // Handle bottom_navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.navigate_to_dtu) {
+            startActivity(new Intent(this, NavigateToDTUActivity.class));
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {

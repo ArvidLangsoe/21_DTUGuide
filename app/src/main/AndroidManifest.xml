@@ -45,6 +45,7 @@
         <activity android:name=".data.FireBaseActivity">
         </activity>
         <activity android:name=".MapActivity"></activity>
+        <activity android:name=".NavigateToDTUActivity"></activity>
     </application>
 
 </manifest>
