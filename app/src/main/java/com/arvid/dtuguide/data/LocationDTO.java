@@ -1,12 +1,12 @@
 package com.arvid.dtuguide.data;
 
+import android.support.annotation.NonNull;
+
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 
 import java.io.Serializable;
 
-public class LocationDTO implements Serializable {
-
-
+public class LocationDTO implements Serializable, Comparable<LocationDTO> {
 
     public enum MARKTYPE {
         CANTEEN,
@@ -60,6 +60,11 @@ public class LocationDTO implements Serializable {
         this.type = builder.type;
         this.description = builder.description;
 
+    }
+
+    @Override
+    public int compareTo(@NonNull LocationDTO o) {
+        return this.name.compareToIgnoreCase(o.name);
     }
 
     public String toString(){
