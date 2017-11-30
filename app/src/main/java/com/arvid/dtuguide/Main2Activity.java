@@ -2,12 +2,9 @@ package com.arvid.dtuguide;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.database.MergeCursor;
 import android.os.Bundle;
-import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,28 +12,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.arvid.dtuguide.data.LocationDAO;
-import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.NavigationController;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.w3c.dom.Text;
+
 import java.util.List;
-import java.util.Map;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,15 +33,15 @@ public class Main2Activity extends AppCompatActivity
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
     public static final String TAG = "";
-    private LocationDAO dao;
-    private NavigationController controller;
-    private MatrixCursor roomsCursor;
+    NavigationController controller;
+    LocationDAO dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
+        dao = new LocationDAO();
+        controller = new NavigationController(dao);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -65,64 +54,6 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        dao = new LocationDAO();
-        controller = new NavigationController(dao);
-
-        updateData();
-
-    }
-
-    public void extraFunc(){
-        try {
-            Toast.makeText(getApplicationContext(),  dao.getLocations()+"", Toast.LENGTH_LONG).show();
-        } catch (LocationDAO.DAOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            controller.getLocation("X1.81");
-        } catch (LocationDAO.DAOException e) {
-            //throw new RuntimeException(e);
-        }
-
-        List<String> historyList = controller.getHistoryList();
-        int id = 0;
-        roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
-        for(String name : historyList) {
-            Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-            Object[] obj = { id, name };
-            id++;
-            roomsCursor.addRow(obj);
-        }
-    }
-
-    public void updateData(){
-
-        myRef.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
-
-                dao.setLocations(new HashMap<String, LocationDTO>());
-
-                for(String location : map){
-                    Toast.makeText(getApplicationContext(),  location+"", Toast.LENGTH_LONG).show();
-                    dao.saveLocation((dao.parseToDTO(location)));
-                }
-
-                extraFunc();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
     }
 
     @Override
@@ -137,24 +68,25 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.topbar, menu);
 
         //EditText searchViewPlaceholder = (EditText)
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
         //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-
-        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, roomsCursor, 0);
+        Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] {""}, null);
+        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
-        /*
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -167,7 +99,27 @@ public class Main2Activity extends AppCompatActivity
                 return true;
             }
         });
-        */
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                String roomName = adapter.getItemName(position);
+                try {
+                    controller.getLocation(roomName);
+                } catch (LocationDAO.DAOException e) {
+                    e.printStackTrace();
+                }
+                searchView.setQuery("", false);
+                return true;
+            }
+        });
+
+
 
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
