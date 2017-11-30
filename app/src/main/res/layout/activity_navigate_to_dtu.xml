@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.arvid.dtuguide.NavigateToDTUActivity">
+
+    <ImageView
+        android:id="@+id/DTULogo"
+        android:layout_width="147dp"
+        android:layout_height="138dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/dtu_logo" />
+
+    <TextView
+        android:id="@+id/NavigateDisc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        android:text="Tryk på det campus du skal finde vej til!"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/DTULogo" />
+
+    <Button
+        android:id="@+id/lyngby_button"
+        android:layout_width="240dp"
+        android:layout_height="52dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="Lyngby Campus"
+        app:layout_constraintEnd_toEndOf="@+id/NavigateDisc"
+        app:layout_constraintStart_toStartOf="@+id/NavigateDisc"
+        app:layout_constraintTop_toBottomOf="@+id/NavigateDisc" />
+
+    <Button
+        android:id="@+id/ballerup_button"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:text="Ballerup Campus"
+        app:layout_constraintEnd_toEndOf="@+id/lyngby_button"
+        app:layout_constraintStart_toStartOf="@+id/lyngby_button"
+        app:layout_constraintTop_toBottomOf="@+id/lyngby_button" />
+
+    <Button
+        android:id="@+id/riso_button"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Risø Campus"
+        app:layout_constraintEnd_toEndOf="@+id/ballerup_button"
+        app:layout_constraintStart_toStartOf="@+id/ballerup_button"
+        app:layout_constraintTop_toBottomOf="@+id/ballerup_button" />
+
+</android.support.constraint.ConstraintLayout>

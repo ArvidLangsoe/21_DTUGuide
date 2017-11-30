@@ -60,26 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
         writeImageWithLocation(nc.getMyLocation());
 
-/* //This will be needed later for updating map when different events happen.
-        Thread background=new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                while(true)
-                {
-                    try {
-                        Thread.sleep(1000);
-                        nc.setRandomMyLocation();
-                        handler.sendMessage(handler.obtainMessage());
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-        });
-
-        background.start();
-    */
     }
 
 
