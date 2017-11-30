@@ -68,51 +68,6 @@ public class Main2Activity extends AppCompatActivity
 
     }
 
-    public void extraFunc(){
-        try {
-            Toast.makeText(getApplicationContext(),  dao.getLocations()+"", Toast.LENGTH_LONG).show();
-        } catch (LocationDAO.DAOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            controller.getLocation("X1.81");
-        } catch (LocationDAO.DAOException e) {
-            //throw new RuntimeException(e);
-        }
-
-
-    }
-
-    public void updateData(){
-
-        myRef.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-
-                ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
-
-                dao.setLocations(new HashMap<String, LocationDTO>());
-
-                for(String location : map){
-                    Toast.makeText(getApplicationContext(),  location+"", Toast.LENGTH_LONG).show();
-                    dao.saveLocation((dao.parseToDTO(location)));
-                }
-
-                extraFunc();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -126,18 +81,6 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        dao = new LocationDAO();
-        controller = new NavigationController(dao);
-
-        updateData();
-        historyList = controller.getHistoryList();
-        int id = 0;
-        roomsCursor = new MatrixCursor(new String[] { "_id", "name" });
-        for(String name : historyList) {
-            Object[] obj = { id, name };
-            id++;
-            roomsCursor.addRow(obj);
-        }
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.topbar, menu);
 
@@ -151,8 +94,10 @@ public class Main2Activity extends AppCompatActivity
         //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
         //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-        System.out.println("CURSORMENU" + roomsCursor);
-        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, roomsCursor, historyList, 0);
+        Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, null, null);
+        c.moveToNext();
+        System.out.println("CURSOR_C "+ c.getString(1));
+        final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
         /*

@@ -25,12 +25,8 @@ import java.util.List;
 
 public class SearchCursorAdapter extends ResourceCursorAdapter {
 
-    List<String> list;
-    List<String> items;
-
-    public SearchCursorAdapter(Context context, int layout, Cursor cursor, List<String> list, int flags) {
+    public SearchCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
         super(context, layout, cursor, flags);
-        this.list = list;
     }
 
 

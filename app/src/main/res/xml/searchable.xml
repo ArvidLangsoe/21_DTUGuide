@@ -3,5 +3,5 @@
     android:label="@string/app_name"
     android:hint="@string/topbar_searchview_hint"
     android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"
-    android:searchSuggestAuthority="com.arvid.dtuguide.RecentSearchSuggestionProvider">
+    android:searchSuggestAuthority="com.arvid.dtuguide.Provider">
 </searchable>
