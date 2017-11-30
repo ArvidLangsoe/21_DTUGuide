@@ -15,7 +15,7 @@ public class LocationDAO {
 		public String toString(){return getMessage();}
 	}
 
-	private HashMap<String, LocationDTO> locations;
+	private static HashMap<String, LocationDTO> locations;
 
 	public LocationDAO(){
 		try {

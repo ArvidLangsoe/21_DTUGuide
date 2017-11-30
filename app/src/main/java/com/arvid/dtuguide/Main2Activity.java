@@ -69,10 +69,20 @@ public class Main2Activity extends AppCompatActivity
         controller = new NavigationController(dao);
 
         updateData();
+
+    }
+
+    public void extraFunc(){
+        try {
+            Toast.makeText(getApplicationContext(),  dao.getLocations()+"", Toast.LENGTH_LONG).show();
+        } catch (LocationDAO.DAOException e) {
+            e.printStackTrace();
+        }
+
         try {
             controller.getLocation("X1.81");
         } catch (LocationDAO.DAOException e) {
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         }
 
         List<String> historyList = controller.getHistoryList();
@@ -95,14 +105,16 @@ public class Main2Activity extends AppCompatActivity
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
 
-                GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
                 ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
 
                 dao.setLocations(new HashMap<String, LocationDTO>());
 
                 for(String location : map){
+                    Toast.makeText(getApplicationContext(),  location+"", Toast.LENGTH_LONG).show();
                     dao.saveLocation((dao.parseToDTO(location)));
                 }
+
+                extraFunc();
             }
 
             @Override
