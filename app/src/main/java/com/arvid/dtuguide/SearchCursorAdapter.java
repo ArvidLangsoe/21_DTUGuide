@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -22,10 +23,14 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView name = (TextView) view.findViewById(R.id.room_name);
-        //name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+        TextView name = (TextView) view.findViewById(R.id.search_item_name);
+        TextView type = (TextView) view.findViewById(R.id.search_item_type);
+        ImageView icon = (ImageView) view.findViewById(R.id.search_item_icon);
+
         name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-        //name.setText("-");
+        type.setText("test");
+        icon.setImageResource(R.drawable.ic_history_black_24dp);
+
 
 
         //ImageView image = (ImageView) view.findViewById(R.id.imageView1);

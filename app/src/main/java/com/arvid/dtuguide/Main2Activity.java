@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -56,6 +58,27 @@ public class Main2Activity extends AppCompatActivity
     NavigationController controller;
     LocationDAO dao;
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    //TODO: What to happen when the bottom menu is clicked
+                    //mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    //mTextMessage.setText(R.string.title_dashboard);
+                    return true;
+                case R.id.navigation_notifications:
+                    //mTextMessage.setText(R.string.title_notifications);
+                    return true;
+            }
+            return false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +102,9 @@ public class Main2Activity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     @Override
@@ -199,7 +225,7 @@ public class Main2Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.drawer_nav_settings) {
 
         }
 
