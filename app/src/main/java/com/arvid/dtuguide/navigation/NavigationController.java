@@ -1,27 +1,20 @@
 package com.arvid.dtuguide.navigation;
 
-import android.location.Location;
 import android.util.Log;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
-import com.arvid.dtuguide.navigation.coordinates.CoordinateConverter;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
-import com.arvid.dtuguide.navigation.coordinates.MapPoint;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import static com.arvid.dtuguide.Main2Activity.TAG;
 
@@ -33,7 +26,7 @@ public class NavigationController implements Navigation{
 
     private GeoPoint myLocation=new GeoPoint(12.395167,55.732010);
 
-    private CoordinateConverter coorconv;
+
 
     private LocationDAO dao;
     private static List<String> historyList = new ArrayList<String>();
@@ -74,17 +67,7 @@ public class NavigationController implements Navigation{
         });
     }
 
-    public void calibrate(GeoPoint g1, GeoPoint g2,MapPoint m1, MapPoint m2){
-        coorconv= new CoordinateConverter(g1,g2,m1,m2);
-    }
 
-    @Override
-    public MapPoint getMyLocation() {
-        MapPoint m =coorconv.geoToMap(myLocation);
-        System.out.println(m);
-        return m;
-
-    }
 
     public LocationDTO getLocation(String name) throws LocationDAO.DAOException {
         LocationDTO dto = dao.getLocation(name);
