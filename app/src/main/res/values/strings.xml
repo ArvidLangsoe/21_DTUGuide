@@ -11,7 +11,8 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_navigate">Navigere</string>
+    <string name="title_floor">Skift plan</string>
+    <string name="title_filter">Filter kort</string>
+    <string name="settings">Indstillinger</string>
 </resources>

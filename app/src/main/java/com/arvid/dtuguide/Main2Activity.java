@@ -30,7 +30,6 @@ import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
-import com.arvid.dtuguide.navigation.BuildingModel;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,7 +40,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
-import com.google.android.gms.maps.model.IndoorBuilding;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -71,6 +69,27 @@ public class Main2Activity extends AppCompatActivity
     NavigationController controller;
     LocationDAO dao;
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    //TODO: What to happen when the bottom menu is clicked
+                    //mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    //mTextMessage.setText(R.string.title_dashboard);
+                    return true;
+                case R.id.navigation_notifications:
+                    //mTextMessage.setText(R.string.title_notifications);
+                    return true;
+            }
+            return false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,8 +114,8 @@ public class Main2Activity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
-
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     @Override
@@ -217,7 +236,7 @@ public class Main2Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.drawer_nav_settings) {
 
         }
 
@@ -231,9 +250,7 @@ public class Main2Activity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
 
-        mMap.setIndoorEnabled(true);
-
-        mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
+        mMap.setIndoorEnabled(false);
 
         mMap.setMinZoomPreference(16);
         mMap.setMaxZoomPreference(20);

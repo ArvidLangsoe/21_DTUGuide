@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -22,15 +23,22 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView name = (TextView) view.findViewById(R.id.room_name);
-        //name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-        name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-        //name.setText("-");
+        TextView nameTV = (TextView) view.findViewById(R.id.search_item_name);
+        TextView typeTV = (TextView) view.findViewById(R.id.search_item_type);
+        ImageView iconV = (ImageView) view.findViewById(R.id.search_item_icon);
 
+        String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+        String type = cursor.getString(cursor.getColumnIndex("type"));
+        nameTV.setText(name);
+        typeTV.setText(type);
 
-        //ImageView image = (ImageView) view.findViewById(R.id.imageView1);
-        //image.setImageResource(cursor.getInt(cursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_1)));
-
+        switch (type) {
+            case "recent":
+                iconV.setImageResource(R.drawable.ic_history_black_24dp);
+                break;
+            case "favorite":
+                iconV.setImageResource(R.drawable.ic_history_black_24dp);
+        }
 
     }
 
