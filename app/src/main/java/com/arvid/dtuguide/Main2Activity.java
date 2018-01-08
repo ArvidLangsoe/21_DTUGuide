@@ -1,11 +1,19 @@
 package com.arvid.dtuguide;
 
+import android.*;
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
@@ -40,15 +49,18 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
 
     private Marker currentMarker;
-    private GroundOverlay ballerupMap;
+    private static ArrayList<GroundOverlay> ballerupMap = new ArrayList<>();
+    private int LOCATION_REQUEST_CODE=4565;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
@@ -79,6 +91,8 @@ public class Main2Activity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
     }
 
     @Override
@@ -137,7 +151,7 @@ public class Main2Activity extends AppCompatActivity
                 try {
                     LocationDTO location = controller.getLocation(roomName);
 
-                    showLocation(location.getPosition());
+                    showLocation(location);
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
@@ -211,41 +225,114 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(this);
 
-
-        //Delete this for drawn map
-        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.setIndoorEnabled(false);
 
         mMap.setMinZoomPreference(16);
         mMap.setMaxZoomPreference(20);
 
-        // Add a marker in Sydney and move the camera
         LatLng ballerupSW = new LatLng(55.730327, 12.393678);
         LatLng ballerupNE = new LatLng(55.732781, 12.401019);
 
         LatLng ballerupCenter = new LatLng(55.731543, 12.396680);
 
-
         LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW,ballerupNE);
 
-        currentMarker=mMap.addMarker(new MarkerOptions().position(ballerupCenter).title("Ballerup Campus"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter,16f));
 
-        GroundOverlayOptions options =new GroundOverlayOptions();
-        options.image(BitmapDescriptorFactory.fromResource(R.drawable.low_res_dtu_map)).positionFromBounds(ballerupBounds);
-        ballerupMap = googleMap.addGroundOverlay(options);
+        LatLngBounds BALLERUP = new LatLngBounds(new LatLng(55.730067,12.393402),new LatLng(55.733131,12.402851));
+        mMap.setLatLngBoundsForCameraTarget(BALLERUP);
 
 
-        showLocation(new GeoPoint(12.395511,55.731598));
+        Bitmap dtuMap = BitmapFactory.decodeResource(getResources(),R.drawable.dtu_map);
+
+        addGroundOverlay(dtuMap,ballerupSW, ballerupNE);
+        enableGPS();
+
+
     }
 
-    public void showLocation(GeoPoint point){
-        currentMarker.remove();
-        LatLng myPoint = new LatLng(point.getLat(),point.getLong());
-        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title("Some Point"));
+    private void addGroundOverlay(Bitmap dtuMap,LatLng swCorner, LatLng neCorner){
+        int height = dtuMap.getHeight();
+        int width = dtuMap.getWidth();
+        int heightTiles = 2;
+        int widthTiles = 4;
 
+        double tileSizeLat=(neCorner.latitude-swCorner.latitude)/heightTiles;
+        double tileSizeLong=(neCorner.longitude-swCorner.longitude)/widthTiles;
+
+        for(int heightTile=0;heightTile<heightTiles;heightTile++){
+            for(int widthTile=0;widthTile<widthTiles;widthTile++){
+                Bitmap bm=Bitmap.createBitmap(dtuMap,widthTile*(width/widthTiles),heightTile*(height/heightTiles),width/widthTiles,height/heightTiles);
+
+                GroundOverlayOptions options =new GroundOverlayOptions();
+
+                LatLng sw = new LatLng(neCorner.latitude-(heightTile+1)*tileSizeLat,swCorner.longitude+widthTile*tileSizeLong);
+                LatLng ne = new LatLng(neCorner.latitude-(heightTile)*tileSizeLat,swCorner.longitude+(widthTile+1)*tileSizeLong);
+
+                System.out.println("Coor: " + sw + " " + ne);
+                LatLngBounds tempBounds = new LatLngBounds(sw,ne);
+
+                options.image(BitmapDescriptorFactory.fromBitmap(bm)).positionFromBounds(tempBounds);
+                ballerupMap.add(mMap.addGroundOverlay(options));
+
+
+            }
+        }
+    }
+
+    private void enableGPS(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+
+            mMap.setMyLocationEnabled(true);
+            System.out.println("GPS: GPS enabled: "+mMap.isMyLocationEnabled());
+        }
+        else{
+            System.out.println("GPS: No GPS accesss allowed, requesting permission");
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+                System.out.println("GPS: Need explanation. See permission requests android.");
+            }
+            else{
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_REQUEST_CODE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        System.out.println("GPS: Handling Request result");
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            try {
+                mMap.setMyLocationEnabled(true);
+            }catch (SecurityException e){
+                System.out.println("GPS: Security Exception, user denied GPS access.");
+            }
+        }
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        //Todo: Add a check to see if the user is outside the map.
+        return false;
+    }
+
+
+    public void showLocation(LocationDTO location){
+        if(currentMarker!=null) {
+            currentMarker.remove();
+        }
+        LatLng myPoint = new LatLng(location.getPosition().getLat(),location.getPosition().getLong());
+        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
 
+    }
+
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        System.out.println("UserClick: "+ latLng);
     }
 }
