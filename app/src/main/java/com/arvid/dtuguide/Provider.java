@@ -58,7 +58,7 @@ public class Provider extends ContentProvider {
         String search = selectionArgs[0];
         int id = 0;
 
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"id", "name", "type"});
+        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type"});
 
         if(search.isEmpty()) {
             for (String name : historyList) {
@@ -72,7 +72,7 @@ public class Provider extends ContentProvider {
                 List<String> suggestionsList = controller.searchMatch(search);
 
                 for (String name :  suggestionsList) {
-                    Object[] obj = {id, name};
+                    Object[] obj = {id, name, "type"};
                     id++;
                     suggestionsCursor.addRow(obj);
                 }
