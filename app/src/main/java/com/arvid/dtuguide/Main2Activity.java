@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.navigation.BuildingModel;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +41,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.google.android.gms.maps.model.IndoorBuilding;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -56,6 +58,7 @@ public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener {
 
+    
     private GoogleMap mMap;
 
     private Marker currentMarker;
@@ -91,6 +94,7 @@ public class Main2Activity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
 
     }
@@ -227,7 +231,9 @@ public class Main2Activity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
 
-        mMap.setIndoorEnabled(false);
+        mMap.setIndoorEnabled(true);
+
+        mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
 
         mMap.setMinZoomPreference(16);
         mMap.setMaxZoomPreference(20);
