@@ -22,12 +22,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -72,19 +74,21 @@ public class Main2Activity extends AppCompatActivity
                 checkBoxMapFirst.setChecked(false);
                 checkBoxMapSecond.setChecked(false);
                 showFloor(Floor.basement);
-
+                currentMap = Floor.basement;
                 break;
             case R.id.map_layers_checkbox_1:
                 checkBoxMapFirst.setChecked(true);
                 checkBoxMapBasement.setChecked(false);
                 checkBoxMapSecond.setChecked(false);
                 showFloor(Floor.ground_floor);
+                currentMap = Floor.ground_floor;
                 break;
             case R.id.map_layers_checkbox_2:
                 checkBoxMapSecond.setChecked(true);
                 checkBoxMapBasement.setChecked(false);
                 checkBoxMapFirst.setChecked(false);
                 showFloor(Floor.first_floor);
+                currentMap = Floor.first_floor;
         }
     }
 
@@ -106,7 +110,11 @@ public class Main2Activity extends AppCompatActivity
     NavigationController controller;
     LocationDAO dao;
 
+    private Floor currentMap;
+
     private CheckBox checkBoxMapBasement, checkBoxMapFirst, checkBoxMapSecond;
+
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +142,8 @@ public class Main2Activity extends AppCompatActivity
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        currentMap = Floor.ground_floor;
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -153,6 +163,7 @@ public class Main2Activity extends AppCompatActivity
                 case R.id.map_layers_button:
                     popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
 
+
                     checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
                     checkBoxMapFirst = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_1);
                     checkBoxMapSecond = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_2);
@@ -161,8 +172,17 @@ public class Main2Activity extends AppCompatActivity
                     checkBoxMapBasement.setOnClickListener(Main2Activity.this);
                     checkBoxMapSecond.setOnClickListener(Main2Activity.this);
 
-                    System.out.println("#CHECKBOX TEST#");
-                    System.out.println(checkBoxMapBasement);
+                    switch (currentMap) {
+                        case basement:
+                            checkBoxMapBasement.setChecked(true);
+                            break;
+                        case ground_floor:
+                            checkBoxMapFirst.setChecked(true);
+                            break;
+                        case first_floor:
+                            checkBoxMapSecond.setChecked(true);
+                            break;
+                    }
 
                     PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -171,6 +191,16 @@ public class Main2Activity extends AppCompatActivity
                     popupWindowLayer.setOutsideTouchable(true);
 
                     popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
+
+
+
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    int width = displayMetrics.widthPixels;
+                    popupWindowLayer.update(findViewById(R.id.navigation),width,400);
+
+
+
 
                     return true;
 
@@ -184,6 +214,10 @@ public class Main2Activity extends AppCompatActivity
                     popupWindowFilter.setOutsideTouchable(true);
 
                     popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
+                    displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    width = displayMetrics.widthPixels;
+                    popupWindowFilter.update(findViewById(R.id.navigation),width,300);
 
                     return true;
 
@@ -235,13 +269,14 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.topbar, menu);
 
         //EditText searchViewPlaceholder = (EditText)
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
@@ -321,7 +356,6 @@ public class Main2Activity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle bottom_navigation view item clicks here.
@@ -475,6 +509,14 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
+        hideSoftKeyboard();
 
+    }
+
+    private void hideSoftKeyboard() {
+        View view = this.getCurrentFocus();
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        view.clearFocus();
     }
 }
