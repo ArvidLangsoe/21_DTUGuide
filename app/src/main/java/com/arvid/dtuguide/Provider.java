@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -69,10 +70,10 @@ public class Provider extends ContentProvider {
         }
         else{
             try {
-                List<String> suggestionsList = controller.searchMatch(search);
+                List<Searchable> suggestionsList = controller.searchMatch(search);
 
-                for (String name :  suggestionsList) {
-                    Object[] obj = {id, name, "type"};
+                for (Searchable item :  suggestionsList) {
+                    Object[] obj = {id, item.getName(), "type"};
                     id++;
                     suggestionsCursor.addRow(obj);
                 }
