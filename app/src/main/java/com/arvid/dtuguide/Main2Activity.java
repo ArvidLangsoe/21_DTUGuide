@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -23,10 +24,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +65,7 @@ import java.util.List;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, CompoundButton.OnCheckedChangeListener {
 
 
     private GoogleMap mMap;
@@ -71,31 +80,13 @@ public class Main2Activity extends AppCompatActivity
     NavigationController controller;
     LocationDAO dao;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    //TODO: What to happen when the bottom menu is clicked
-                    //mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    //mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    //mTextMessage.setText(R.string.title_notifications);
-                    return true;
-            }
-            return false;
-        }
-    };
+    private CheckBox checkBoxMapBasement, checkBoxMapFirst, checkBoxMapSecond;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         dao = new LocationDAO();
         controller = new NavigationController(dao);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -115,9 +106,99 @@ public class Main2Activity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        /*
+        checkBoxMapBasement = (CheckBox)findViewById(R.id.map_layers_checkbox_0);
+        checkBoxMapFirst = (CheckBox)findViewById(R.id.map_layers_checkbox_1);
+        checkBoxMapSecond = (CheckBox)findViewById(R.id.map_layers_checkbox_2);
+
+        checkBoxMapBasement.setOnCheckedChangeListener(this);
+        checkBoxMapFirst.setOnCheckedChangeListener(this);
+        checkBoxMapSecond.setOnCheckedChangeListener(this);
+        */
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            switch (item.getItemId()) {
+                case R.id.map_navigate_button:
+                    //TODO: What to happen when the bottom menu is clicked
+                    //mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.map_layers_button:
+                    /*
+                    PopupMenu popupMenu = new PopupMenu(Main2Activity.this, findViewById(R.id.map_filter_button));
+                    popupMenu.getMenuInflater().inflate(R.menu.filter_dropdown_menu, popupMenu.getMenu());
+                    popupMenu.show();
+                    */
+
+
+                    View popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
+
+                    PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    //popupWindow.setBackgroundDrawable(new BitmapDrawable());
+                    popupWindowLayer.setOutsideTouchable(true);
+
+                    //popupWindow.showAtLocation(findViewById(R.id.testeren), Gravity.BOTTOM|Gravity.CENTER, 0, 0);
+                    popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
+                    //popupWindow.
+
+                    return true;
+                case R.id.map_filter_button:
+                    //
+                    View popupFilterView = layoutInflater.inflate(R.layout.map_filter_popup_layout, null);
+
+                    PopupWindow popupWindowFilter = new PopupWindow(popupFilterView,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    popupWindowFilter.setOutsideTouchable(true);
+
+                    //popupWindow.showAtLocation(findViewById(R.id.testeren), Gravity.BOTTOM|Gravity.CENTER, 0, 0);
+                    popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
+
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()){
+            case R.id.map_layers_checkbox_0:
+                if (isChecked) {
+                    checkBoxMapFirst.setChecked(false);
+                    checkBoxMapSecond.setChecked(false);
+                }
+                break;
+            case R.id.map_layers_checkbox_1:
+                if (isChecked) {
+                    checkBoxMapBasement.setChecked(false);
+                    checkBoxMapSecond.setChecked(false);
+                }
+                break;
+            case R.id.map_layers_checkbox_2:
+                if (isChecked) {
+                    checkBoxMapBasement.setChecked(false);
+                    checkBoxMapFirst.setChecked(false);
+                }
+                break;
+        }
+
+    }
+
+
 
     @Override
     public void onBackPressed() {
@@ -225,20 +306,12 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle bottom_navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.navigate_to_dtu) {
-            startActivity(new Intent(this, NavigateToDTUActivity.class));
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.drawer_nav_settings) {
-
+        switch (item.getItemId()) {
+            case R.id.navigate_to_dtu:
+                startActivity(new Intent(this, NavigateToDTUActivity.class));
+                System.out.println("XX HELLOE XX");
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

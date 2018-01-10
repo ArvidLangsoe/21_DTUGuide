@@ -5,38 +5,33 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_drawer_favorite"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="@string/favorite" />
+        <item
             android:id="@+id/navigate_to_dtu"
-            android:icon="@drawable/ic_room_black_24dp"
+            android:icon="@drawable/ic_navigation_black_24dp"
             android:title="Navigate to DTU" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+
         <item
             android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:icon="@drawable/ic_place_black_24dp"
+            android:title="@string/campus" />
+
+        <item
+            android:id="@+id/drawer_nav_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/settings" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/nav_drawer_helpfeedback"
+                android:title="@string/help_feedback" />
             <item
-                android:id="@+id/drawer_nav_settings"
-                android:icon="@drawable/ic_settings_black_24dp"
-                android:title="@string/settings" />
-        </menu>
-    </item>
-    <item android:title="Test">
-        <menu>
-
+                android:id="@+id/nav_drawer_about"
+                android:title="@string/about" />
         </menu>
     </item>
 
