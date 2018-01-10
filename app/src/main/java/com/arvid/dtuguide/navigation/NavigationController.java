@@ -122,8 +122,8 @@ public class NavigationController implements Navigation{
         return dto;
     }
 
-    public List<String> searchMatch(String matchString) throws LocationDAO.DAOException {
-        List<String> searchData = new ArrayList<String>();
+    public List<Searchable> searchMatch(String matchString) throws LocationDAO.DAOException {
+        List<Searchable> searchData = new ArrayList<Searchable>();
         matchString = matchString.replace(" ", "");
 
         //Search with name
@@ -131,7 +131,7 @@ public class NavigationController implements Navigation{
             if(dto.getName().replace(".", "").toLowerCase().matches("(.*)"+matchString+"(.*)")
                     || dto.getName().replace(".", "").toLowerCase().matches("(.*)"+matchString+"(.*)")
                     || dto.getName().replace(" ", "").toLowerCase().matches("(.*)"+matchString+"(.*)")){
-                searchData.add(dto.getName());
+                searchData.add(dto);
             }
         }
 
@@ -143,8 +143,8 @@ public class NavigationController implements Navigation{
         return searchData;
     }
 
-    public ArrayList<String> searchWithTag(String tag) throws LocationDAO.DAOException {
-        ArrayList<String> tags = new ArrayList<String>();
+    public ArrayList<Searchable> searchWithTag(String tag) throws LocationDAO.DAOException {
+        ArrayList<Searchable> tags = new ArrayList<Searchable>();
 
         for(Searchable dto:dao.getAllData().values()){
             if(dto.getClass().isAssignableFrom(LocationDTO.class)) {
@@ -153,7 +153,7 @@ public class NavigationController implements Navigation{
                 if (loc.getTags() != null) {
                     for (String t : loc.getTags()) {
                         if (t.toLowerCase().matches("(.*)" + tag + "(.*)")) {
-                            tags.add(loc.getName());
+                            tags.add(loc);
                         }
                     }
                 }
