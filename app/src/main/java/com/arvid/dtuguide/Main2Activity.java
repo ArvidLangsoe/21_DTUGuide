@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -60,8 +61,32 @@ import java.util.Random;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, CompoundButton.OnCheckedChangeListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
 
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.map_layers_checkbox_0:
+                checkBoxMapBasement.setChecked(true);
+                checkBoxMapFirst.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(Floor.basement);
+
+                break;
+            case R.id.map_layers_checkbox_1:
+                checkBoxMapFirst.setChecked(true);
+                checkBoxMapBasement.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(Floor.ground_floor);
+                break;
+            case R.id.map_layers_checkbox_2:
+                checkBoxMapSecond.setChecked(true);
+                checkBoxMapBasement.setChecked(false);
+                checkBoxMapFirst.setChecked(false);
+                showFloor(Floor.first_floor);
+        }
+    }
 
     public enum Floor{basement,ground_floor,first_floor}
 
@@ -109,16 +134,6 @@ public class Main2Activity extends AppCompatActivity
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        /*
-        checkBoxMapBasement = (CheckBox)findViewById(R.id.map_layers_checkbox_0);
-        checkBoxMapFirst = (CheckBox)findViewById(R.id.map_layers_checkbox_1);
-        checkBoxMapSecond = (CheckBox)findViewById(R.id.map_layers_checkbox_2);
-
-        checkBoxMapBasement.setOnCheckedChangeListener(this);
-        checkBoxMapFirst.setOnCheckedChangeListener(this);
-        checkBoxMapSecond.setOnCheckedChangeListener(this);
-        */
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -126,7 +141,9 @@ public class Main2Activity extends AppCompatActivity
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View popupLayerView, popupFilterView;
 
             switch (item.getItemId()) {
                 case R.id.map_navigate_button:
@@ -134,30 +151,31 @@ public class Main2Activity extends AppCompatActivity
                     //mTextMessage.setText(R.string.title_home);
                     return true;
                 case R.id.map_layers_button:
-                    /*
-                    PopupMenu popupMenu = new PopupMenu(Main2Activity.this, findViewById(R.id.map_filter_button));
-                    popupMenu.getMenuInflater().inflate(R.menu.filter_dropdown_menu, popupMenu.getMenu());
-                    popupMenu.show();
-                    */
+                    popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
 
+                    checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
+                    checkBoxMapFirst = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_1);
+                    checkBoxMapSecond = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_2);
+                    
+                    checkBoxMapFirst.setOnClickListener(Main2Activity.this);
+                    checkBoxMapBasement.setOnClickListener(Main2Activity.this);
+                    checkBoxMapSecond.setOnClickListener(Main2Activity.this);
 
-                    View popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
+                    System.out.println("#CHECKBOX TEST#");
+                    System.out.println(checkBoxMapBasement);
 
                     PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                    //popupWindow.setBackgroundDrawable(new BitmapDrawable());
                     popupWindowLayer.setOutsideTouchable(true);
 
-                    //popupWindow.showAtLocation(findViewById(R.id.testeren), Gravity.BOTTOM|Gravity.CENTER, 0, 0);
                     popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
-                    //popupWindow.
 
                     return true;
+
                 case R.id.map_filter_button:
-                    //
-                    View popupFilterView = layoutInflater.inflate(R.layout.map_filter_popup_layout, null);
+                    popupFilterView = layoutInflater.inflate(R.layout.map_filter_popup_layout, null);
 
                     PopupWindow popupWindowFilter = new PopupWindow(popupFilterView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -165,40 +183,43 @@ public class Main2Activity extends AppCompatActivity
 
                     popupWindowFilter.setOutsideTouchable(true);
 
-                    //popupWindow.showAtLocation(findViewById(R.id.testeren), Gravity.BOTTOM|Gravity.CENTER, 0, 0);
                     popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
 
                     return true;
+
             }
             return false;
         }
     };
-
+    /*
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()){
             case R.id.map_layers_checkbox_0:
-                if (isChecked) {
-                    checkBoxMapFirst.setChecked(false);
-                    checkBoxMapSecond.setChecked(false);
-                }
+                checkBoxMapBasement.setChecked(true);
+                checkBoxMapFirst.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(Floor.basement);
+
                 break;
             case R.id.map_layers_checkbox_1:
                 if (isChecked) {
                     checkBoxMapBasement.setChecked(false);
                     checkBoxMapSecond.setChecked(false);
+                    showFloor(Floor.ground_floor);
                 }
                 break;
             case R.id.map_layers_checkbox_2:
                 if (isChecked) {
                     checkBoxMapBasement.setChecked(false);
                     checkBoxMapFirst.setChecked(false);
+                    showFloor(Floor.first_floor);
                 }
                 break;
         }
 
     }
-
+    */
 
 
     @Override
@@ -224,9 +245,6 @@ public class Main2Activity extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
-        //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
-        //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
-        //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
         Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] {""}, null);
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
@@ -457,22 +475,6 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
-        switch ((int)(Math.random()*3)){
-            case 0:
-                showFloor(Floor.basement);
-                System.out.println("Basement");
-                break;
-            case 1:
-                showFloor(Floor.ground_floor);
-
-                System.out.println("GroundFloor");
-                break;
-            case 2:
-                showFloor(Floor.first_floor);
-
-                System.out.println("FirstFloor");
-                break;
-        }
 
     }
 }
