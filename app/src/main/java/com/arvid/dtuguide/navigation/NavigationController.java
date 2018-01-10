@@ -1,6 +1,7 @@
 package com.arvid.dtuguide.navigation;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
@@ -40,10 +41,15 @@ public class NavigationController implements Navigation{
 
 
     private LocationDAO dao;
-    private static List<String> historyList = new ArrayList<String>();
+    private static List<Searchable> historyList = new ArrayList<Searchable>();
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Searchable");
+
+    final String HISTORYPREF = "History_list";
+
+    // create a reference to the shared preferences object
+    SharedPreferences mySharedPreferences;
 
     public NavigationController(){
     }
@@ -106,6 +112,9 @@ public class NavigationController implements Navigation{
         });
     }
 
+    private void updatePref(){
+
+    }
 
 
     public Searchable getSearchableItem(String name) throws LocationDAO.DAOException {
@@ -117,7 +126,7 @@ public class NavigationController implements Navigation{
         else if(historyList.size()==10)
             historyList.remove(historyList.get(0));
 
-        historyList.add(dto.getName());
+        historyList.add(dto);
         System.out.println("HISTORYLIST: " + historyList);
         return dto;
     }
@@ -163,7 +172,7 @@ public class NavigationController implements Navigation{
         return tags;
     }
 
-    public List<String> getHistoryList(){
+    public List<Searchable> getHistoryList(){
         Collections.reverse(historyList);
 
         return historyList;
