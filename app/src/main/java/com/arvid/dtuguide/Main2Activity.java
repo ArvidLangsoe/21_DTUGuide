@@ -135,9 +135,9 @@ public class Main2Activity extends AppCompatActivity
             public boolean onSuggestionClick(int position) {
                 String roomName = adapter.getItemName(position);
                 try {
-                    LocationDTO location = controller.getLocation(roomName);
+                    LocationDTO location = (LocationDTO) controller.getSearchableItem(roomName);
 
-                    showLocation(location.getPosition());
+                    showLocation(new GeoPoint(location.getPosition().longitude, location.getPosition().latitude));
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }

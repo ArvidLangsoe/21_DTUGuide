@@ -15,75 +15,46 @@ public class LocationDAO {
 		public String toString(){return getMessage();}
 	}
 
-	private static HashMap<String, LocationDTO> locations;
+	private static HashMap<String, Searchable> data;
 
 	public LocationDAO(){
 		try {
-			getLocations();
+			getAllData();
 		} catch (Exception e) {
-			setLocations(new HashMap<String, LocationDTO>());
+			setData(new HashMap<String, Searchable>());
 		}
 	}
 
-	public LocationDTO parseToDTO(String string){
-		LocationDTO dto;
-
-		String[] info = string.split(";");
-		String name = info[0];
-		double l1 = Double.parseDouble((info[1].split("-"))[0]);
-		double l2 = Double.parseDouble((info[1].split("-"))[1]);
-		GeoPoint position = new GeoPoint(l1, l2);
-		int stage = Integer.parseInt(info[2]);
-		String description = info[3];
-
-		LocationDTO.MARKTYPE type;
-
-		if(!info[4].equals("null"))
-			type = LocationDTO.MARKTYPE.valueOf(info[4]);
-		else
-			type = null;
-
-		dto = new LocationDTO(new LocationDTO.LocationBuilder(
-				name,
-				position,
-				stage)
-				.description(description)
-				.type(type));
-
-
-		return dto;
-	}
-
-	public HashMap<String, LocationDTO> getLocations() throws DAOException {
-		if(locations !=null)
-			return locations;
+	public HashMap<String, Searchable> getAllData() throws DAOException {
+		if(data !=null)
+			return data;
 		else
 			throw new DAOException("Locations can not be found (Null value).");
 	}
 
-	public boolean setLocations(HashMap<String, LocationDTO> locations) {
-		this.locations = locations;
+	public boolean setData(HashMap<String, Searchable> data) {
+		this.data = data;
 		return true;
 	}
 
-	public LocationDTO getLocation(String name) throws DAOException {
-		LocationDTO location = locations.get(name);
+	public Searchable getData(String name) throws DAOException {
+		Searchable dto = data.get(name);
 
-		if(location!=null)
-			return location;
+		if(dto!=null)
+			return dto;
 		else
-			throw new DAOException("Location "+name+" can not be found (Null value)");
+			throw new DAOException("Searchable "+name+" can not be found (Null value)");
 	}
 
-	public boolean saveLocation(LocationDTO newLocation){
-		locations.put(newLocation.getName(), newLocation);
+	public boolean saveData(Searchable newSearchable){
+		data.put(newSearchable.getName(), newSearchable);
 		return true;
 	}
 
 
 	@RequiresApi(api = Build.VERSION_CODES.N)
-	public boolean updateLocation(LocationDTO newLocation){
-		locations.replace(newLocation.getName(), newLocation);
+	public boolean updateLocation(Searchable newSearchable){
+		data.replace(newSearchable.getName(), newSearchable);
 		return true;
 	}
 }

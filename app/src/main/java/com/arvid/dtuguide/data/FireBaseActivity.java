@@ -48,23 +48,7 @@ public class FireBaseActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
 
-                GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
-                ArrayList<String> map = (ArrayList<String>) dataSnapshot.getValue();
-
-                dao.setLocations(new HashMap<String, LocationDTO>());
-
-                for(String location : map){
-                    dao.saveLocation((dao.parseToDTO(location)));
-                }
-
-                try {
-                    text.setText(dao.getLocations()+"");
-                } catch (LocationDAO.DAOException e) {
-                    e.printStackTrace();
-                }
             }
 
             @Override
