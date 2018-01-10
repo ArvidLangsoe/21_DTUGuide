@@ -156,7 +156,7 @@ public class Main2Activity extends AppCompatActivity
                     checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
                     checkBoxMapFirst = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_1);
                     checkBoxMapSecond = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_2);
-                    
+
                     checkBoxMapFirst.setOnClickListener(Main2Activity.this);
                     checkBoxMapBasement.setOnClickListener(Main2Activity.this);
                     checkBoxMapSecond.setOnClickListener(Main2Activity.this);
