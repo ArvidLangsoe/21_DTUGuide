@@ -183,7 +183,8 @@ public class Main2Activity extends AppCompatActivity
 
                     popupWindowFilter.setOutsideTouchable(true);
 
-                    popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
+                    //popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
+                    popupWindowFilter.showAtLocation(findViewById(R.id.map), Gravity.TOP|Gravity.LEFT, 0, 0);
 
                     return true;
 
