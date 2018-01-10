@@ -2,6 +2,7 @@ package com.arvid.dtuguide.navigation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,7 +19,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +45,8 @@ public class NavigationController implements Navigation{
 
 
     private LocationDAO dao;
-    private static List<Searchable> historyList = new ArrayList<Searchable>();
+    private static List<Searchable> historyList;
+    private Context context;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Searchable");
@@ -51,11 +56,20 @@ public class NavigationController implements Navigation{
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
 
+    SharedPreferences.Editor myEditor;
+
     public NavigationController(){
     }
 
-    public NavigationController(LocationDAO dao){
+    public NavigationController(LocationDAO dao, Context context){
         this.dao = dao;
+        this.context = context;
+
+        mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
+
+        historyList = new ArrayList<Searchable>();
+        //savePrefs();
+
         updateDataFromFireBase();
     }
 
@@ -96,6 +110,11 @@ public class NavigationController implements Navigation{
 
 
                         dao.saveData(dto);
+                        try {
+                            retrievePrefs();
+                        } catch (LocationDAO.DAOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
 
@@ -112,21 +131,40 @@ public class NavigationController implements Navigation{
         });
     }
 
-    private void updatePref(){
+    private void retrievePrefs() throws LocationDAO.DAOException{
+        historyList.clear();
+
+        System.out.println("WARN "+mySharedPreferences.getAll().values());
+
+        System.out.println("WARN 2 :"+mySharedPreferences.getString("0",""));
+
+        for(int i=0;i<mySharedPreferences.getAll().values().size();++i)
+            historyList.add(dao.getData(mySharedPreferences.getString(i+"","")));
 
     }
 
+    private void savePrefs() {
+        myEditor = mySharedPreferences.edit();
+        int i = 0;
+        for (Searchable item : historyList) {
+            myEditor.putString(i+"", item.getName());
+            myEditor.commit();
+
+            ++i;
+        }
+    }
 
     public Searchable getSearchableItem(String name) throws LocationDAO.DAOException {
         Searchable dto = dao.getData(name);
 
-        if(historyList.contains(dto.getName()))
-            historyList.remove(dto.getName());
+        if(historyList.contains(dto))
+            historyList.remove(dto);
 
         else if(historyList.size()==10)
             historyList.remove(historyList.get(0));
 
         historyList.add(dto);
+        savePrefs();
         System.out.println("HISTORYLIST: " + historyList);
         return dto;
     }
@@ -173,9 +211,14 @@ public class NavigationController implements Navigation{
     }
 
     public List<Searchable> getHistoryList(){
-        Collections.reverse(historyList);
+        List<Searchable> list = new ArrayList<Searchable>();
 
-        return historyList;
+        for(Searchable item:historyList) {
+            list.add(item);
+        }
+        Collections.reverse(list);
+
+        return list;
     }
 
     public List<LocationDTO> getLandmarks() throws Exception {

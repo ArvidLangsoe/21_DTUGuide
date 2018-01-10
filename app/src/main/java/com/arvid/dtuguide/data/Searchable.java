@@ -13,6 +13,8 @@ public abstract class Searchable implements Serializable, Comparable<Searchable>
     private String name;
     private List<String> tags;
 
+    public Searchable(){}
+
     public String getName() {
         return name;
     }
