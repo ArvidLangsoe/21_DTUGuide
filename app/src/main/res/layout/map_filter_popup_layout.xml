@@ -10,7 +10,7 @@
 
     <Switch
         android:id="@+id/map_filter_cantine"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:layout_marginStart="24dp"
@@ -23,7 +23,7 @@
 
     <Switch
         android:id="@+id/map_filter_toilet"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="24dp"
