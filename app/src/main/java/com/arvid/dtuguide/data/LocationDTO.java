@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 
-public class LocationDTO extends Searchable{
+public class LocationDTO extends Searchable implements Serializable{
 
     private static final long serialVersionUID = 5555874847854456L;
     //Needed
