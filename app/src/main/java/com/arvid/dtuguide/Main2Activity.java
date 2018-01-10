@@ -275,7 +275,7 @@ public class Main2Activity extends AppCompatActivity
                 try {
                     LocationDTO location = (LocationDTO) controller.getSearchableItem(roomName);
 
-                    showLocation(new GeoPoint(location.getPosition().longitude, location.getPosition().latitude));
+                    showLocation(location);
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
@@ -464,7 +464,7 @@ public class Main2Activity extends AppCompatActivity
         }
 
         //TODO: Remember to change to the floor.
-        LatLng myPoint = new LatLng(location.getPosition().getLat(),location.getPosition().getLong());
+        LatLng myPoint = location.getPosition();
         currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
 

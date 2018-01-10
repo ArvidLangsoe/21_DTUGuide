@@ -9,9 +9,7 @@ import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
 import com.arvid.dtuguide.data.Searchable;
-import com.arvid.dtuguide.navigation.coordinates.CoordinateConverter;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
-import com.arvid.dtuguide.navigation.coordinates.MapPoint;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -175,7 +173,7 @@ public class NavigationController implements Navigation{
         ArrayList<LocationDTO> Landmarks = new ArrayList<LocationDTO>();
 
         for(Searchable item:dao.getAllData().values()){
-            if(item.getClass().isAssignableFrom(LocationDTO.class))){
+            if(item.getClass().isAssignableFrom(LocationDTO.class)){
                 if(!(((LocationDTO) item).getLandmark().equals(MARKTYPE.NONE))){
                     Landmarks.add((LocationDTO) item);
                 }
