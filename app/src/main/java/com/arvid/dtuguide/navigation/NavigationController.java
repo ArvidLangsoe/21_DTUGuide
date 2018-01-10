@@ -2,6 +2,7 @@ package com.arvid.dtuguide.navigation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ public class NavigationController implements Navigation{
 
     private LocationDAO dao;
     private static List<Searchable> historyList = new ArrayList<Searchable>();
+    private Context context;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Searchable");
@@ -51,12 +53,17 @@ public class NavigationController implements Navigation{
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
 
+    SharedPreferences.Editor myEditor;
+
     public NavigationController(){
     }
 
-    public NavigationController(LocationDAO dao){
+    public NavigationController(LocationDAO dao, Context context){
         this.dao = dao;
+        this.context = context;
+
         updateDataFromFireBase();
+        retrievePrefs();
     }
 
 
@@ -112,10 +119,19 @@ public class NavigationController implements Navigation{
         });
     }
 
-    private void updatePref(){
-
+    private void retrievePrefs(){
+        mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
+        historyList = new ArrayList<Searchable>();
+        for(Object str:mySharedPreferences.getAll().values()){
+            historyList=(ArrayList<Searchable>) str;
+        }
     }
 
+    private void savePrefs(){
+        myEditor = mySharedPreferences.edit();
+        myEditor.putString(HISTORYPREF,historyList+"");
+        myEditor.commit();
+    }
 
     public Searchable getSearchableItem(String name) throws LocationDAO.DAOException {
         Searchable dto = dao.getData(name);
@@ -127,6 +143,7 @@ public class NavigationController implements Navigation{
             historyList.remove(historyList.get(0));
 
         historyList.add(dto);
+        savePrefs();
         System.out.println("HISTORYLIST: " + historyList);
         return dto;
     }

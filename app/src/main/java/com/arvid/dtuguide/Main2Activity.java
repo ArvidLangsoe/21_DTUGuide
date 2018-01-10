@@ -114,7 +114,7 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
 
         dao = new LocationDAO();
-        controller = new NavigationController(dao);
+        controller = new NavigationController(dao, getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
