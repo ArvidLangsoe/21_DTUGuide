@@ -22,6 +22,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -153,6 +154,7 @@ public class Main2Activity extends AppCompatActivity
                 case R.id.map_layers_button:
                     popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
 
+
                     checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
                     checkBoxMapFirst = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_1);
                     checkBoxMapSecond = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_2);
@@ -172,6 +174,16 @@ public class Main2Activity extends AppCompatActivity
 
                     popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
 
+
+
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    int width = displayMetrics.widthPixels;
+                    popupWindowLayer.update(findViewById(R.id.navigation),width,400);
+
+
+
+
                     return true;
 
                 case R.id.map_filter_button:
@@ -183,8 +195,11 @@ public class Main2Activity extends AppCompatActivity
 
                     popupWindowFilter.setOutsideTouchable(true);
 
-                    //popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
-                    popupWindowFilter.showAtLocation(findViewById(R.id.map), Gravity.TOP|Gravity.LEFT, 0, 0);
+                    popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
+                    displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    width = displayMetrics.widthPixels;
+                    popupWindowFilter.update(findViewById(R.id.navigation),width,300);
 
                     return true;
 

@@ -9,7 +9,7 @@
 
     <CheckBox
         android:id="@+id/map_layers_checkbox_2"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="48dp"
         android:layout_marginStart="16dp"
@@ -22,7 +22,7 @@
 
     <CheckBox
         android:id="@+id/map_layers_checkbox_1"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="48dp"
         android:layout_marginStart="16dp"
@@ -35,7 +35,7 @@
 
     <CheckBox
         android:id="@+id/map_layers_checkbox_0"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="48dp"
