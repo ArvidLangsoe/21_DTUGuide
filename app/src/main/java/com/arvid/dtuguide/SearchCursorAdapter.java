@@ -29,17 +29,23 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
         String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
         String type = cursor.getString(cursor.getColumnIndex("type"));
+        boolean recent = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("recent")));
+
         nameTV.setText(name);
         typeTV.setText(type);
 
-        switch (type) {
-            case "recent":
-                iconV.setImageResource(R.drawable.ic_history_black_24dp);
-                break;
-            case "favorite":
-                iconV.setImageResource(R.drawable.ic_history_black_24dp);
+        if(recent) {
+            iconV.setImageResource(R.drawable.ic_history_black_24dp);
         }
-
+        else {
+            switch (type) {
+                case "Person":
+                    iconV.setImageResource(R.drawable.ic_perm_identity_black_24dp);
+                    break;
+                case "Location":
+                    iconV.setImageResource(R.drawable.ic_place_black_24dp);
+            }
+        }
     }
 
     @Override
