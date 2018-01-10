@@ -55,39 +55,33 @@ public class Provider extends ContentProvider {
 
         historyList = controller.getHistoryList();
 
-/*
-        historyList = new ArrayList<String>();
-        historyList.add("room1");
-        historyList.add("room2");
-*/
-        System.out.println("LISTX: "+ historyList);
-        String search=selectionArgs[0];
-
+        String search = selectionArgs[0];
         int id = 0;
-        MatrixCursor roomsCursor = new MatrixCursor(new String[]{"_id", "name"});
+
+        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type"});
 
         if(search.isEmpty()) {
             for (String name : historyList) {
-                Object[] obj = {id, name};
+                Object[] obj = {id, name, "recent" };
                 id++;
-                roomsCursor.addRow(obj);
+                suggestionsCursor.addRow(obj);
             }
         }
         else{
             try {
-                List<String> myList =controller.searchMatch(search);
+                List<String> suggestionsList = controller.searchMatch(search);
 
-                for (String name :  myList) {
-                    Object[] obj = {id, name};
+                for (String name :  suggestionsList) {
+                    Object[] obj = {id, name, "type"};
                     id++;
-                    roomsCursor.addRow(obj);
+                    suggestionsCursor.addRow(obj);
                 }
             } catch (LocationDAO.DAOException e) {
                 e.printStackTrace();
             }
         }
 
-        return roomsCursor;
+        return suggestionsCursor;
     }
 
     @Nullable

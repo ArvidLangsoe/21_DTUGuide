@@ -1,11 +1,20 @@
 package com.arvid.dtuguide;
 
+import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.MatrixCursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,21 +22,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.NavigationController;
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
@@ -38,17 +54,51 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.w3c.dom.Text;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
-import java.util.List;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.map_layers_checkbox_0:
+                checkBoxMapBasement.setChecked(true);
+                checkBoxMapFirst.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(Floor.basement);
+
+                break;
+            case R.id.map_layers_checkbox_1:
+                checkBoxMapFirst.setChecked(true);
+                checkBoxMapBasement.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(Floor.ground_floor);
+                break;
+            case R.id.map_layers_checkbox_2:
+                checkBoxMapSecond.setChecked(true);
+                checkBoxMapBasement.setChecked(false);
+                checkBoxMapFirst.setChecked(false);
+                showFloor(Floor.first_floor);
+        }
+    }
+
+    public enum Floor{basement,ground_floor,first_floor}
 
     private GoogleMap mMap;
 
     private Marker currentMarker;
-    private GroundOverlay ballerupMap;
+
+    private static ArrayList<GroundOverlay> currentMaps;
+    private static HashMap<Floor,ArrayList<GroundOverlay>> maps=new HashMap<Floor,ArrayList<GroundOverlay>>();
+
+
+    private int LOCATION_REQUEST_CODE=4565;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
@@ -56,10 +106,13 @@ public class Main2Activity extends AppCompatActivity
     NavigationController controller;
     LocationDAO dao;
 
+    private CheckBox checkBoxMapBasement, checkBoxMapFirst, checkBoxMapSecond;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         dao = new LocationDAO();
         controller = new NavigationController(dao);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,12 +127,100 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        MapActivity fragment = new MapActivity();
-
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View popupLayerView, popupFilterView;
+
+            switch (item.getItemId()) {
+                case R.id.map_navigate_button:
+                    //TODO: What to happen when the bottom menu is clicked
+                    //mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.map_layers_button:
+                    popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
+
+                    checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
+                    checkBoxMapFirst = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_1);
+                    checkBoxMapSecond = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_2);
+
+                    checkBoxMapFirst.setOnClickListener(Main2Activity.this);
+                    checkBoxMapBasement.setOnClickListener(Main2Activity.this);
+                    checkBoxMapSecond.setOnClickListener(Main2Activity.this);
+
+                    System.out.println("#CHECKBOX TEST#");
+                    System.out.println(checkBoxMapBasement);
+
+                    PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    popupWindowLayer.setOutsideTouchable(true);
+
+                    popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
+
+                    return true;
+
+                case R.id.map_filter_button:
+                    popupFilterView = layoutInflater.inflate(R.layout.map_filter_popup_layout, null);
+
+                    PopupWindow popupWindowFilter = new PopupWindow(popupFilterView,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    popupWindowFilter.setOutsideTouchable(true);
+
+                    popupWindowFilter.showAsDropDown(findViewById(R.id.map_filter_button));
+
+                    return true;
+
+            }
+            return false;
+        }
+    };
+    /*
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()){
+            case R.id.map_layers_checkbox_0:
+                checkBoxMapBasement.setChecked(true);
+                checkBoxMapFirst.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(Floor.basement);
+
+                break;
+            case R.id.map_layers_checkbox_1:
+                if (isChecked) {
+                    checkBoxMapBasement.setChecked(false);
+                    checkBoxMapSecond.setChecked(false);
+                    showFloor(Floor.ground_floor);
+                }
+                break;
+            case R.id.map_layers_checkbox_2:
+                if (isChecked) {
+                    checkBoxMapBasement.setChecked(false);
+                    checkBoxMapFirst.setChecked(false);
+                    showFloor(Floor.first_floor);
+                }
+                break;
+        }
+
+    }
+    */
+
 
     @Override
     public void onBackPressed() {
@@ -104,9 +245,6 @@ public class Main2Activity extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
-        //Cursor cursorRecent = getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
-        //Cursor cursorRooms = getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { "" }, null);
-        //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
         Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] {""}, null);
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
@@ -187,20 +325,12 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle bottom_navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.navigate_to_dtu) {
-            startActivity(new Intent(this, NavigateToDTUActivity.class));
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        switch (item.getItemId()) {
+            case R.id.navigate_to_dtu:
+                startActivity(new Intent(this, NavigateToDTUActivity.class));
+                System.out.println("XX HELLOE XX");
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -211,41 +341,140 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(this);
 
-
-        //Delete this for drawn map
-        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.setIndoorEnabled(false);
 
         mMap.setMinZoomPreference(16);
         mMap.setMaxZoomPreference(20);
 
-        // Add a marker in Sydney and move the camera
         LatLng ballerupSW = new LatLng(55.730327, 12.393678);
         LatLng ballerupNE = new LatLng(55.732781, 12.401019);
 
         LatLng ballerupCenter = new LatLng(55.731543, 12.396680);
 
-
         LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW,ballerupNE);
 
-        currentMarker=mMap.addMarker(new MarkerOptions().position(ballerupCenter).title("Ballerup Campus"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter,16f));
 
-        GroundOverlayOptions options =new GroundOverlayOptions();
-        options.image(BitmapDescriptorFactory.fromResource(R.drawable.low_res_dtu_map)).positionFromBounds(ballerupBounds);
-        ballerupMap = googleMap.addGroundOverlay(options);
+        LatLngBounds BALLERUP = new LatLngBounds(new LatLng(55.730067,12.393402),new LatLng(55.733131,12.402851));
+        mMap.setLatLngBoundsForCameraTarget(BALLERUP);
+
+        Bitmap basement = BitmapFactory.decodeResource(getResources(),R.drawable.basement);
+        generateGroundOverlay(basement,Floor.basement,ballerupSW, ballerupNE);
+        Bitmap groundFloor = BitmapFactory.decodeResource(getResources(),R.drawable.ground_floor);
+        generateGroundOverlay(groundFloor,Floor.ground_floor,ballerupSW, ballerupNE);
+        Bitmap firstFloor = BitmapFactory.decodeResource(getResources(),R.drawable.first_floor);
+        generateGroundOverlay(firstFloor,Floor.first_floor,ballerupSW, ballerupNE);
+
+        showFloor(Floor.ground_floor);
+        enableGPS();
 
 
-        showLocation(new GeoPoint(12.395511,55.731598));
     }
 
-    public void showLocation(GeoPoint point){
-        currentMarker.remove();
-        LatLng myPoint = new LatLng(point.getLat(),point.getLong());
-        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title("Some Point"));
+    public void showFloor(Floor floor){
+        if(null!=currentMaps){
+            for(GroundOverlay o :currentMaps){
+                o.setVisible(false);
+            }
+        }
 
+        for(GroundOverlay o :maps.get(floor)){
+            o.setVisible(true);
+        }
+
+        currentMaps=maps.get(floor);
+    }
+
+    private void generateGroundOverlay(Bitmap dtuMap,Floor floor,LatLng swCorner, LatLng neCorner){
+        int height = dtuMap.getHeight();
+        int width = dtuMap.getWidth();
+        int heightTiles = 2;
+        int widthTiles = 4;
+
+        double tileSizeLat=(neCorner.latitude-swCorner.latitude)/heightTiles;
+        double tileSizeLong=(neCorner.longitude-swCorner.longitude)/widthTiles;
+        maps.put(floor,new ArrayList<GroundOverlay>());
+
+        for(int heightTile=0;heightTile<heightTiles;heightTile++){
+            for(int widthTile=0;widthTile<widthTiles;widthTile++){
+                Bitmap bm=Bitmap.createBitmap(dtuMap,widthTile*(width/widthTiles),heightTile*(height/heightTiles),width/widthTiles,height/heightTiles);
+
+                GroundOverlayOptions options =new GroundOverlayOptions();
+
+                LatLng sw = new LatLng(neCorner.latitude-(heightTile+1)*tileSizeLat,swCorner.longitude+widthTile*tileSizeLong);
+                LatLng ne = new LatLng(neCorner.latitude-(heightTile)*tileSizeLat,swCorner.longitude+(widthTile+1)*tileSizeLong);
+
+                System.out.println("Coor: " + sw + " " + ne);
+                LatLngBounds tempBounds = new LatLngBounds(sw,ne);
+
+                options.image(BitmapDescriptorFactory.fromBitmap(bm)).positionFromBounds(tempBounds);
+
+                GroundOverlay overlay = mMap.addGroundOverlay(options);
+
+                maps.get(floor).add(overlay);
+                overlay.setVisible(false);
+
+            }
+        }
+    }
+
+    private void enableGPS(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+
+            mMap.setMyLocationEnabled(true);
+            System.out.println("GPS: GPS enabled: "+mMap.isMyLocationEnabled());
+        }
+        else{
+            System.out.println("GPS: No GPS accesss allowed, requesting permission");
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+                System.out.println("GPS: Need explanation. See permission requests android.");
+            }
+            else{
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_REQUEST_CODE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        System.out.println("GPS: Handling Request result");
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            try {
+                mMap.setMyLocationEnabled(true);
+            }catch (SecurityException e){
+                System.out.println("GPS: Security Exception, user denied GPS access.");
+            }
+        }
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        //Todo: Add a check to see if the user is outside the map.
+        return false;
+    }
+
+
+    public void showLocation(LocationDTO location){
+        if(currentMarker!=null) {
+            currentMarker.remove();
+        }
+
+        //TODO: Remember to change to the floor.
+        LatLng myPoint = new LatLng(location.getPosition().getLat(),location.getPosition().getLong());
+        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
+
+    }
+
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+        System.out.println("UserClick: "+ latLng);
 
     }
 }
