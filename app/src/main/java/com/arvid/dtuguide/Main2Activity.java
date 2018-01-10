@@ -459,6 +459,7 @@ public class Main2Activity extends AppCompatActivity
                 == PackageManager.PERMISSION_GRANTED){
 
             mMap.setMyLocationEnabled(true);
+
             System.out.println("GPS: GPS enabled: "+mMap.isMyLocationEnabled());
         }
         else{
