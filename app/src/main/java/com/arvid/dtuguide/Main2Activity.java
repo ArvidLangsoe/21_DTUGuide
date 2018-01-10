@@ -72,19 +72,21 @@ public class Main2Activity extends AppCompatActivity
                 checkBoxMapFirst.setChecked(false);
                 checkBoxMapSecond.setChecked(false);
                 showFloor(Floor.basement);
-
+                currentMap = Floor.basement;
                 break;
             case R.id.map_layers_checkbox_1:
                 checkBoxMapFirst.setChecked(true);
                 checkBoxMapBasement.setChecked(false);
                 checkBoxMapSecond.setChecked(false);
                 showFloor(Floor.ground_floor);
+                currentMap = Floor.ground_floor;
                 break;
             case R.id.map_layers_checkbox_2:
                 checkBoxMapSecond.setChecked(true);
                 checkBoxMapBasement.setChecked(false);
                 checkBoxMapFirst.setChecked(false);
                 showFloor(Floor.first_floor);
+                currentMap = Floor.first_floor;
         }
     }
 
@@ -105,6 +107,8 @@ public class Main2Activity extends AppCompatActivity
     public static final String TAG = "";
     NavigationController controller;
     LocationDAO dao;
+
+    private Floor currentMap;
 
     private CheckBox checkBoxMapBasement, checkBoxMapFirst, checkBoxMapSecond;
 
@@ -134,6 +138,8 @@ public class Main2Activity extends AppCompatActivity
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        currentMap = Floor.ground_floor;
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -161,8 +167,17 @@ public class Main2Activity extends AppCompatActivity
                     checkBoxMapBasement.setOnClickListener(Main2Activity.this);
                     checkBoxMapSecond.setOnClickListener(Main2Activity.this);
 
-                    System.out.println("#CHECKBOX TEST#");
-                    System.out.println(checkBoxMapBasement);
+                    switch (currentMap) {
+                        case basement:
+                            checkBoxMapBasement.setChecked(true);
+                            break;
+                        case ground_floor:
+                            checkBoxMapFirst.setChecked(true);
+                            break;
+                        case first_floor:
+                            checkBoxMapSecond.setChecked(true);
+                            break;
+                    }
 
                     PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
