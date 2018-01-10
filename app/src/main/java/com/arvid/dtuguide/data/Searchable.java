@@ -34,7 +34,7 @@ public abstract class Searchable implements Serializable, Comparable<Searchable>
     public abstract String getDescription();
 
     public String getType(){
-        if(this instanceof LocationDTO)
+        if(this.getClass().isAssignableFrom(LocationDTO.class))
             return "Location";
         else
             return "Person";

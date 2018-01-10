@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -40,8 +41,7 @@ public class Provider extends ContentProvider {
     public static final String TAG = "";
     private static LocationDAO dao;
     private static NavigationController controller;
-    private List<String> historyList;
-
+    private List<Searchable> historyList;
 
     @Override
     public boolean onCreate() {
@@ -59,11 +59,11 @@ public class Provider extends ContentProvider {
         String search = selectionArgs[0];
         int id = 0;
 
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type"});
+        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type", "recent"});
 
         if(search.isEmpty()) {
-            for (String name : historyList) {
-                Object[] obj = {id, name, "recent" };
+            for (Searchable item : historyList) {
+                Object[] obj = {id, item.getName(), item.getType(), true };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -73,7 +73,7 @@ public class Provider extends ContentProvider {
                 List<Searchable> suggestionsList = controller.searchMatch(search);
 
                 for (Searchable item :  suggestionsList) {
-                    Object[] obj = {id, item.getName(), "type"};
+                    Object[] obj = {id, item.getName(), item.getType(), historyList.contains(item)};
                     id++;
                     suggestionsCursor.addRow(obj);
                 }
