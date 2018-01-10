@@ -1,14 +1,11 @@
 package com.arvid.dtuguide;
 
-import android.*;
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -42,12 +39,10 @@ import android.widget.Toast;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.NavigationController;
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
@@ -58,20 +53,26 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Random;
+
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, CompoundButton.OnCheckedChangeListener {
 
 
+    public enum Floor{basement,ground_floor,first_floor}
+
     private GoogleMap mMap;
 
     private Marker currentMarker;
-    private static ArrayList<GroundOverlay> ballerupMap = new ArrayList<>();
+
+    private static ArrayList<GroundOverlay> currentMaps;
+    private static HashMap<Floor,ArrayList<GroundOverlay>> maps=new HashMap<Floor,ArrayList<GroundOverlay>>();
+
+
     private int LOCATION_REQUEST_CODE=4565;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -341,16 +342,34 @@ public class Main2Activity extends AppCompatActivity
         LatLngBounds BALLERUP = new LatLngBounds(new LatLng(55.730067,12.393402),new LatLng(55.733131,12.402851));
         mMap.setLatLngBoundsForCameraTarget(BALLERUP);
 
+        Bitmap basement = BitmapFactory.decodeResource(getResources(),R.drawable.basement);
+        generateGroundOverlay(basement,Floor.basement,ballerupSW, ballerupNE);
+        Bitmap groundFloor = BitmapFactory.decodeResource(getResources(),R.drawable.ground_floor);
+        generateGroundOverlay(groundFloor,Floor.ground_floor,ballerupSW, ballerupNE);
+        Bitmap firstFloor = BitmapFactory.decodeResource(getResources(),R.drawable.first_floor);
+        generateGroundOverlay(firstFloor,Floor.first_floor,ballerupSW, ballerupNE);
 
-        Bitmap dtuMap = BitmapFactory.decodeResource(getResources(),R.drawable.dtu_map);
-
-        addGroundOverlay(dtuMap,ballerupSW, ballerupNE);
+        showFloor(Floor.ground_floor);
         enableGPS();
 
 
     }
 
-    private void addGroundOverlay(Bitmap dtuMap,LatLng swCorner, LatLng neCorner){
+    public void showFloor(Floor floor){
+        if(null!=currentMaps){
+            for(GroundOverlay o :currentMaps){
+                o.setVisible(false);
+            }
+        }
+
+        for(GroundOverlay o :maps.get(floor)){
+            o.setVisible(true);
+        }
+
+        currentMaps=maps.get(floor);
+    }
+
+    private void generateGroundOverlay(Bitmap dtuMap,Floor floor,LatLng swCorner, LatLng neCorner){
         int height = dtuMap.getHeight();
         int width = dtuMap.getWidth();
         int heightTiles = 2;
@@ -358,6 +377,7 @@ public class Main2Activity extends AppCompatActivity
 
         double tileSizeLat=(neCorner.latitude-swCorner.latitude)/heightTiles;
         double tileSizeLong=(neCorner.longitude-swCorner.longitude)/widthTiles;
+        maps.put(floor,new ArrayList<GroundOverlay>());
 
         for(int heightTile=0;heightTile<heightTiles;heightTile++){
             for(int widthTile=0;widthTile<widthTiles;widthTile++){
@@ -372,8 +392,11 @@ public class Main2Activity extends AppCompatActivity
                 LatLngBounds tempBounds = new LatLngBounds(sw,ne);
 
                 options.image(BitmapDescriptorFactory.fromBitmap(bm)).positionFromBounds(tempBounds);
-                ballerupMap.add(mMap.addGroundOverlay(options));
 
+                GroundOverlay overlay = mMap.addGroundOverlay(options);
+
+                maps.get(floor).add(overlay);
+                overlay.setVisible(false);
 
             }
         }
@@ -421,6 +444,8 @@ public class Main2Activity extends AppCompatActivity
         if(currentMarker!=null) {
             currentMarker.remove();
         }
+
+        //TODO: Remember to change to the floor.
         LatLng myPoint = new LatLng(location.getPosition().getLat(),location.getPosition().getLong());
         currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
@@ -430,6 +455,24 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onMapClick(LatLng latLng) {
+
         System.out.println("UserClick: "+ latLng);
+        switch ((int)(Math.random()*3)){
+            case 0:
+                showFloor(Floor.basement);
+                System.out.println("Basement");
+                break;
+            case 1:
+                showFloor(Floor.ground_floor);
+
+                System.out.println("GroundFloor");
+                break;
+            case 2:
+                showFloor(Floor.first_floor);
+
+                System.out.println("FirstFloor");
+                break;
+        }
+
     }
 }
