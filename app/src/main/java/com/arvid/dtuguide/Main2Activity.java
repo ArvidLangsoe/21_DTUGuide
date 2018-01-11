@@ -9,12 +9,12 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
@@ -24,7 +24,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,14 +31,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
@@ -60,7 +54,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 
 public class Main2Activity extends AppCompatActivity
@@ -132,9 +125,22 @@ public class Main2Activity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                searchView.clearFocus();
+            }
+        };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -266,9 +272,9 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            System.out.println("BACK PRESSED");
+
             hideSoftKeyboard();
-            super.onBackPressed();
+            //super.onBackPressed();
 
         }
     }
@@ -304,8 +310,13 @@ public class Main2Activity extends AppCompatActivity
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     toggle.setDrawerIndicatorEnabled(false);
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    /*
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.add(R.id.map, new SearchFragment()).commit();
+                    transaction.addToBackStack("SearchFragment");
+                    */
                 }
                 else {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -374,7 +385,7 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -385,9 +396,9 @@ public class Main2Activity extends AppCompatActivity
                 onBackPressed();
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+    */
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -396,8 +407,12 @@ public class Main2Activity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.navigate_to_dtu:
                 startActivity(new Intent(this, NavigateToDTUActivity.class));
-                System.out.println("XX HELLOE XX");
                 break;
+            /*
+            case R.id.nav_drawer_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            */
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
