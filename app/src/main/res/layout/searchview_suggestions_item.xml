@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/search_item_icon"
@@ -24,4 +24,5 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:text="TextView" />
+
 </LinearLayout>

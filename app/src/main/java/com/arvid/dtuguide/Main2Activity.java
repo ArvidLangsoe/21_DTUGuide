@@ -1,6 +1,7 @@
 package com.arvid.dtuguide;
 
 import android.Manifest;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -58,7 +59,7 @@ import java.util.HashMap;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
 
 
     @Override
@@ -86,6 +87,23 @@ public class Main2Activity extends AppCompatActivity
                 currentMap = Floor.first_floor;
         }
     }
+
+    @Override
+    public void onBackStackChanged() {
+        System.out.println("### BACKSTACK COUNT ###");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
+        if(getSupportFragmentManager().getBackStackEntryCount()>0) {
+            toggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toggle.setDrawerIndicatorEnabled(true);
+        }
+
+    }
+
 
     public enum Floor{basement,ground_floor,first_floor}
 
@@ -128,8 +146,8 @@ public class Main2Activity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
             public void onDrawerClosed(View view) {
+                view.requestFocus();
                 super.onDrawerClosed(view);
-                searchView.clearFocus();
             }
         };
         drawer.addDrawerListener(toggle);
@@ -154,6 +172,9 @@ public class Main2Activity extends AppCompatActivity
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         currentMap = Floor.ground_floor;
+
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        //Handle when activity is recreated like on orientation Change
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -272,7 +293,9 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            searchView.clearFocus();
             super.onBackPressed();
+
         }
     }
 
@@ -294,6 +317,7 @@ public class Main2Activity extends AppCompatActivity
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
+        searchView.setFocusable(false);
 
         // Remove underline on search view
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
@@ -305,19 +329,15 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+                final String BACK_STACK_ROOT_TAG = "search_fragment";
                 if(hasFocus) {
-                    toggle.setDrawerIndicatorEnabled(false);
+                    getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.add(R.id.map, new SearchFragment())
-                        .addToBackStack("SearchFragment")
-                        .commit();
+                    transaction.replace(R.id.map, new SearchFragment())
+                            .addToBackStack(BACK_STACK_ROOT_TAG)
+                            .commit();
 
-
-                }
-                else {
-                    //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                    //toggle.setDrawerIndicatorEnabled(true);
                 }
             }
         });
@@ -351,7 +371,8 @@ public class Main2Activity extends AppCompatActivity
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
-                searchView.setQuery("", false);
+                searchView.setQuery(roomName, false);
+                onBackPressed();
                 return true;
             }
         });
@@ -360,7 +381,14 @@ public class Main2Activity extends AppCompatActivity
 
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
+
         searchEditText.setDropDownAnchor(R.id.toolbar);
+
+        //searchEditText.setDropDownAnchor(R.id.anchor_dropdown);
+        //searchEditText.setDropDownHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        searchEditText.setDropDownVerticalOffset(58);
+
 
         final View dropDownAnchor = findViewById(searchEditText.getDropDownAnchor());
 
@@ -379,8 +407,30 @@ public class Main2Activity extends AppCompatActivity
 
 
 
+
+
         return true;
     }
+
+    /*
+    @Override
+    public void onBackStackChanged() {
+        shouldDisplayHomeUp();
+    }
+
+    public void shouldDisplayHomeUp(){
+        //Enable Up button only  if there are entries in the back stack
+        boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        //This method is called when the up button is pressed. Just the pop back stack.
+        getSupportFragmentManager().popBackStack();
+        return true;
+    }
+    */
 
     /*
     @Override
@@ -554,7 +604,6 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
-        hideSoftKeyboard();
 
     }
 
