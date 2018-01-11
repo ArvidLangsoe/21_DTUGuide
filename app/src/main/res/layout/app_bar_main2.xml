@@ -19,6 +19,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/app_bar_background_shape"
             android:elevation="4dp"
+            app:theme="@style/ToolbarColoredBackArrow"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         <View
