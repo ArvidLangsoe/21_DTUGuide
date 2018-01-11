@@ -96,10 +96,12 @@ public class Main2Activity extends AppCompatActivity
         if(getSupportFragmentManager().getBackStackEntryCount()>0) {
             toggle.setDrawerIndicatorEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         }
         else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             toggle.setDrawerIndicatorEnabled(true);
+            getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
 
     }
@@ -130,6 +132,7 @@ public class Main2Activity extends AppCompatActivity
     private SearchView searchView;
 
     ActionBarDrawerToggle toggle;
+    private final String BACK_STACK_ROOT_TAG = "search_fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -293,8 +296,9 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            searchView.clearFocus();
-            super.onBackPressed();
+            //searchView.clearFocus();
+            hideSoftKeyboard();
+            //super.onBackPressed();
 
         }
     }
@@ -319,6 +323,7 @@ public class Main2Activity extends AppCompatActivity
         searchView.setSuggestionsAdapter(adapter);
         searchView.setFocusable(false);
 
+
         // Remove underline on search view
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
         View v2 = (LinearLayout)searchView.findViewById(android.support.v7.appcompat.R.id.search_voice_btn).getParent();
@@ -329,7 +334,7 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                final String BACK_STACK_ROOT_TAG = "search_fragment";
+
                 if(hasFocus) {
                     getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
@@ -338,6 +343,12 @@ public class Main2Activity extends AppCompatActivity
                             .addToBackStack(BACK_STACK_ROOT_TAG)
                             .commit();
 
+                    System.out.println("***SEARCHVIEW FOCUS***");
+
+                }
+                else {
+                    getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    System.out.println("***SEARCHVIEW _NOT_ FOCUS***");
                 }
             }
         });
@@ -424,13 +435,14 @@ public class Main2Activity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
     }
 
+*/
     @Override
     public boolean onSupportNavigateUp() {
         //This method is called when the up button is pressed. Just the pop back stack.
-        getSupportFragmentManager().popBackStack();
-        return true;
+        //getSupportFragmentManager().popBackStack();
+        return false;
     }
-    */
+
 
     /*
     @Override
@@ -604,12 +616,13 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
-
+        hideSoftKeyboard();
     }
 
     private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         searchView.clearFocus();
+        //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }
