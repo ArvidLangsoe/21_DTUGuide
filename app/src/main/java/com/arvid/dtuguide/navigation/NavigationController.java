@@ -11,7 +11,6 @@ import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
 import com.arvid.dtuguide.data.Searchable;
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,7 +39,6 @@ import static com.arvid.dtuguide.Main2Activity.TAG;
 
 public class NavigationController implements Navigation{
 
-    private GeoPoint myLocation=new GeoPoint(12.395167,55.732010);
 
 
 

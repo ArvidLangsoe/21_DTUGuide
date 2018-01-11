@@ -4,7 +4,6 @@ package com.arvid.dtuguide.data;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 
 import java.util.HashMap;
 
