@@ -272,10 +272,7 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-
-            hideSoftKeyboard();
-            //super.onBackPressed();
-
+            super.onBackPressed();
         }
     }
 
@@ -408,11 +405,10 @@ public class Main2Activity extends AppCompatActivity
             case R.id.navigate_to_dtu:
                 startActivity(new Intent(this, NavigateToDTUActivity.class));
                 break;
-            /*
+
             case R.id.nav_drawer_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            */
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
