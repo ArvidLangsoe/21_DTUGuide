@@ -308,16 +308,16 @@ public class Main2Activity extends AppCompatActivity
                 if(hasFocus) {
                     toggle.setDrawerIndicatorEnabled(false);
 
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    /*
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.add(R.id.map, new SearchFragment()).commit();
-                    transaction.addToBackStack("SearchFragment");
-                    */
+                    transaction.add(R.id.map, new SearchFragment())
+                        .addToBackStack("SearchFragment")
+                        .commit();
+
+
                 }
                 else {
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                    toggle.setDrawerIndicatorEnabled(true);
+                    //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    //toggle.setDrawerIndicatorEnabled(true);
                 }
             }
         });
