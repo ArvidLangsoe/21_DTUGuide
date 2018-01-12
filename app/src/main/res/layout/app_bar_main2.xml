@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/testeren"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,14 +18,10 @@
             android:layout_margin="10dp"
             android:background="@drawable/app_bar_background_shape"
             android:elevation="4dp"
+            app:theme="@style/ToolbarColoredBackArrow"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-        <View
-            android:id="@+id/anchor_dropdown"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
     </android.support.design.widget.AppBarLayout>
-
 
     <include layout="@layout/content_main2" />
 

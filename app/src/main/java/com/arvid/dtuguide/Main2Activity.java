@@ -1,6 +1,7 @@
 package com.arvid.dtuguide;
 
 import android.Manifest;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,12 +9,13 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
@@ -23,7 +25,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,13 +32,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.PopupMenu;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
@@ -58,12 +55,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
 
 
     @Override
@@ -92,6 +88,25 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onBackStackChanged() {
+        System.out.println("### BACKSTACK COUNT ###");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
+        if(getSupportFragmentManager().getBackStackEntryCount()>0) {
+            toggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
+        else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toggle.setDrawerIndicatorEnabled(true);
+            getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+
+    }
+
+
     public enum Floor{basement,ground_floor,first_floor}
 
     private GoogleMap mMap;
@@ -116,6 +131,9 @@ public class Main2Activity extends AppCompatActivity
 
     private SearchView searchView;
 
+    ActionBarDrawerToggle toggle;
+    private final String BACK_STACK_ROOT_TAG = "search_fragment";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,10 +145,24 @@ public class Main2Activity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerClosed(View view) {
+                view.requestFocus();
+                super.onDrawerClosed(view);
+            }
+        };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -139,11 +171,13 @@ public class Main2Activity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         currentMap = Floor.ground_floor;
+
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        //Handle when activity is recreated like on orientation Change
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -262,7 +296,10 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //searchView.clearFocus();
+            hideSoftKeyboard();
+            //super.onBackPressed();
+
         }
     }
 
@@ -284,6 +321,37 @@ public class Main2Activity extends AppCompatActivity
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
+        searchView.setFocusable(false);
+
+
+        // Remove underline on search view
+        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        View v2 = (LinearLayout)searchView.findViewById(android.support.v7.appcompat.R.id.search_voice_btn).getParent();
+        v.setBackgroundColor(Color.WHITE);
+        v2.setBackgroundColor(Color.WHITE);
+
+        searchView.setOnQueryTextFocusChangeListener(new SearchView.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if(hasFocus) {
+                    getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.map, new SearchFragment())
+                            .addToBackStack(BACK_STACK_ROOT_TAG)
+                            .commit();
+
+                    System.out.println("***SEARCHVIEW FOCUS***");
+
+                }
+                else {
+                    getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    System.out.println("***SEARCHVIEW _NOT_ FOCUS***");
+                }
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -314,7 +382,8 @@ public class Main2Activity extends AppCompatActivity
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
-                searchView.setQuery("", false);
+                searchView.setQuery(roomName, false);
+                onBackPressed();
                 return true;
             }
         });
@@ -323,7 +392,14 @@ public class Main2Activity extends AppCompatActivity
 
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
+
         searchEditText.setDropDownAnchor(R.id.toolbar);
+
+        //searchEditText.setDropDownAnchor(R.id.anchor_dropdown);
+        //searchEditText.setDropDownHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        searchEditText.setDropDownVerticalOffset(58);
+
 
         final View dropDownAnchor = findViewById(searchEditText.getDropDownAnchor());
 
@@ -342,19 +418,46 @@ public class Main2Activity extends AppCompatActivity
 
 
 
+
+
         return true;
     }
 
+    /*
+    @Override
+    public void onBackStackChanged() {
+        shouldDisplayHomeUp();
+    }
 
+    public void shouldDisplayHomeUp(){
+        //Enable Up button only  if there are entries in the back stack
+        boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
+    }
+
+*/
+    @Override
+    public boolean onSupportNavigateUp() {
+        //This method is called when the up button is pressed. Just the pop back stack.
+        //getSupportFragmentManager().popBackStack();
+        return false;
+    }
+
+
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+    */
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -363,7 +466,10 @@ public class Main2Activity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.navigate_to_dtu:
                 startActivity(new Intent(this, NavigateToDTUActivity.class));
-                System.out.println("XX HELLOE XX");
+                break;
+
+            case R.id.nav_drawer_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
 
@@ -459,6 +565,7 @@ public class Main2Activity extends AppCompatActivity
                 == PackageManager.PERMISSION_GRANTED){
 
             mMap.setMyLocationEnabled(true);
+
             System.out.println("GPS: GPS enabled: "+mMap.isMyLocationEnabled());
         }
         else{
@@ -510,13 +617,12 @@ public class Main2Activity extends AppCompatActivity
 
         System.out.println("UserClick: "+ latLng);
         hideSoftKeyboard();
-
     }
 
     private void hideSoftKeyboard() {
-        View view = this.getCurrentFocus();
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        view.clearFocus();
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+        searchView.clearFocus();
+        //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }

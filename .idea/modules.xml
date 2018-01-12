@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:\Users\peter\AndroidStudioProjects\21_DTUGuide_real\21_DTUGuide.iml" filepath="C:\Users\peter\AndroidStudioProjects\21_DTUGuide_real\21_DTUGuide.iml" />
-      <module fileurl="file://$PROJECT_DIR$/21_DTUGuide_real.iml" filepath="$PROJECT_DIR$/21_DTUGuide_real.iml" />
-      <module fileurl="file://C:\Users\arvid\AndroidStudioProjects\21_DTUGuide\.idea\21_DTUGuide_real.iml" filepath="C:\Users\arvid\AndroidStudioProjects\21_DTUGuide\.idea\21_DTUGuide_real.iml" />
+      <module fileurl="file://$PROJECT_DIR$/21_DTUGuide.iml" filepath="$PROJECT_DIR$/21_DTUGuide.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -23,6 +23,7 @@ dependencies {
     implementation 'com.android.support:design:25.+'
     implementation 'com.google.firebase:firebase-auth:11.+'
     implementation 'com.google.firebase:firebase-database:11.+'
+    implementation 'com.android.support:support-v4:25.4.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -36,6 +37,10 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.7'
 }
+
+
+
+
 
 
 
