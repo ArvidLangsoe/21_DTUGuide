@@ -6,16 +6,19 @@ package com.arvid.dtuguide.data;
 
 public enum MARKTYPE {
     NONE,
-    CANTEEN,
-    WC,
-    STAIRS_UP,
-    STAIRS_DOWN,
-    STAIRS_UP_DOWN,
+    CANTEEN,//
+    WC,//
+    WC_HANDICAP,//
+    STAIRS_UP,//
+    STAIRS_DOWN,//
+    STAIRS_UP_DOWN,//
     ELEVATOR_UP,
     ELEVATOR_DOWN,
     ELEVATOR_UP_DOWN,
-    KITCHEN,
-    LIBRARY,
-    SHOP
+    KITCHEN,//
+    LIBRARY,//
+    SHOP,//
+    ENTRANCE,//
+    WATER_FOUNTAIN//
 }
 

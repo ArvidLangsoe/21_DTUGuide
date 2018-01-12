@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">#c62828</color>
     <color name="colorPrimaryDark">#8e0000</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#C0C0C0</color>
     <color name="divider_color">#1F000000</color>
     <color name="cards_and_dialogs_color">@android:color/white</color>
+    <color name="kitchenColor">#c14b7a</color>
 </resources>

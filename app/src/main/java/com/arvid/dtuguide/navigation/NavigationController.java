@@ -7,6 +7,7 @@ import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.arvid.dtuguide.Main2Activity;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
@@ -51,6 +52,8 @@ public class NavigationController implements Navigation{
 
     final String HISTORYPREF = "History_list";
 
+    Main2Activity ui;
+
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
 
@@ -59,9 +62,10 @@ public class NavigationController implements Navigation{
     public NavigationController(){
     }
 
-    public NavigationController(LocationDAO dao, Context context){
+    public NavigationController(LocationDAO dao, Context context, Main2Activity ui){
         this.dao = dao;
         this.context = context;
+        this.ui=ui;
 
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
 
@@ -86,40 +90,39 @@ public class NavigationController implements Navigation{
                 //    dao.saveLocation((dao.parseToDTO(location)));
                 //}
 
-                System.out.println("TEST DEBUG : "+map+"");
+                System.out.println("TEST DEBUG : " + map + "");
 
                 HashMap<String, HashMap<String, Object>> locations = map.get("Locations");
 
-                    for(HashMap<String, Object> location:locations.values()) {
+                for (HashMap<String, Object> location : locations.values()) {
 
-                        LatLng geo = new LatLng(
-                                ((HashMap<String, Double>) location.get("position")).get("latitude"),
-                                ((HashMap<String, Double>) location.get("position")).get("longitude")
-                        );
+                    LatLng geo = new LatLng(
+                            ((HashMap<String, Double>) location.get("position")).get("latitude"),
+                            ((HashMap<String, Double>) location.get("position")).get("longitude")
+                    );
 
-                            LocationDTO dto = (LocationDTO) new LocationDTO()
-                                    .setPosition(geo)
-                                    .setFloor(Integer.parseInt((String)location.get("floor")))
-                                    .setDescription((String)location.get("description"))
-                                    .setLandmark(MARKTYPE.valueOf((String)location.get("landmark")))
-                                    .setTags((ArrayList<String>) location.get("tags"))
-                                    .setName((String) location.get("name"));
+                    LocationDTO dto = (LocationDTO) new LocationDTO()
+                            .setPosition(geo)
+                            .setFloor(Integer.parseInt((String) location.get("floor")))
+                            .setDescription((String) location.get("description"))
+                            .setLandmark(MARKTYPE.valueOf((String) location.get("landmark")))
+                            .setTags((ArrayList<String>) location.get("tags"))
+                            .setName((String) location.get("name"));
 
 
-
-                        dao.saveData(dto);
-                        try {
-                            retrievePrefs();
-                        } catch (LocationDAO.DAOException e) {
-                            e.printStackTrace();
-                        }
+                    dao.saveData(dto);
+                    try {
+                        retrievePrefs();
+                    } catch (LocationDAO.DAOException e) {
+                        e.printStackTrace();
                     }
+                }
+                if (ui != null) {
+                    ui.generateLandmarks();
 
-
-
-
-
+                }
             }
+
 
             @Override
             public void onCancelled(DatabaseError error) {
@@ -222,7 +225,9 @@ public class NavigationController implements Navigation{
     public List<LocationDTO> getLandmarks() throws Exception {
         ArrayList<LocationDTO> Landmarks = new ArrayList<LocationDTO>();
 
+
         for(Searchable item:dao.getAllData().values()){
+
             if(item.getClass().isAssignableFrom(LocationDTO.class)){
                 if(!(((LocationDTO) item).getLandmark().equals(MARKTYPE.NONE))){
                     Landmarks.add((LocationDTO) item);
