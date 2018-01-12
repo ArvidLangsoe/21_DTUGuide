@@ -33,11 +33,15 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.data.MARKTYPE;
 import com.arvid.dtuguide.navigation.Floor;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,11 +60,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener,
         GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
 
 
@@ -91,11 +96,12 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
+    private double cameraZoom=0;
     private GoogleMap mMap;
 
     private Marker currentMarker;
 
-    private static ArrayList<GroundOverlay> currentMaps;
+    HashMap<Switch,String> switches= new HashMap<Switch,String>();
     private static HashMap<FloorHeight,Floor> maps=new HashMap<FloorHeight,Floor>();
 
 
@@ -121,7 +127,7 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
 
         dao = new LocationDAO();
-        controller = new NavigationController(dao, getApplicationContext());
+        controller = new NavigationController(dao, getApplicationContext(),this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -204,20 +210,26 @@ public class Main2Activity extends AppCompatActivity
 
                     popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
 
-
-
                     DisplayMetrics displayMetrics = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     int width = displayMetrics.widthPixels;
                     popupWindowLayer.update(findViewById(R.id.navigation),width,400);
 
-
-
-
                     return true;
 
                 case R.id.map_filter_button:
                     popupFilterView = layoutInflater.inflate(R.layout.map_filter_popup_layout, null);
+
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_cantine,"cantine",MARKTYPE.CANTEEN);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_movement,"movement",MARKTYPE.STAIRS_UP);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_public,"public",MARKTYPE.LIBRARY);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_toilet,"toilet",MARKTYPE.WC);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_water,"water",MARKTYPE.WATER_FOUNTAIN);
+
+                    int i=0;
+                    for(Switch s: switches.keySet()) {
+                        s.setOnCheckedChangeListener(Main2Activity.this);
+                    }
 
                     PopupWindow popupWindowFilter = new PopupWindow(popupFilterView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -229,7 +241,7 @@ public class Main2Activity extends AppCompatActivity
                     displayMetrics = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     width = displayMetrics.widthPixels;
-                    popupWindowFilter.update(findViewById(R.id.navigation),width,300);
+                    popupWindowFilter.update(findViewById(R.id.navigation),width,600);
 
                     return true;
 
@@ -237,36 +249,13 @@ public class Main2Activity extends AppCompatActivity
             return false;
         }
     };
-    /*
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch (buttonView.getId()){
-            case R.id.map_layers_checkbox_0:
-                checkBoxMapBasement.setChecked(true);
-                checkBoxMapFirst.setChecked(false);
-                checkBoxMapSecond.setChecked(false);
-                showFloor(Floor.basement);
 
-                break;
-            case R.id.map_layers_checkbox_1:
-                if (isChecked) {
-                    checkBoxMapBasement.setChecked(false);
-                    checkBoxMapSecond.setChecked(false);
-                    showFloor(Floor.ground_floor);
-                }
-                break;
-            case R.id.map_layers_checkbox_2:
-                if (isChecked) {
-                    checkBoxMapBasement.setChecked(false);
-                    checkBoxMapFirst.setChecked(false);
-                    showFloor(Floor.first_floor);
-                }
-                break;
-        }
-
+    private void readyFilterSwitch(View filterView,int id, String nameCheck, MARKTYPE filterSettingCheck){
+        com.arvid.dtuguide.Settings currentSettings = com.arvid.dtuguide.Settings.getInstance();
+        Switch mySwitch =(Switch)filterView.findViewById(id);
+        switches.put(mySwitch,nameCheck);
+        mySwitch.setChecked( currentSettings.isVisible(filterSettingCheck));
     }
-    */
-
 
     @Override
     public void onBackPressed() {
@@ -422,8 +411,13 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
+
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
 
@@ -437,7 +431,6 @@ public class Main2Activity extends AppCompatActivity
 
         LatLng ballerupCenter = new LatLng(55.731543, 12.396680);
 
-        LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW,ballerupNE);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter,16f));
 
@@ -453,9 +446,13 @@ public class Main2Activity extends AppCompatActivity
         Bitmap firstFloor = BitmapFactory.decodeResource(getResources(),R.drawable.first_floor);
         generateGroundOverlay(firstFloor,FloorHeight.first_floor,ballerupSW, ballerupNE);
 
+
+
         showFloor(FloorHeight.ground_floor);
         enableGPS();
+        generateLandmarks();
 
+        mMap.setOnCameraMoveListener(this);
 
     }
 
@@ -498,8 +495,10 @@ public class Main2Activity extends AppCompatActivity
                 floorObj.addOverlay(overlay);
                 overlay.setVisible(false);
 
+
             }
         }
+
     }
 
     private void enableGPS(){
@@ -521,7 +520,13 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
-    private void generateLandmarks(){
+    public void generateLandmarks(){
+       if(maps==null){
+           return;
+       }
+       if(maps.size()<3){
+           return;
+       }
         List<LocationDTO> landmarks;
         try {
             landmarks = controller.getLandmarks();
@@ -530,6 +535,7 @@ public class Main2Activity extends AppCompatActivity
             e.printStackTrace();
             return;
         }
+        System.out.println("LANDMARK: " + landmarks);
         for(LocationDTO landMark : landmarks){
             switch (landMark.getFloor()){
                 case 0:
@@ -543,6 +549,7 @@ public class Main2Activity extends AppCompatActivity
                     break;
             }
         }
+        showFloor(currentMap);
 
     }
 
@@ -569,6 +576,7 @@ public class Main2Activity extends AppCompatActivity
     public void showLocation(LocationDTO location){
         for(Floor f:maps.values()){
             f.removeMarkers();
+            f.hideFloor();
         }
 
         LatLng myPoint = location.getPosition();
@@ -578,12 +586,15 @@ public class Main2Activity extends AppCompatActivity
         switch(location.getFloor()){
             case 0:
                 maps.get(FloorHeight.basement).addMarker(currentMarker).showFloor();
+                currentMap=FloorHeight.basement;
                 break;
             case 1:
                 maps.get(FloorHeight.ground_floor).addMarker(currentMarker).showFloor();
+                currentMap=FloorHeight.ground_floor;
                 break;
             case 2:
                 maps.get(FloorHeight.first_floor).addMarker(currentMarker).showFloor();
+                currentMap=FloorHeight.first_floor;
                 break;
         }
 
@@ -604,5 +615,58 @@ public class Main2Activity extends AppCompatActivity
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         searchView.clearFocus();
+    }
+
+    @Override
+    public void onCameraMove() {
+        double tolerance= 17.5;
+        double newZoom=mMap.getCameraPosition().zoom;
+        if(cameraZoom>tolerance){
+            if(newZoom<=tolerance){
+                showFloor(currentMap);
+            }
+        }else{
+            if(newZoom>tolerance){
+                showFloor(currentMap);
+            }
+        }
+
+        cameraZoom= newZoom;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        System.out.println("TEST"+ isChecked);
+        String filterChanged = switches.get(buttonView);
+        com.arvid.dtuguide.Settings mySettings= com.arvid.dtuguide.Settings.getInstance();
+
+        switch(filterChanged){
+            case "cantine":
+                mySettings.setFilter(MARKTYPE.CANTEEN,isChecked);
+                mySettings.setFilter(MARKTYPE.KITCHEN,isChecked);
+                break;
+            case "movement":
+                mySettings.setFilter(MARKTYPE.STAIRS_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.STAIRS_UP,isChecked);
+                mySettings.setFilter(MARKTYPE.STAIRS_UP_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.ELEVATOR_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.ELEVATOR_UP,isChecked);
+                mySettings.setFilter(MARKTYPE.ELEVATOR_UP_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.ENTRANCE,isChecked);
+                break;
+            case "public":
+                mySettings.setFilter(MARKTYPE.LIBRARY,isChecked);
+                mySettings.setFilter(MARKTYPE.SHOP,isChecked);
+                break;
+            case "toilet":
+                mySettings.setFilter(MARKTYPE.WC,isChecked);
+                mySettings.setFilter(MARKTYPE.WC_HANDICAP,isChecked);
+                break;
+            case "water":
+                mySettings.setFilter(MARKTYPE.WATER_FOUNTAIN,isChecked);
+                break;
+        }
+        showFloor(currentMap);
+
     }
 }
