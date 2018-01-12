@@ -67,7 +67,9 @@ import java.util.List;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListenerGoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener,, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener
+        ,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener
+        , View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
 
 
     @Override
@@ -114,8 +116,6 @@ public class Main2Activity extends AppCompatActivity
 
     }
 
-
-    public enum Floor{basement,ground_floor,first_floor}
 
     private double cameraZoom=0;
     private GoogleMap mMap;
