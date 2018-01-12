@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
+import com.arvid.dtuguide.data.Person;
 import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.google.gson.internal.ObjectConstructor;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -46,15 +48,18 @@ public class NavigationController implements Navigation{
 
     private LocationDAO dao;
     private static List<Searchable> historyList;
+    private static List<Searchable> favorite;
     private Context context;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Searchable");
 
     final String HISTORYPREF = "History_list";
+    final String FAVORITEPREF = "Favorite_list";
 
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
+    SharedPreferences mySharedPreferencesFav;
 
     SharedPreferences.Editor myEditor;
 
@@ -66,8 +71,10 @@ public class NavigationController implements Navigation{
         this.context = context;
 
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
+        mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
 
         historyList = new ArrayList<Searchable>();
+        favorite = new ArrayList<Searchable>();
         //savePrefs();
 
         updateDataFromFireBase();
@@ -91,35 +98,54 @@ public class NavigationController implements Navigation{
                 System.out.println("TEST DEBUG : "+map+"");
 
                 HashMap<String, HashMap<String, Object>> locations = map.get("Locations");
+                HashMap<String, HashMap<String, Object>> persons = map.get("Persons");
 
-                    for(HashMap<String, Object> location:locations.values()) {
+                for(HashMap<String, Object> location:locations.values()) {
 
-                        LatLng geo = new LatLng(
-                                ((HashMap<String, Double>) location.get("position")).get("latitude"),
-                                ((HashMap<String, Double>) location.get("position")).get("longitude")
-                        );
+                    LatLng geo = new LatLng(
+                            ((HashMap<String, Double>) location.get("position")).get("latitude"),
+                            ((HashMap<String, Double>) location.get("position")).get("longitude")
+                    );
 
-                            LocationDTO dto = (LocationDTO) new LocationDTO()
-                                    .setPosition(geo)
-                                    .setFloor(Integer.parseInt((String)location.get("floor")))
-                                    .setDescription((String)location.get("description"))
-                                    .setLandmark(MARKTYPE.valueOf((String)location.get("landmark")))
-                                    .setTags((ArrayList<String>) location.get("tags"))
-                                    .setName((String) location.get("name"));
+                    LocationDTO dto = (LocationDTO) new LocationDTO()
+                            .setPosition(geo)
+                            .setFloor(Integer.parseInt((String)location.get("floor")))
+                            .setDescription((String)location.get("description"))
+                            .setLandmark(MARKTYPE.valueOf((String)location.get("landmark")))
+                            .setTags((ArrayList<String>) location.get("tags"))
+                            .setName((String) location.get("name"));
 
 
+
+                    dao.saveData(dto);
+                }
+
+                for(HashMap<String, Object> person:persons.values()){
+                    Person dto = null;
+                    try {
+                        dto = (Person) new Person()
+                                .setdescription((String)person.get("description"))
+                                .setEmail((String)person.get("email"))
+                                .setPictureURL((String)person.get("pictureURL"))
+                                .setRole((String)person.get("role"))
+                                .setRoom((LocationDTO) dao.getData((String)person.get("roomName")))
+                                .setName((String)person.get("name"));
 
                         dao.saveData(dto);
-                        try {
-                            retrievePrefs();
-                        } catch (LocationDAO.DAOException e) {
-                            e.printStackTrace();
-                        }
+                    } catch (LocationDAO.DAOException e) {
+                        e.printStackTrace();
+                        System.out.println((String)person.get("name")
+                                +" Object Data is rejected because the Room "
+                                +(String)person.get("roomName")+" does not exist.");
                     }
 
+                }
 
-
-
+                try {
+                    retrievePrefs();
+                } catch (LocationDAO.DAOException e) {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -141,18 +167,65 @@ public class NavigationController implements Navigation{
         for(int i=0;i<mySharedPreferences.getAll().values().size();++i)
             historyList.add(dao.getData(mySharedPreferences.getString(i+"","")));
 
+        retrieveFavorite();
+
     }
 
     private void savePrefs() {
         myEditor = mySharedPreferences.edit();
-        int i = 0;
-        for (Searchable item : historyList) {
-            myEditor.putString(i+"", item.getName());
-            myEditor.commit();
+        for(int i = 0; i<historyList.size();++i){
+            myEditor.putString(i+"", historyList.get(i).getName());
+        }
+        myEditor.commit();
+    }
 
-            ++i;
+    private void retrieveFavorite() throws LocationDAO.DAOException{
+        favorite.clear();
+
+        System.out.println("WARN 3 :"+mySharedPreferencesFav.getString("0",""));
+
+        for(int i=0;i<mySharedPreferencesFav.getAll().values().size();++i)
+            favorite.add(dao.getData(mySharedPreferencesFav.getString(i+"","")));
+
+    }
+
+    private void saveFavorite(){
+        myEditor = mySharedPreferencesFav.edit();
+        for(int i = 0; i<favorite.size();++i){
+            myEditor.putString(i+"", favorite.get(i).getName());
+        }
+        myEditor.commit();
+    }
+
+    public void clearFavorite(){
+        myEditor = mySharedPreferencesFav.edit();
+        myEditor.clear();
+        myEditor.commit();
+    }
+
+    public void removeFavorite(Searchable itemTORemove){
+        myEditor = mySharedPreferencesFav.edit();
+
+        for(int i=0; i<favorite.size();++i){
+            if(favorite.get(i).equals(itemTORemove)){
+                myEditor.remove(i+"");
+                try {
+                    retrieveFavorite();
+                } catch (LocationDAO.DAOException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
+
+    public void addFavorite(Searchable item){
+        favorite.add(item);
+        saveFavorite();
+    }
+
+    public List<Searchable> getFavorite(){return favorite;}
+
 
     public Searchable getSearchableItem(String name) throws LocationDAO.DAOException {
         Searchable dto = dao.getData(name);
