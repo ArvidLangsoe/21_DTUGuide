@@ -9,10 +9,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.VectorDrawable;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
@@ -30,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
 import com.arvid.dtuguide.data.LocationDAO;
@@ -109,6 +113,8 @@ public class Main2Activity extends AppCompatActivity
 
     private SearchView searchView;
 
+    ActionBarDrawerToggle toggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,10 +126,24 @@ public class Main2Activity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                searchView.clearFocus();
+            }
+        };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -131,7 +151,6 @@ public class Main2Activity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -255,7 +274,10 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+
+            hideSoftKeyboard();
+            //super.onBackPressed();
+
         }
     }
 
@@ -277,6 +299,33 @@ public class Main2Activity extends AppCompatActivity
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
+
+        // Remove underline on search view
+        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        View v2 = (LinearLayout)searchView.findViewById(android.support.v7.appcompat.R.id.search_voice_btn).getParent();
+        v.setBackgroundColor(Color.WHITE);
+        v2.setBackgroundColor(Color.WHITE);
+
+        searchView.setOnQueryTextFocusChangeListener(new SearchView.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    toggle.setDrawerIndicatorEnabled(false);
+
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    /*
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.add(R.id.map, new SearchFragment()).commit();
+                    transaction.addToBackStack("SearchFragment");
+                    */
+                }
+                else {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    toggle.setDrawerIndicatorEnabled(true);
+                }
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -338,16 +387,20 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+    */
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -356,8 +409,12 @@ public class Main2Activity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.navigate_to_dtu:
                 startActivity(new Intent(this, NavigateToDTUActivity.class));
-                System.out.println("XX HELLOE XX");
                 break;
+            /*
+            case R.id.nav_drawer_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            */
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -544,9 +601,8 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void hideSoftKeyboard() {
-        View view = this.getCurrentFocus();
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        view.clearFocus();
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+        searchView.clearFocus();
     }
 }

@@ -19,7 +19,7 @@
             android:title="@string/campus" />
 
         <item
-            android:id="@+id/drawer_nav_settings"
+            android:id="@+id/nav_drawer_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/settings" />
     </group>
