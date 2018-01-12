@@ -33,6 +33,13 @@ public abstract class Searchable implements Serializable, Comparable<Searchable>
         return this;
     }
 
+    public boolean equals(Searchable o){
+        if(this.getName().equals(o.getName()))
+            return true;
+        else
+            return false;
+    }
+
     public abstract String getDescription();
 
     public String getType(){
