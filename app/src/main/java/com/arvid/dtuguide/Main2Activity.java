@@ -11,12 +11,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +36,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
@@ -59,7 +61,7 @@ import java.util.HashMap;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener, GoogleMap.OnMarkerClickListener {
 
 
     @Override
@@ -85,6 +87,7 @@ public class Main2Activity extends AppCompatActivity
                 checkBoxMapFirst.setChecked(false);
                 showFloor(Floor.first_floor);
                 currentMap = Floor.first_floor;
+                break;
         }
     }
 
@@ -102,8 +105,15 @@ public class Main2Activity extends AppCompatActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             toggle.setDrawerIndicatorEnabled(true);
             getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            searchView.clearFocus();
         }
 
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return false;
     }
 
 
@@ -133,6 +143,7 @@ public class Main2Activity extends AppCompatActivity
 
     ActionBarDrawerToggle toggle;
     private final String BACK_STACK_ROOT_TAG = "search_fragment";
+    private MenuItem bottomNavigationItemSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +184,7 @@ public class Main2Activity extends AppCompatActivity
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //bottomNavigationView.setSelectedItemId(R.id.map_layers_button);
 
         currentMap = Floor.ground_floor;
 
@@ -189,6 +201,15 @@ public class Main2Activity extends AppCompatActivity
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View popupLayerView, popupFilterView;
 
+            if(bottomNavigationItemSelected == item) {
+                bottomNavigationItemSelected = null;
+                item.setChecked(false);
+                return true;
+            }
+
+            bottomNavigationItemSelected = item;
+
+
             switch (item.getItemId()) {
                 case R.id.map_navigate_button:
                     //TODO: What to happen when the bottom menu is clicked
@@ -196,6 +217,7 @@ public class Main2Activity extends AppCompatActivity
                     return true;
                 case R.id.map_layers_button:
                     popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
+
 
 
                     checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
@@ -218,9 +240,11 @@ public class Main2Activity extends AppCompatActivity
                             break;
                     }
 
+
                     PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
+
 
                     popupWindowLayer.setOutsideTouchable(true);
 
@@ -232,9 +256,6 @@ public class Main2Activity extends AppCompatActivity
                     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     int width = displayMetrics.widthPixels;
                     popupWindowLayer.update(findViewById(R.id.navigation),width,400);
-
-
-
 
                     return true;
 
@@ -256,6 +277,7 @@ public class Main2Activity extends AppCompatActivity
                     return true;
 
             }
+
             return false;
         }
     };
@@ -297,8 +319,8 @@ public class Main2Activity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             //searchView.clearFocus();
-            hideSoftKeyboard();
-            //super.onBackPressed();
+            //hideSoftKeyboard();
+            super.onBackPressed();
 
         }
     }
@@ -436,12 +458,14 @@ public class Main2Activity extends AppCompatActivity
     }
 
 */
+    /*
     @Override
     public boolean onSupportNavigateUp() {
         //This method is called when the up button is pressed. Just the pop back stack.
         //getSupportFragmentManager().popBackStack();
         return false;
     }
+    */
 
 
     /*
@@ -482,7 +506,7 @@ public class Main2Activity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
-
+        mMap.setOnMarkerClickListener(this);
         mMap.setIndoorEnabled(false);
 
         mMap.setMinZoomPreference(16);
@@ -599,7 +623,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    public void showLocation(LocationDTO location){
+    public void showLocation(final LocationDTO location){
         if(currentMarker!=null) {
             currentMarker.remove();
         }
@@ -609,6 +633,41 @@ public class Main2Activity extends AppCompatActivity
         currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
 
+
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                View infoWindowContent = getLayoutInflater().inflate(R.layout.infowindow_content, null);
+                TextView nameTV = (TextView)infoWindowContent.findViewById(R.id.info_name);
+                nameTV.setText(location.getName());
+
+                TextView descriptionTV = (TextView)infoWindowContent.findViewById(R.id.info_description);
+                descriptionTV.setText(location.getDescription());
+
+                RecyclerView recyclerView = (RecyclerView)infoWindowContent.findViewById(R.id.info_tags_recyclerview);
+                recyclerView.setHasFixedSize(true);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+                TagsAdapter recAdapter = new TagsAdapter(location.getTags());
+                recyclerView.setAdapter(recAdapter);
+
+                //TextView tvtest = (TextView)infoWindowContent.findViewById(R.id.tagstester);
+                //tvtest.setText(location.getTags().toString());
+
+                return infoWindowContent;
+            }
+        });
+        currentMarker.showInfoWindow();
+
     }
 
 
@@ -616,13 +675,12 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
-        hideSoftKeyboard();
+        getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-        searchView.clearFocus();
         //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 }
