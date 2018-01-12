@@ -6,10 +6,23 @@
     android:layout_height="match_parent"
     tools:context="com.arvid.dtuguide.SettingsActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_simple"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
+
     <fragment
-        android:id="@+id/settings_content"
+        android:id="@+id/content_settings"
+        android:name="com.arvid.dtuguide.SettingsFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:name="com.arvid.dtuguide.SettingsFragment" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_simple" />
 
 </android.support.constraint.ConstraintLayout>

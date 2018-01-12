@@ -1,6 +1,7 @@
 package com.arvid.dtuguide;
 
 import android.Manifest;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -65,8 +66,8 @@ import java.util.List;
 
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListenerGoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener,, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
 
 
     @Override
@@ -95,6 +96,26 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onBackStackChanged() {
+        System.out.println("### BACKSTACK COUNT ###");
+        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
+
+        if(getSupportFragmentManager().getBackStackEntryCount()>0) {
+            toggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
+        else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toggle.setDrawerIndicatorEnabled(true);
+            getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+
+    }
+
+
+    public enum Floor{basement,ground_floor,first_floor}
 
     private double cameraZoom=0;
     private GoogleMap mMap;
@@ -120,6 +141,7 @@ public class Main2Activity extends AppCompatActivity
     private SearchView searchView;
 
     ActionBarDrawerToggle toggle;
+    private final String BACK_STACK_ROOT_TAG = "search_fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,8 +158,8 @@ public class Main2Activity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
             public void onDrawerClosed(View view) {
+                view.requestFocus();
                 super.onDrawerClosed(view);
-                searchView.clearFocus();
             }
         };
         drawer.addDrawerListener(toggle);
@@ -162,6 +184,9 @@ public class Main2Activity extends AppCompatActivity
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         currentMap = FloorHeight.ground_floor;
+
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        //Handle when activity is recreated like on orientation Change
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -263,7 +288,7 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-
+            //searchView.clearFocus();
             hideSoftKeyboard();
             //super.onBackPressed();
 
@@ -288,6 +313,8 @@ public class Main2Activity extends AppCompatActivity
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
+        searchView.setFocusable(false);
+
 
         // Remove underline on search view
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
@@ -299,19 +326,21 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
-                    toggle.setDrawerIndicatorEnabled(false);
 
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    /*
+                if(hasFocus) {
+                    getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.add(R.id.map, new SearchFragment()).commit();
-                    transaction.addToBackStack("SearchFragment");
-                    */
+                    transaction.replace(R.id.map, new SearchFragment())
+                            .addToBackStack(BACK_STACK_ROOT_TAG)
+                            .commit();
+
+                    System.out.println("***SEARCHVIEW FOCUS***");
+
                 }
                 else {
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                    toggle.setDrawerIndicatorEnabled(true);
+                    getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    System.out.println("***SEARCHVIEW _NOT_ FOCUS***");
                 }
             }
         });
@@ -345,7 +374,8 @@ public class Main2Activity extends AppCompatActivity
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
-                searchView.setQuery("", false);
+                searchView.setQuery(roomName, false);
+                onBackPressed();
                 return true;
             }
         });
@@ -354,7 +384,14 @@ public class Main2Activity extends AppCompatActivity
 
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
+
         searchEditText.setDropDownAnchor(R.id.toolbar);
+
+        //searchEditText.setDropDownAnchor(R.id.anchor_dropdown);
+        //searchEditText.setDropDownHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        searchEditText.setDropDownVerticalOffset(58);
+
 
         final View dropDownAnchor = findViewById(searchEditText.getDropDownAnchor());
 
@@ -373,8 +410,31 @@ public class Main2Activity extends AppCompatActivity
 
 
 
+
+
         return true;
     }
+
+    /*
+    @Override
+    public void onBackStackChanged() {
+        shouldDisplayHomeUp();
+    }
+
+    public void shouldDisplayHomeUp(){
+        //Enable Up button only  if there are entries in the back stack
+        boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
+    }
+
+*/
+    @Override
+    public boolean onSupportNavigateUp() {
+        //This method is called when the up button is pressed. Just the pop back stack.
+        //getSupportFragmentManager().popBackStack();
+        return false;
+    }
+
 
     /*
     @Override
@@ -399,11 +459,10 @@ public class Main2Activity extends AppCompatActivity
             case R.id.navigate_to_dtu:
                 startActivity(new Intent(this, NavigateToDTUActivity.class));
                 break;
-            /*
+
             case R.id.nav_drawer_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            */
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -431,6 +490,7 @@ public class Main2Activity extends AppCompatActivity
 
         LatLng ballerupCenter = new LatLng(55.731543, 12.396680);
 
+        LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW,ballerupNE);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter,16f));
 
@@ -608,13 +668,13 @@ public class Main2Activity extends AppCompatActivity
 
         System.out.println("UserClick: "+ latLng);
         hideSoftKeyboard();
-
     }
 
     private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         searchView.clearFocus();
+        //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     @Override
