@@ -5,6 +5,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -21,6 +22,10 @@ public class NavigateToDTUActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigate_to_dtu);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_navigate);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         lyngbyImage = (ImageView)findViewById(R.id.image_lyngby);
         ballerupImage = (ImageView)findViewById(R.id.image_ballerup);

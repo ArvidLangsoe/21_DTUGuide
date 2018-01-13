@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -141,7 +142,7 @@ public class Main2Activity extends AppCompatActivity
 
     private SearchView searchView;
 
-    ActionBarDrawerToggle toggle;
+    private ActionBarDrawerToggle toggle;
     private final String BACK_STACK_ROOT_TAG = "search_fragment";
     private MenuItem bottomNavigationItemSelected;
 
@@ -495,6 +496,10 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_drawer_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+
+            case R.id.nav_drawer_favorite:
+                startActivity(new Intent(this, FavoriteActivity.class));
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -507,6 +512,7 @@ public class Main2Activity extends AppCompatActivity
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
+
         mMap.setIndoorEnabled(false);
 
         mMap.setMinZoomPreference(16);
@@ -633,9 +639,8 @@ public class Main2Activity extends AppCompatActivity
         currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
 
-
-
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
             @Override
             public View getInfoWindow(Marker marker) {
                 return null;
@@ -650,22 +655,42 @@ public class Main2Activity extends AppCompatActivity
                 TextView descriptionTV = (TextView)infoWindowContent.findViewById(R.id.info_description);
                 descriptionTV.setText(location.getDescription());
 
-                RecyclerView recyclerView = (RecyclerView)infoWindowContent.findViewById(R.id.info_tags_recyclerview);
-                recyclerView.setHasFixedSize(true);
 
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                final ImageView favoriteIcon = (ImageView)infoWindowContent.findViewById(R.id.info_favorite);
+
+                if(controller.isFavorite(location)) {
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
+                }
+
+                RecyclerView recyclerView = (RecyclerView)infoWindowContent.findViewById(R.id.info_tags_recyclerview);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+
                 recyclerView.setLayoutManager(linearLayoutManager);
 
-                TagsAdapter recAdapter = new TagsAdapter(location.getTags());
+                TagsAdapter recAdapter = new TagsAdapter(location.getTags(), R.layout.recycler_item_tag);
                 recyclerView.setAdapter(recAdapter);
 
-                //TextView tvtest = (TextView)infoWindowContent.findViewById(R.id.tagstester);
-                //tvtest.setText(location.getTags().toString());
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+
+                        if(controller.isFavorite(location)) {
+                            controller.removeFavorite(location);
+                        }
+                        else {
+                            controller.addFavorite(location);
+                        }
+                        marker.showInfoWindow();
+
+                    }
+                });
+
 
                 return infoWindowContent;
             }
         });
+
         currentMarker.showInfoWindow();
 
     }
@@ -675,6 +700,7 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
+        bottomNavigationItemSelected = null;
         getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
@@ -682,5 +708,9 @@ public class Main2Activity extends AppCompatActivity
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    public NavigationController getController() {
+        return controller;
     }
 }

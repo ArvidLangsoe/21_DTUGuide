@@ -5,7 +5,7 @@
     android:id="@+id/toolbar_simple"
     android:layout_width="match_parent"
     android:layout_height="@dimen/toolbar_height"
-    android:background="@color/colorPrimary"
     android:elevation="4dp"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-    app:popupTheme="@style/AppTheme.PopupOverlay" />
+    app:theme="@style/ToolbarSubActivity"
+    app:popupTheme="@style/AppTheme.PopupOverlay"
+    />

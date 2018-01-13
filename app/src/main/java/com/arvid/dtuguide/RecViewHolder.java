@@ -12,9 +12,9 @@ public class RecViewHolder extends RecyclerView.ViewHolder {
 
     public TextView tagText;
 
-    public RecViewHolder(View itemView){
+    public RecViewHolder(View itemView, int layout){
         super(itemView);
 
-        tagText = (TextView)itemView.findViewById(R.id.tag_content);
+        tagText = (TextView)itemView.findViewById(layout);
     }
 }

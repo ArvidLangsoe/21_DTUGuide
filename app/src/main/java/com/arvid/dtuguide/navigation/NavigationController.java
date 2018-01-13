@@ -224,6 +224,16 @@ public class NavigationController implements Navigation{
         saveFavorite();
     }
 
+    public boolean isFavorite(Searchable item) {
+        List<Searchable> favorites = getFavorite();
+        if(favorites.contains(item)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     public List<Searchable> getFavorite(){return favorite;}
 
 
@@ -309,6 +319,5 @@ public class NavigationController implements Navigation{
         else
             throw new Exception("No landmarks found !");
     }
-
 
 }
