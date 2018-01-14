@@ -47,8 +47,8 @@ public class NavigationController implements Navigation{
 
 
     private LocationDAO dao;
-    private static List<Searchable> historyList;
-    private static List<Searchable> favorite;
+    private static List<Searchable> historyList = new ArrayList<Searchable>();
+    private static List<Searchable> favorite = new ArrayList<Searchable>();
     private Context context;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -73,8 +73,6 @@ public class NavigationController implements Navigation{
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
         mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
 
-        historyList = new ArrayList<Searchable>();
-        favorite = new ArrayList<Searchable>();
         //savePrefs();
 
         updateDataFromFireBase();
