@@ -204,6 +204,14 @@ public class NavigationController implements Navigation{
         myEditor = mySharedPreferencesFav.edit();
         myEditor.clear();
         myEditor.commit();
+        favorite.clear();
+    }
+
+    public void clearHistory(){
+        myEditor = mySharedPreferences.edit();
+        myEditor.clear();
+        myEditor.commit();
+        historyList.clear();
     }
 
     public void removeFavorite(Searchable itemTORemove){
