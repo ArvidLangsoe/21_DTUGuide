@@ -33,5 +33,9 @@
     <string name="placeholder_text">Placeholder</string>
 
     <!-- Strings related to Settings -->
+    <string name="dialog_fav_title">Clear Favorites</string>
+    <string name="dialog_fav_message">Are you sure you want to clear your favorites?</string>
+    <string name="clear">Clear</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
