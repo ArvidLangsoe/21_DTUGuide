@@ -47,8 +47,8 @@ public class NavigationController implements Navigation{
 
 
     private LocationDAO dao;
-    private static List<Searchable> historyList;
-    private static List<Searchable> favorite;
+    private static List<Searchable> historyList = new ArrayList<Searchable>();
+    private static List<Searchable> favorite = new ArrayList<Searchable>();
     private Context context;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -73,8 +73,6 @@ public class NavigationController implements Navigation{
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
         mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
 
-        historyList = new ArrayList<Searchable>();
-        favorite = new ArrayList<Searchable>();
         //savePrefs();
 
         updateDataFromFireBase();
@@ -194,16 +192,21 @@ public class NavigationController implements Navigation{
 
     private void saveFavorite(){
         myEditor = mySharedPreferencesFav.edit();
+        clearFavPrefs();
         for(int i = 0; i<favorite.size();++i){
             myEditor.putString(i+"", favorite.get(i).getName());
         }
         myEditor.commit();
     }
 
-    public void clearFavorite(){
+    private void clearFavPrefs(){
         myEditor = mySharedPreferencesFav.edit();
         myEditor.clear();
         myEditor.commit();
+    }
+
+    public void clearFavorite(){
+        clearFavPrefs();
         favorite.clear();
     }
 
@@ -216,19 +219,8 @@ public class NavigationController implements Navigation{
 
     public void removeFavorite(Searchable itemTORemove){
         myEditor = mySharedPreferencesFav.edit();
-
-        for(int i=0; i<favorite.size();++i){
-            if(favorite.get(i).equals(itemTORemove)){
-                myEditor.remove(i+"");
-                try {
-                    retrieveFavorite();
-                } catch (LocationDAO.DAOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            favorite.remove(itemTORemove);
-        }
+        favorite.remove(itemTORemove);
+        saveFavorite();
     }
 
     public void addFavorite(Searchable item){
@@ -236,7 +228,7 @@ public class NavigationController implements Navigation{
         saveFavorite();
     }
 
-    public boolean checkFavorite(Searchable item) {;
+    public boolean isFavorite(Searchable item) {
         if(favorite.contains(item)) {
             return true;
         }
