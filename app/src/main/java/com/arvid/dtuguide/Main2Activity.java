@@ -651,7 +651,6 @@ public class Main2Activity extends AppCompatActivity
                 }
                 else {
                     controller.addFavorite(location);
-                    System.out.println(controller.isFavorite(location));
                 }
 
                 marker.showInfoWindow();
