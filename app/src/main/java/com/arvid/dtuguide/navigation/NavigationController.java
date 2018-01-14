@@ -227,6 +227,7 @@ public class NavigationController implements Navigation{
                 }
             }
 
+            favorite.remove(itemTORemove);
         }
     }
 
