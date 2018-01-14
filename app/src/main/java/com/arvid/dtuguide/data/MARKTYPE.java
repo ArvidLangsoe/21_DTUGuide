@@ -6,6 +6,7 @@ package com.arvid.dtuguide.data;
 
 public enum MARKTYPE {
     NONE,
+    ENTRANCE,
     CANTEEN,
     WC,
     STAIRS_UP,
