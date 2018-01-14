@@ -639,6 +639,25 @@ public class Main2Activity extends AppCompatActivity
         currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+                System.out.println("IS IT FAVORITE");
+                System.out.println(controller.isFavorite(location));
+
+                if(controller.isFavorite(location)) {
+                    controller.removeFavorite(location);
+                }
+                else {
+                    controller.addFavorite(location);
+                }
+
+                marker.showInfoWindow();
+
+            }
+        });
+
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
             @Override
@@ -661,6 +680,9 @@ public class Main2Activity extends AppCompatActivity
                 if(controller.isFavorite(location)) {
                     favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
                 }
+                else {
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                }
 
                 RecyclerView recyclerView = (RecyclerView)infoWindowContent.findViewById(R.id.info_tags_recyclerview);
 
@@ -670,21 +692,6 @@ public class Main2Activity extends AppCompatActivity
 
                 TagsAdapter recAdapter = new TagsAdapter(location.getTags(), R.layout.recycler_item_tag);
                 recyclerView.setAdapter(recAdapter);
-
-                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                    @Override
-                    public void onInfoWindowClick(Marker marker) {
-
-                        if(controller.isFavorite(location)) {
-                            controller.removeFavorite(location);
-                        }
-                        else {
-                            controller.addFavorite(location);
-                        }
-                        marker.showInfoWindow();
-
-                    }
-                });
 
 
                 return infoWindowContent;

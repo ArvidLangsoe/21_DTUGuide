@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.navigation.NavigationController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FavoriteActivity extends AppCompatActivity {
     private NavigationController controller;
 
@@ -26,8 +29,13 @@ public class FavoriteActivity extends AppCompatActivity {
 
         RecyclerView recView = (RecyclerView) findViewById(R.id.favorite_recycler);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         recView.setLayoutManager(linearLayoutManager);
+        /*
+        List<String> list = new ArrayList<String>();
+        list.add("test1");
+        list.add("test2");
+        */
 
         FavoritesAdapter recAdapter = new FavoritesAdapter(controller.getFavorite(), R.layout.recycler_item_favorite);
 

@@ -21,13 +21,19 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        LocationDAO dao = new LocationDAO();
+        controller = new NavigationController(dao, getApplicationContext());
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        Button button = (Button) findViewById(R.id.reset_favorite);
-        button.setOnClickListener(this);
+        Button resetFavButton = (Button) findViewById(R.id.reset_favorite);
+        Button resetRecButton = (Button) findViewById(R.id.reset_recent);
+
+        resetFavButton.setOnClickListener(this);
+        resetRecButton.setOnClickListener(this);
     }
 
 
@@ -37,6 +43,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case R.id.reset_favorite:
                 controller.clearFavorite();
                 Toast toast = Toast.makeText(this, "Favorites has been removed", Toast.LENGTH_SHORT);
+                toast.show();
+                break;
+            case R.id.reset_recent:
+                // TODO: add method to clear historylist
+                toast = Toast.makeText(this, "Recent history has been removed", Toast.LENGTH_SHORT);
                 toast.show();
                 break;
         }

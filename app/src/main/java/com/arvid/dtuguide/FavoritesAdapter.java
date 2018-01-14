@@ -38,8 +38,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecViewHolder>{
     }
 
     public void onBindViewHolder(RecViewHolder holder, int i){
-        //holder.tagText.setText(mList.get(i).getName());
-        holder.tagText.setText("haha");
+        holder.tagText.setText(mList.get(i).getName());
     }
 
     @Override

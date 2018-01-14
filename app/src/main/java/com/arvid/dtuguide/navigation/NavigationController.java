@@ -78,6 +78,9 @@ public class NavigationController implements Navigation{
         //savePrefs();
 
         updateDataFromFireBase();
+
+        System.out.println("NAVCONTROLLER FAVORITE LIST:");
+        System.out.println(favorite);
     }
 
 
@@ -234,7 +237,9 @@ public class NavigationController implements Navigation{
         }
     }
 
-    public List<Searchable> getFavorite(){return favorite;}
+    public List<Searchable> getFavorite(){
+        return favorite;
+    }
 
 
     public Searchable getSearchableItem(String name) throws LocationDAO.DAOException {
