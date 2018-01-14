@@ -235,7 +235,7 @@ public class NavigationController implements Navigation{
         saveFavorite();
     }
 
-    public boolean checkFavorite(Searchable item) {;
+    public boolean isFavorite(Searchable item) {;
         if(favorite.contains(item)) {
             return true;
         }
