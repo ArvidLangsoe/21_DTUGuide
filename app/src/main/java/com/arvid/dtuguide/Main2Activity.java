@@ -644,9 +644,9 @@ public class Main2Activity extends AppCompatActivity
             public void onInfoWindowClick(Marker marker) {
 
                 System.out.println("IS IT FAVORITE");
-                System.out.println(controller.isFavorite(location));
+                System.out.println(controller.checkFavorite(location));
 
-                if(controller.isFavorite(location)) {
+                if(controller.checkFavorite(location)) {
                     controller.removeFavorite(location);
                 }
                 else {
@@ -677,7 +677,7 @@ public class Main2Activity extends AppCompatActivity
 
                 final ImageView favoriteIcon = (ImageView)infoWindowContent.findViewById(R.id.info_favorite);
 
-                if(controller.isFavorite(location)) {
+                if(controller.checkFavorite(location)) {
                     favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
                 }
                 else {
