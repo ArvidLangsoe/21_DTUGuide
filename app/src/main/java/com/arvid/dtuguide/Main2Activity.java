@@ -728,11 +728,15 @@ public class Main2Activity extends AppCompatActivity
             public void onInfoWindowClick(Marker marker) {
 
                 if (controller.checkFavorite(location)) {
+                    System.out.println("FAVVV : 1 "+controller.checkFavorite(location));
                     controller.removeFavorite(location);
                     Toast.makeText(getApplicationContext(), R.string.toast_rem_fav, Toast.LENGTH_SHORT).show();
+                    System.out.println("FAVVV : 1 "+controller.checkFavorite(location));
                 } else {
+                    System.out.println("FAVVV : 2 "+controller.checkFavorite(location));
                     controller.addFavorite(location);
                     Toast.makeText(getApplicationContext(), R.string.toast_add_fav, Toast.LENGTH_SHORT).show();
+                    System.out.println("FAVVV : 2 "+controller.checkFavorite(location));
                 }
 
                 marker.showInfoWindow();
