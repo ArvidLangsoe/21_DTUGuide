@@ -566,7 +566,7 @@ public class Main2Activity extends AppCompatActivity
 
         Settings mySettings = Settings.getInstance(getApplicationContext());
 
-        mMap.setMinZoomPreference(mySettings.getGoogleMinZoom()-0.1f);
+        mMap.setMinZoomPreference(mySettings.getGoogleMinZoom()+0.1f);
         mMap.setMaxZoomPreference(mySettings.getGoogleMaxZoom());
 
         LatLng ballerupSW = new LatLng(55.730327, 12.393678);
