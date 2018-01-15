@@ -44,15 +44,32 @@
         </activity>
         <activity android:name=".data.DataTestActivity" />
         <activity android:name=".data.FireBaseActivity" />
-        <activity android:name=".NavigateToDTUActivity" />
+        <activity
+            android:name=".NavigateToDTUActivity"
+            android:label="@string/navigate_to_dtu"
+            android:parentActivityName=".Main2Activity" />
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".Main2Activity" />
+        />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".Main2Activity"/>
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Main2Activity" />
+            android:label="@string/settings"
+            android:parentActivityName=".Main2Activity" />
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".Main2Activity" />
+
+        <activity
+            android:name=".FavoriteActivity"
+            android:label="@string/favorite_title"
+            android:parentActivityName=".Main2Activity" />
+        <!-- Parent activity meta-data to support 4.0 and lower -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".Main2Activity" />
     </application>
 
 </manifest>

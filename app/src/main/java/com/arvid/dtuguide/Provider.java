@@ -42,6 +42,7 @@ public class Provider extends ContentProvider {
     private static LocationDAO dao;
     private static NavigationController controller;
     private List<Searchable> historyList;
+    private List<Searchable> favoriteList;
 
     @Override
     public boolean onCreate() {
@@ -55,15 +56,16 @@ public class Provider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
         historyList = controller.getHistoryList();
+        favoriteList = controller.getFavorite();
 
         String search = selectionArgs[0];
         int id = 0;
 
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type", "recent"});
+        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type", "recent", "favorite"});
 
         if(search.isEmpty()) {
             for (Searchable item : historyList) {
-                Object[] obj = {id, item.getName(), item.getType(), true };
+                Object[] obj = {id, item.getName(), item.getType(), true, favoriteList.contains(item) };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -73,7 +75,7 @@ public class Provider extends ContentProvider {
                 List<Searchable> suggestionsList = controller.searchMatch(search);
 
                 for (Searchable item :  suggestionsList) {
-                    Object[] obj = {id, item.getName(), item.getType(), historyList.contains(item)};
+                    Object[] obj = {id, item.getName(), item.getType(), historyList.contains(item), favoriteList.contains(item) };
                     id++;
                     suggestionsCursor.addRow(obj);
                 }

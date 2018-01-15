@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -11,14 +12,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.VectorDrawable;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,9 +39,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 
@@ -69,9 +76,7 @@ import java.util.Set;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener
-        ,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener
-        , View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener {
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener, GoogleMap.OnMarkerClickListener,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener {
 
 
     @Override
@@ -97,6 +102,7 @@ public class Main2Activity extends AppCompatActivity
                 checkBoxMapFirst.setChecked(false);
                 showFloor(FloorHeight.first_floor);
                 currentMap = FloorHeight.first_floor;
+                break;
         }
     }
 
@@ -114,8 +120,15 @@ public class Main2Activity extends AppCompatActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             toggle.setDrawerIndicatorEnabled(true);
             getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            searchView.clearFocus();
         }
 
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return false;
     }
 
 
@@ -142,13 +155,50 @@ public class Main2Activity extends AppCompatActivity
 
     private SearchView searchView;
 
-    ActionBarDrawerToggle toggle;
+    private ActionBarDrawerToggle toggle;
     private final String BACK_STACK_ROOT_TAG = "search_fragment";
+    private MenuItem bottomNavigationItemSelected;
+
+    public boolean isConnectedToInternet(){
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null &&
+                cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+    public void showInternetWarning() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle("No Internet connection");
+        builder.setMessage("DTU Guide needs a Internet connection at the start to work. " +
+                "Check your device and click 'Retry' to use the Application.");
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+                if(!isConnectedToInternet())
+                    showInternetWarning();
+            }
+        });
+        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                finish();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        if(!isConnectedToInternet())
+            showInternetWarning();
 
         dao = new LocationDAO();
         controller = new NavigationController(dao, getApplicationContext(),this);
@@ -184,6 +234,7 @@ public class Main2Activity extends AppCompatActivity
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //bottomNavigationView.setSelectedItemId(R.id.map_layers_button);
 
         currentMap = FloorHeight.ground_floor;
 
@@ -200,6 +251,15 @@ public class Main2Activity extends AppCompatActivity
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View popupLayerView, popupFilterView;
 
+            if(bottomNavigationItemSelected == item) {
+                bottomNavigationItemSelected = null;
+                item.setChecked(false);
+                return true;
+            }
+
+            bottomNavigationItemSelected = item;
+
+
             switch (item.getItemId()) {
                 case R.id.map_navigate_button:
                     //TODO: What to happen when the bottom menu is clicked
@@ -207,6 +267,7 @@ public class Main2Activity extends AppCompatActivity
                     return true;
                 case R.id.map_layers_button:
                     popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
+
 
 
                     checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
@@ -229,9 +290,11 @@ public class Main2Activity extends AppCompatActivity
                             break;
                     }
 
+
                     PopupWindow popupWindowLayer = new PopupWindow(popupLayerView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
+
 
                     popupWindowLayer.setOutsideTouchable(true);
 
@@ -273,6 +336,7 @@ public class Main2Activity extends AppCompatActivity
                     return true;
 
             }
+
             return false;
         }
     };
@@ -291,8 +355,8 @@ public class Main2Activity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             //searchView.clearFocus();
-            hideSoftKeyboard();
-            //super.onBackPressed();
+            //hideSoftKeyboard();
+            super.onBackPressed();
 
         }
     }
@@ -430,12 +494,14 @@ public class Main2Activity extends AppCompatActivity
     }
 
 */
+    /*
     @Override
     public boolean onSupportNavigateUp() {
         //This method is called when the up button is pressed. Just the pop back stack.
         //getSupportFragmentManager().popBackStack();
         return false;
     }
+    */
 
 
     /*
@@ -465,6 +531,10 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_drawer_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+
+            case R.id.nav_drawer_favorite:
+                startActivity(new Intent(this, FavoriteActivity.class));
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -481,6 +551,7 @@ public class Main2Activity extends AppCompatActivity
 
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
+        mMap.setOnMarkerClickListener(this);
 
         mMap.setIndoorEnabled(false);
 
@@ -635,7 +706,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    public void showLocation(LocationDTO location){
+    public void showLocation(final LocationDTO location){
         for(Floor f:maps.values()){
             f.removeMarkers();
             f.hideFloor();
@@ -662,6 +733,67 @@ public class Main2Activity extends AppCompatActivity
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17.5f),1500,null);
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+                System.out.println("IS IT FAVORITE");
+                System.out.println(controller.checkFavorite(location));
+
+                if(controller.checkFavorite(location)) {
+                    controller.removeFavorite(location);
+                }
+                else {
+                    controller.addFavorite(location);
+                }
+
+                marker.showInfoWindow();
+
+            }
+        });
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                View infoWindowContent = getLayoutInflater().inflate(R.layout.infowindow_content, null);
+                TextView nameTV = (TextView)infoWindowContent.findViewById(R.id.info_name);
+                nameTV.setText(location.getName());
+
+                TextView descriptionTV = (TextView)infoWindowContent.findViewById(R.id.info_description);
+                descriptionTV.setText(location.getDescription());
+
+
+                final ImageView favoriteIcon = (ImageView)infoWindowContent.findViewById(R.id.info_favorite);
+
+                if(controller.checkFavorite(location)) {
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
+                }
+                else {
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                }
+
+                RecyclerView recyclerView = (RecyclerView)infoWindowContent.findViewById(R.id.info_tags_recyclerview);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+                TagsAdapter recAdapter = new TagsAdapter(location.getTags(), R.layout.recycler_item_tag);
+                recyclerView.setAdapter(recAdapter);
+
+
+                return infoWindowContent;
+            }
+        });
+
+        currentMarker.showInfoWindow();
+
     }
 
 
@@ -669,13 +801,13 @@ public class Main2Activity extends AppCompatActivity
     public void onMapClick(LatLng latLng) {
 
         System.out.println("UserClick: "+ latLng);
-        hideSoftKeyboard();
+        bottomNavigationItemSelected = null;
+        getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-        searchView.clearFocus();
         //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
@@ -731,5 +863,9 @@ public class Main2Activity extends AppCompatActivity
         }
         showFloor(currentMap);
 
+    }
+
+    public NavigationController getController() {
+        return controller;
     }
 }

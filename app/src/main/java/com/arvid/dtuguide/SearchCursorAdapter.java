@@ -26,10 +26,12 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         TextView nameTV = (TextView) view.findViewById(R.id.search_item_name);
         TextView typeTV = (TextView) view.findViewById(R.id.search_item_type);
         ImageView iconV = (ImageView) view.findViewById(R.id.search_item_icon);
+        ImageView favoriteV = (ImageView) view.findViewById(R.id.search_item_favorite);
 
         String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
         String type = cursor.getString(cursor.getColumnIndex("type"));
         boolean recent = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("recent")));
+        boolean favorite = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("favorite")));
 
         nameTV.setText(name);
         typeTV.setText(type);
@@ -45,6 +47,12 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
                 case "Location":
                     iconV.setImageResource(R.drawable.ic_place_black_24dp);
             }
+        }
+        if(favorite) {
+            favoriteV.setImageResource(R.drawable.ic_favorite_black_24dp);
+        }
+        else {
+            favoriteV.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
     }
 

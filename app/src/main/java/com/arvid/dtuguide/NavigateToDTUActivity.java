@@ -1,17 +1,21 @@
 package com.arvid.dtuguide;
 
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class NavigateToDTUActivity extends AppCompatActivity implements View.OnClickListener {
-
-    Button lyngbyNavigate;
-    Button ballerupNavigate;
-    Button risoNavigate;
+    private ImageView lyngbyImage, ballerupImage, risooImage, lyngbyCircle, ballerupCircle, risooCircle;
+    private TextView lyngbyText, ballerupText, risooText;
 
 
     @Override
@@ -19,24 +23,30 @@ public class NavigateToDTUActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigate_to_dtu);
 
-        lyngbyNavigate = (Button)findViewById(R.id.lyngby_button);
-        ballerupNavigate = (Button)findViewById(R.id.ballerup_button);
-        risoNavigate = (Button)findViewById(R.id.riso_button);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_navigate);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        lyngbyNavigate.setOnClickListener(this);
-        ballerupNavigate.setOnClickListener(this);
-        risoNavigate.setOnClickListener(this);
+        lyngbyImage = (ImageView)findViewById(R.id.image_lyngby);
+        ballerupImage = (ImageView)findViewById(R.id.image_ballerup);
+        risooImage = (ImageView)findViewById(R.id.image_risoo);
+
+
+        lyngbyImage.setOnClickListener(this);
+        ballerupImage.setOnClickListener(this);
+        risooImage.setOnClickListener(this);
+
 
     }
 
     @Override
     public void onClick(View view) {
         Uri gmmIntentUri;
-        if(view.equals(lyngbyNavigate)){
-            gmmIntentUri = Uri.parse("geo:0,0?q=55.785858,12.524933(Lyngby+Campus)");
-        }else if(view.equals(ballerupNavigate)){
+        if(view.equals(lyngbyImage)){
+        gmmIntentUri = Uri.parse("geo:0,0?q=55.785858,12.524933(Lyngby+Campus)");
+    } else if(view.equals(ballerupImage)){
             gmmIntentUri = Uri.parse("geo:0,0?q=55.731133,12.396795(Ballerup+Campus)");
-        }else if(view.equals(risoNavigate)){
+        }else if(view.equals(risooImage)){
             gmmIntentUri = Uri.parse("geo:0,0?q=55.692385,12.102599(Risø+Campus)");
         }
         else{
