@@ -107,7 +107,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 builder.setTitle(R.string.dialog_zoom_title);
                 builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Settings.getInstance(getApplicationContext()).setZoom(Float.parseFloat((String)zoomLevelTV.getText()));
+                        Settings.getInstance(getApplicationContext()).setZoom(Integer.parseInt((String)zoomLevelTV.getText()));
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

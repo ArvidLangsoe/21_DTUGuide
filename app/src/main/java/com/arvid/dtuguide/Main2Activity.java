@@ -547,8 +547,10 @@ public class Main2Activity extends AppCompatActivity
 
         mMap.setIndoorEnabled(false);
 
-        mMap.setMinZoomPreference(16);
-        mMap.setMaxZoomPreference(20);
+        Settings mySettings = Settings.getInstance(getApplicationContext());
+
+        mMap.setMinZoomPreference(mySettings.getGoogleMinZoom());
+        mMap.setMaxZoomPreference(mySettings.getGoogleMaxZoom());
 
         LatLng ballerupSW = new LatLng(55.730327, 12.393678);
         LatLng ballerupNE = new LatLng(55.732781, 12.401019);
@@ -816,7 +818,7 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onCameraMove() {
-        Float zoomSetting = com.arvid.dtuguide.Settings.getInstance(getApplicationContext()).getZoom();
+        Float zoomSetting = com.arvid.dtuguide.Settings.getInstance(getApplicationContext()).getGoogleZoom();
         double tolerance= zoomSetting;
         double newZoom=mMap.getCameraPosition().zoom;
         if(cameraZoom>tolerance){

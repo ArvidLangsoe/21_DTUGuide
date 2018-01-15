@@ -57,7 +57,7 @@ public class Floor {
         }
         if(landMarks!=null) {
             Settings settings = Settings.getInstance(appContext);
-            if(map.getCameraPosition().zoom> settings.getZoom()) {
+            if(map.getCameraPosition().zoom> settings.getGoogleZoom()) {
                 for (LandMarkInfo l : landMarks) {
                     System.out.println("LANDMARK: " + l.location.getLandmark());
                     if (settings.isVisible(l.location.getLandmark()))
