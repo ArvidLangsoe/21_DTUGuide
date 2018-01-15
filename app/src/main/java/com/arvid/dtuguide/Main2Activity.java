@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -159,20 +161,41 @@ public class Main2Activity extends AppCompatActivity
                 cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
+    public void showInternetWarning() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle("No Internet connection");
+        builder.setMessage("DTU Guide needs a Internet connection at the start to work. " +
+                "Check your device and click 'Retry' to use the Application.");
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+                if(!isConnectedToInternet())
+                    showInternetWarning();
+            }
+        });
+        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                finish();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        if(!isConnectedToInternet())
+            showInternetWarning();
+
         dao = new LocationDAO();
         controller = new NavigationController(dao, getApplicationContext());
-
-        Context context = getApplicationContext();
-        CharSequence text = "Internet : " + isConnectedToInternet();
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
