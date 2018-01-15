@@ -10,6 +10,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -44,6 +47,7 @@ import android.widget.Toast;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.NavigationController;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -63,13 +67,13 @@ import java.util.HashMap;
 
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener, GoogleMap.OnMarkerClickListener {
 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.map_layers_checkbox_0:
                 checkBoxMapBasement.setChecked(true);
                 checkBoxMapFirst.setChecked(false);
@@ -99,12 +103,11 @@ public class Main2Activity extends AppCompatActivity
         System.out.println("### BACKSTACK COUNT ###");
         System.out.println(getSupportFragmentManager().getBackStackEntryCount());
 
-        if(getSupportFragmentManager().getBackStackEntryCount()>0) {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             toggle.setDrawerIndicatorEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        }
-        else {
+        } else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             toggle.setDrawerIndicatorEnabled(true);
             getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -120,17 +123,17 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    public enum Floor{basement,ground_floor,first_floor}
+    public enum Floor {basement, ground_floor, first_floor}
 
     private GoogleMap mMap;
 
     private Marker currentMarker;
 
     private static ArrayList<GroundOverlay> currentMaps;
-    private static HashMap<Floor,ArrayList<GroundOverlay>> maps=new HashMap<Floor,ArrayList<GroundOverlay>>();
+    private static HashMap<Floor, ArrayList<GroundOverlay>> maps = new HashMap<Floor, ArrayList<GroundOverlay>>();
 
 
-    private int LOCATION_REQUEST_CODE=4565;
+    private int LOCATION_REQUEST_CODE = 4565;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Locations");
@@ -148,7 +151,7 @@ public class Main2Activity extends AppCompatActivity
     private final String BACK_STACK_ROOT_TAG = "search_fragment";
     private MenuItem bottomNavigationItemSelected;
 
-    public boolean isConnectedToInternet(){
+    public boolean isConnectedToInternet() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -220,7 +223,7 @@ public class Main2Activity extends AppCompatActivity
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View popupLayerView, popupFilterView;
 
-            if(bottomNavigationItemSelected == item) {
+            if (bottomNavigationItemSelected == item) {
                 bottomNavigationItemSelected = null;
                 item.setChecked(false);
                 return true;
@@ -231,17 +234,15 @@ public class Main2Activity extends AppCompatActivity
 
             switch (item.getItemId()) {
                 case R.id.map_navigate_button:
-                    //TODO: What to happen when the bottom menu is clicked
-                    //mTextMessage.setText(R.string.title_home);
+                    getMyLocation();
                     return true;
                 case R.id.map_layers_button:
                     popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
 
 
-
-                    checkBoxMapBasement = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_0);
-                    checkBoxMapFirst = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_1);
-                    checkBoxMapSecond = (CheckBox)popupLayerView.findViewById(R.id.map_layers_checkbox_2);
+                    checkBoxMapBasement = (CheckBox) popupLayerView.findViewById(R.id.map_layers_checkbox_0);
+                    checkBoxMapFirst = (CheckBox) popupLayerView.findViewById(R.id.map_layers_checkbox_1);
+                    checkBoxMapSecond = (CheckBox) popupLayerView.findViewById(R.id.map_layers_checkbox_2);
 
                     checkBoxMapFirst.setOnClickListener(Main2Activity.this);
                     checkBoxMapBasement.setOnClickListener(Main2Activity.this);
@@ -270,11 +271,10 @@ public class Main2Activity extends AppCompatActivity
                     popupWindowLayer.showAsDropDown(findViewById(R.id.map_layers_button));
 
 
-
                     DisplayMetrics displayMetrics = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     int width = displayMetrics.widthPixels;
-                    popupWindowLayer.update(findViewById(R.id.navigation),width,400);
+                    popupWindowLayer.update(findViewById(R.id.navigation), width, 400);
 
                     return true;
 
@@ -291,7 +291,7 @@ public class Main2Activity extends AppCompatActivity
                     displayMetrics = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     width = displayMetrics.widthPixels;
-                    popupWindowFilter.update(findViewById(R.id.navigation),width,300);
+                    popupWindowFilter.update(findViewById(R.id.navigation), width, 300);
 
                     return true;
 
@@ -358,7 +358,7 @@ public class Main2Activity extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
-        Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] {""}, null);
+        Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[]{""}, null);
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
 
         searchView.setSuggestionsAdapter(adapter);
@@ -367,7 +367,7 @@ public class Main2Activity extends AppCompatActivity
 
         // Remove underline on search view
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
-        View v2 = (LinearLayout)searchView.findViewById(android.support.v7.appcompat.R.id.search_voice_btn).getParent();
+        View v2 = (LinearLayout) searchView.findViewById(android.support.v7.appcompat.R.id.search_voice_btn).getParent();
         v.setBackgroundColor(Color.WHITE);
         v2.setBackgroundColor(Color.WHITE);
 
@@ -376,7 +376,7 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
 
-                if(hasFocus) {
+                if (hasFocus) {
                     getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -386,8 +386,7 @@ public class Main2Activity extends AppCompatActivity
 
                     System.out.println("***SEARCHVIEW FOCUS***");
 
-                }
-                else {
+                } else {
                     getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     System.out.println("***SEARCHVIEW _NOT_ FOCUS***");
                 }
@@ -430,7 +429,6 @@ public class Main2Activity extends AppCompatActivity
         });
 
 
-
         int searchEditTextId = R.id.search_src_text;
         final AutoCompleteTextView searchEditText = (AutoCompleteTextView) searchView.findViewById(searchEditTextId);
 
@@ -456,9 +454,6 @@ public class Main2Activity extends AppCompatActivity
                 }
             });
         }
-
-
-
 
 
         return true;
@@ -541,19 +536,19 @@ public class Main2Activity extends AppCompatActivity
 
         LatLng ballerupCenter = new LatLng(55.731543, 12.396680);
 
-        LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW,ballerupNE);
+        LatLngBounds ballerupBounds = new LatLngBounds(ballerupSW, ballerupNE);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter,16f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ballerupCenter, 16f));
 
-        LatLngBounds BALLERUP = new LatLngBounds(new LatLng(55.730067,12.393402),new LatLng(55.733131,12.402851));
+        LatLngBounds BALLERUP = new LatLngBounds(new LatLng(55.730067, 12.393402), new LatLng(55.733131, 12.402851));
         mMap.setLatLngBoundsForCameraTarget(BALLERUP);
 
-        Bitmap basement = BitmapFactory.decodeResource(getResources(),R.drawable.basement);
-        generateGroundOverlay(basement,Floor.basement,ballerupSW, ballerupNE);
-        Bitmap groundFloor = BitmapFactory.decodeResource(getResources(),R.drawable.ground_floor);
-        generateGroundOverlay(groundFloor,Floor.ground_floor,ballerupSW, ballerupNE);
-        Bitmap firstFloor = BitmapFactory.decodeResource(getResources(),R.drawable.first_floor);
-        generateGroundOverlay(firstFloor,Floor.first_floor,ballerupSW, ballerupNE);
+        Bitmap basement = BitmapFactory.decodeResource(getResources(), R.drawable.basement);
+        generateGroundOverlay(basement, Floor.basement, ballerupSW, ballerupNE);
+        Bitmap groundFloor = BitmapFactory.decodeResource(getResources(), R.drawable.ground_floor);
+        generateGroundOverlay(groundFloor, Floor.ground_floor, ballerupSW, ballerupNE);
+        Bitmap firstFloor = BitmapFactory.decodeResource(getResources(), R.drawable.first_floor);
+        generateGroundOverlay(firstFloor, Floor.first_floor, ballerupSW, ballerupNE);
 
         showFloor(Floor.ground_floor);
         enableGPS();
@@ -561,41 +556,41 @@ public class Main2Activity extends AppCompatActivity
 
     }
 
-    public void showFloor(Floor floor){
-        if(null!=currentMaps){
-            for(GroundOverlay o :currentMaps){
+    public void showFloor(Floor floor) {
+        if (null != currentMaps) {
+            for (GroundOverlay o : currentMaps) {
                 o.setVisible(false);
             }
         }
 
-        for(GroundOverlay o :maps.get(floor)){
+        for (GroundOverlay o : maps.get(floor)) {
             o.setVisible(true);
         }
 
-        currentMaps=maps.get(floor);
+        currentMaps = maps.get(floor);
     }
 
-    private void generateGroundOverlay(Bitmap dtuMap,Floor floor,LatLng swCorner, LatLng neCorner){
+    private void generateGroundOverlay(Bitmap dtuMap, Floor floor, LatLng swCorner, LatLng neCorner) {
         int height = dtuMap.getHeight();
         int width = dtuMap.getWidth();
         int heightTiles = 2;
         int widthTiles = 4;
 
-        double tileSizeLat=(neCorner.latitude-swCorner.latitude)/heightTiles;
-        double tileSizeLong=(neCorner.longitude-swCorner.longitude)/widthTiles;
-        maps.put(floor,new ArrayList<GroundOverlay>());
+        double tileSizeLat = (neCorner.latitude - swCorner.latitude) / heightTiles;
+        double tileSizeLong = (neCorner.longitude - swCorner.longitude) / widthTiles;
+        maps.put(floor, new ArrayList<GroundOverlay>());
 
-        for(int heightTile=0;heightTile<heightTiles;heightTile++){
-            for(int widthTile=0;widthTile<widthTiles;widthTile++){
-                Bitmap bm=Bitmap.createBitmap(dtuMap,widthTile*(width/widthTiles),heightTile*(height/heightTiles),width/widthTiles,height/heightTiles);
+        for (int heightTile = 0; heightTile < heightTiles; heightTile++) {
+            for (int widthTile = 0; widthTile < widthTiles; widthTile++) {
+                Bitmap bm = Bitmap.createBitmap(dtuMap, widthTile * (width / widthTiles), heightTile * (height / heightTiles), width / widthTiles, height / heightTiles);
 
-                GroundOverlayOptions options =new GroundOverlayOptions();
+                GroundOverlayOptions options = new GroundOverlayOptions();
 
-                LatLng sw = new LatLng(neCorner.latitude-(heightTile+1)*tileSizeLat,swCorner.longitude+widthTile*tileSizeLong);
-                LatLng ne = new LatLng(neCorner.latitude-(heightTile)*tileSizeLat,swCorner.longitude+(widthTile+1)*tileSizeLong);
+                LatLng sw = new LatLng(neCorner.latitude - (heightTile + 1) * tileSizeLat, swCorner.longitude + widthTile * tileSizeLong);
+                LatLng ne = new LatLng(neCorner.latitude - (heightTile) * tileSizeLat, swCorner.longitude + (widthTile + 1) * tileSizeLong);
 
                 System.out.println("Coor: " + sw + " " + ne);
-                LatLngBounds tempBounds = new LatLngBounds(sw,ne);
+                LatLngBounds tempBounds = new LatLngBounds(sw, ne);
 
                 options.image(BitmapDescriptorFactory.fromBitmap(bm)).positionFromBounds(tempBounds);
 
@@ -608,21 +603,19 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
-    private void enableGPS(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED){
+    private void enableGPS() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
 
             mMap.setMyLocationEnabled(true);
 
-            System.out.println("GPS: GPS enabled: "+mMap.isMyLocationEnabled());
-        }
-        else{
+            System.out.println("GPS: GPS enabled: " + mMap.isMyLocationEnabled());
+        } else {
             System.out.println("GPS: No GPS accesss allowed, requesting permission");
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 System.out.println("GPS: Need explanation. See permission requests android.");
-            }
-            else{
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_REQUEST_CODE);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             }
         }
     }
@@ -634,7 +627,7 @@ public class Main2Activity extends AppCompatActivity
         if (requestCode == LOCATION_REQUEST_CODE) {
             try {
                 mMap.setMyLocationEnabled(true);
-            }catch (SecurityException e){
+            } catch (SecurityException e) {
                 System.out.println("GPS: Security Exception, user denied GPS access.");
             }
         }
@@ -647,28 +640,26 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    public void showLocation(final LocationDTO location){
-        if(currentMarker!=null) {
+    public void showLocation(final LocationDTO location) {
+        if (currentMarker != null) {
             currentMarker.remove();
         }
 
         //TODO: Remember to change to the floor.
         LatLng myPoint = location.getPosition();
-        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,19f),3000,null);
+        currentMarker = mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint, 19f), 3000, null);
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
 
-                System.out.println("IS IT FAVORITE");
-                System.out.println(controller.checkFavorite(location));
-
-                if(controller.checkFavorite(location)) {
+                if (controller.checkFavorite(location)) {
                     controller.removeFavorite(location);
-                }
-                else {
+                    Toast.makeText(getApplicationContext(), R.string.toast_rem_fav, Toast.LENGTH_SHORT).show();
+                } else {
                     controller.addFavorite(location);
+                    Toast.makeText(getApplicationContext(), R.string.toast_add_fav, Toast.LENGTH_SHORT).show();
                 }
 
                 marker.showInfoWindow();
@@ -686,23 +677,22 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public View getInfoContents(Marker marker) {
                 View infoWindowContent = getLayoutInflater().inflate(R.layout.infowindow_content, null);
-                TextView nameTV = (TextView)infoWindowContent.findViewById(R.id.info_name);
+                TextView nameTV = (TextView) infoWindowContent.findViewById(R.id.info_name);
                 nameTV.setText(location.getName());
 
-                TextView descriptionTV = (TextView)infoWindowContent.findViewById(R.id.info_description);
+                TextView descriptionTV = (TextView) infoWindowContent.findViewById(R.id.info_description);
                 descriptionTV.setText(location.getDescription());
 
 
-                final ImageView favoriteIcon = (ImageView)infoWindowContent.findViewById(R.id.info_favorite);
+                final ImageView favoriteIcon = (ImageView) infoWindowContent.findViewById(R.id.info_favorite);
 
-                if(controller.checkFavorite(location)) {
+                if (controller.checkFavorite(location)) {
                     favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
-                }
-                else {
+                } else {
                     favoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                 }
 
-                RecyclerView recyclerView = (RecyclerView)infoWindowContent.findViewById(R.id.info_tags_recyclerview);
+                RecyclerView recyclerView = (RecyclerView) infoWindowContent.findViewById(R.id.info_tags_recyclerview);
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
 
@@ -724,18 +714,31 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public void onMapClick(LatLng latLng) {
 
-        System.out.println("UserClick: "+ latLng);
+        System.out.println("UserClick: " + latLng);
         bottomNavigationItemSelected = null;
         getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
-    public NavigationController getController() {
-        return controller;
+    public void getMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationManager locationManager = (LocationManager)
+                    getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            Location location = locationManager.getLastKnownLocation(locationManager
+                    .getBestProvider(criteria, false));
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            LatLng latLng = new LatLng(latitude, longitude);
+
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 3000, null);
+        }
+
     }
 }

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.data.MARKTYPE;
 import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.firebase.database.DataSnapshot;
@@ -65,7 +66,7 @@ public class Provider extends ContentProvider {
 
         if(search.isEmpty()) {
             for (Searchable item : historyList) {
-                Object[] obj = {id, item.getName(), item.getType(), true, favoriteList.contains(item) };
+                Object[] obj = {id, item.getName(), item.getDescription(), true, favoriteList.contains(item) };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -75,7 +76,8 @@ public class Provider extends ContentProvider {
                 List<Searchable> suggestionsList = controller.searchMatch(search);
 
                 for (Searchable item :  suggestionsList) {
-                    Object[] obj = {id, item.getName(), item.getType(), historyList.contains(item), favoriteList.contains(item) };
+
+                    Object[] obj = {id, item.getName(), item.getDescription(), historyList.contains(item), favoriteList.contains(item) };
                     id++;
                     suggestionsCursor.addRow(obj);
                 }

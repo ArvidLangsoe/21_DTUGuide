@@ -51,9 +51,6 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         if(favorite) {
             favoriteV.setImageResource(R.drawable.ic_favorite_black_24dp);
         }
-        else {
-            favoriteV.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-        }
     }
 
     @Override
