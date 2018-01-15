@@ -1,5 +1,7 @@
 package com.arvid.dtuguide.navigation;
 
+import android.content.Context;
+
 import com.arvid.dtuguide.R;
 import com.arvid.dtuguide.Settings;
 import com.arvid.dtuguide.data.Landmark;
@@ -25,7 +27,11 @@ public class Floor {
     ArrayList<LandMarkInfo> landMarks;
     ArrayList<Marker> activeMarkers;
     GoogleMap map;
+    Context appContext;
 
+    public Floor(Context appContext){
+        this.appContext=appContext;
+    }
 
     class LandMarkInfo{
         public LocationDTO location;
@@ -34,10 +40,14 @@ public class Floor {
         public LandMarkInfo(LocationDTO location, Marker marker){
             this.location=location;
             this.marker=marker;
+
         }
     }
 
     public void showFloor(){
+        if(map==null){
+            return;
+        }
         for(GroundOverlay o : mapOverlay)
             o.setVisible(true);
 
@@ -46,8 +56,8 @@ public class Floor {
                 m.setVisible(true);
         }
         if(landMarks!=null) {
-            Settings settings = Settings.getInstance();
-            if(map.getCameraPosition().zoom>17.5) {
+            Settings settings = Settings.getInstance(appContext);
+            if(map.getCameraPosition().zoom> settings.getZoom()) {
                 for (LandMarkInfo l : landMarks) {
                     System.out.println("LANDMARK: " + l.location.getLandmark());
                     if (settings.isVisible(l.location.getLandmark()))
@@ -98,6 +108,9 @@ public class Floor {
 
     public Floor addLandmark(GoogleMap map, LocationDTO loc){
         this.map=map;
+        if(map== null){
+            return null;
+        }
         if(landMarks==null){
             landMarks = new ArrayList<LandMarkInfo>();
         }

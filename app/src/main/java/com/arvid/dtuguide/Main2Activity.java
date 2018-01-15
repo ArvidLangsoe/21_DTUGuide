@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.VectorDrawable;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Main2Activity extends AppCompatActivity
@@ -276,7 +278,7 @@ public class Main2Activity extends AppCompatActivity
     };
 
     private void readyFilterSwitch(View filterView,int id, String nameCheck, MARKTYPE filterSettingCheck){
-        com.arvid.dtuguide.Settings currentSettings = com.arvid.dtuguide.Settings.getInstance();
+        com.arvid.dtuguide.Settings currentSettings = com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
         Switch mySwitch =(Switch)filterView.findViewById(id);
         switches.put(mySwitch,nameCheck);
         mySwitch.setChecked( currentSettings.isVisible(filterSettingCheck));
@@ -533,7 +535,7 @@ public class Main2Activity extends AppCompatActivity
         double tileSizeLat=(neCorner.latitude-swCorner.latitude)/heightTiles;
         double tileSizeLong=(neCorner.longitude-swCorner.longitude)/widthTiles;
 
-        Floor floorObj = new Floor();
+        Floor floorObj = new Floor(getApplicationContext());
         maps.put(floor,floorObj);
 
         for(int heightTile=0;heightTile<heightTiles;heightTile++){
@@ -658,7 +660,7 @@ public class Main2Activity extends AppCompatActivity
                 break;
         }
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17f),1500,null);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17.5f),1500,null);
 
     }
 
@@ -679,7 +681,8 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onCameraMove() {
-        double tolerance= 17.5;
+        Float zoomSetting = com.arvid.dtuguide.Settings.getInstance(getApplicationContext()).getZoom();
+        double tolerance= zoomSetting;
         double newZoom=mMap.getCameraPosition().zoom;
         if(cameraZoom>tolerance){
             if(newZoom<=tolerance){
@@ -698,7 +701,7 @@ public class Main2Activity extends AppCompatActivity
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         System.out.println("TEST"+ isChecked);
         String filterChanged = switches.get(buttonView);
-        com.arvid.dtuguide.Settings mySettings= com.arvid.dtuguide.Settings.getInstance();
+        com.arvid.dtuguide.Settings mySettings= com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
 
         switch(filterChanged){
             case "cantine":
