@@ -21,10 +21,14 @@ import com.arvid.dtuguide.navigation.NavigationController;
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
     private NavigationController controller;
 
+    Settings currentSettings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        currentSettings=Settings.getInstance(getApplicationContext());
 
         LocationDAO dao = new LocationDAO();
         controller = new NavigationController(dao, getApplicationContext());
@@ -75,11 +79,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null);
                 final SeekBar seekBar = (SeekBar) dialogView.findViewById(R.id.zoom_level_seekbar);
                 // TODO: max and min value defined in Settings class
-                final int MAX = 50;
-                final int MIN = 1;
+                final int MAX = currentSettings.getMaxZoom();
+                final int MIN = currentSettings.getMinZoom();
                 final int STEP = 1;
                 seekBar.setMax(100);
-                int currentValue = (int)(Settings.getInstance(getApplicationContext()).getZoom());
+                int currentValue = (int)currentSettings.getZoom();
                 seekBar.setProgress(calculateProgress(currentValue, MIN, MAX, STEP));
 
                 final TextView zoomLevelTV = (TextView) dialogView.findViewById(R.id.zoom_level_value);
@@ -107,7 +111,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 builder.setTitle(R.string.dialog_zoom_title);
                 builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Settings.getInstance(getApplicationContext()).setZoom(Integer.parseInt((String)zoomLevelTV.getText()));
+                        currentSettings.setZoom(Integer.parseInt((String)zoomLevelTV.getText()));
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
