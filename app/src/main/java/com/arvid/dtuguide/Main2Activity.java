@@ -547,6 +547,8 @@ public class Main2Activity extends AppCompatActivity
 
         mMap.setIndoorEnabled(false);
 
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
         Settings mySettings = Settings.getInstance(getApplicationContext());
 
         mMap.setMinZoomPreference(mySettings.getGoogleMinZoom());
