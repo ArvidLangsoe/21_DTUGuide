@@ -57,7 +57,7 @@ public class NavigationController implements Navigation{
     final String HISTORYPREF = "History_list";
     final String FAVORITEPREF = "Favorite_list";
 
-    Main2Activity ui;
+    static Main2Activity ui;
 
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
@@ -66,6 +66,21 @@ public class NavigationController implements Navigation{
     SharedPreferences.Editor myEditor;
 
     public NavigationController(){
+    }
+
+    public NavigationController(LocationDAO dao, Context context){
+        this.dao = dao;
+        this.context = context;
+
+        mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
+        mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
+
+        //savePrefs();
+
+        updateDataFromFireBase();
+
+        System.out.println("NAVCONTROLLER FAVORITE LIST:");
+        System.out.println(favorite);
     }
 
     public NavigationController(LocationDAO dao, Context context, Main2Activity ui){
