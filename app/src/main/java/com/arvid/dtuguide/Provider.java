@@ -11,8 +11,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.arvid.dtuguide.data.Location;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.data.MARKTYPE;
+import com.arvid.dtuguide.data.Person;
 import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.firebase.database.DataSnapshot;
@@ -41,13 +44,20 @@ public class Provider extends ContentProvider {
     public static final String TAG = "";
     private static LocationDAO dao;
     private static NavigationController controller;
-    private List<Searchable> historyList;
-    private List<Searchable> favoriteList;
+
+    public enum CURSOR_COLUMNS {
+        _ID,
+        NAME,
+        TYPE,
+        SUBTEXT,
+        RECENT,
+        FAVORITE
+    }
 
     @Override
     public boolean onCreate() {
         dao = new LocationDAO();
-        controller = new NavigationController(dao, getContext());
+        controller = new NavigationController(dao, getContext(),null);
         return true;
     }
 
@@ -55,17 +65,35 @@ public class Provider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
-        historyList = controller.getHistoryList();
-        favoriteList = controller.getFavorite();
-
         String search = selectionArgs[0];
         int id = 0;
 
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type", "recent", "favorite"});
+        MatrixCursor suggestionsCursor =
+                new MatrixCursor(new String[]{ CURSOR_COLUMNS._ID.toString() , CURSOR_COLUMNS.NAME.toString(), CURSOR_COLUMNS.TYPE.toString(),
+                        CURSOR_COLUMNS.SUBTEXT.toString(), CURSOR_COLUMNS.RECENT.toString(), CURSOR_COLUMNS.FAVORITE.toString()});
 
         if(search.isEmpty()) {
-            for (Searchable item : historyList) {
-                Object[] obj = {id, item.getName(), item.getType(), true, favoriteList.contains(item) };
+            for (Searchable item : controller.getHistoryList()) {
+                String type = item.getType();
+                String subText = "";
+                if(type.equals("Person")) {
+                    subText = ((Person) item).getRole();
+                }
+                else {
+                    subText = item.getDescription();
+                    if(subText.isEmpty()){
+                        ArrayList<Person> people=((LocationDTO)item).getPersons();
+                        subText="";
+                        for(Person p : people){
+                            subText+=" "+p.getName()+",";
+                        }
+                        if(!subText.isEmpty()) {
+                            subText = subText.substring(0, subText.length() - 1);
+                        }
+
+                    }
+                }
+                Object[] obj = {id, item.getName(), item.getType(), subText, true, controller.checkFavorite(item) };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -75,7 +103,27 @@ public class Provider extends ContentProvider {
                 List<Searchable> suggestionsList = controller.searchMatch(search);
 
                 for (Searchable item :  suggestionsList) {
-                    Object[] obj = {id, item.getName(), item.getType(), historyList.contains(item), favoriteList.contains(item) };
+                    String type = item.getType();
+                    String subString = "";
+                    if(type.equals("Person")) {
+                        subString = ((Person) item).getRole();
+                    }
+                    else {
+                        subString = item.getDescription();
+                        if(subString.isEmpty()){
+                            ArrayList<Person> people=((LocationDTO)item).getPersons();
+                            subString="";
+                            for(Person p : people){
+                                subString+=" "+p.getName()+",";
+
+                            }
+                            if(!subString.isEmpty()) {
+                                subString = subString.substring(0, subString.length() - 1);
+                            }
+
+                        }
+                    }
+                    Object[] obj = {id, item.getName(), item.getType(), subString, controller.checkHistory(item), controller.checkFavorite(item) };
                     id++;
                     suggestionsCursor.addRow(obj);
                 }

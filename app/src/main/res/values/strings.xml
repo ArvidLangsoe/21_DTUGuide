@@ -7,7 +7,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="topbar_searchview_hint">Search places</string>
+    <string name="topbar_searchview_hint">Search here</string>
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
@@ -32,6 +32,14 @@
     <string name="campus">Change Campus</string>
 
     <string name="placeholder_text">Placeholder</string>
+    <string name="toast_add_fav">Added to favorites</string>
+    <string name="toast_rem_fav">Removed from favorites</string>
+
+    <string name="dialog_zoom_message">At what zoom level landmarks are visible</string>
+    <string name="dialog_zoom_title">Landmark zoom level</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="food">Canteen and Kitchens</string>
+    <string name="movement">Stairs, elevators and entrances</string>
 
     <string name="no_favorites">You do not have any favorites</string>
     <string name="not_implemented">Activity not implemented yet</string>
@@ -47,5 +55,6 @@
     <string name="dialog_hist_message">Are you sure you want to clear your recent history?</string>
     <string name="clear">Clear</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
 </resources>

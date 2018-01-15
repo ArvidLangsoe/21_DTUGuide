@@ -4,7 +4,6 @@ package com.arvid.dtuguide.data;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 
 import java.util.HashMap;
 
@@ -26,6 +25,7 @@ public class LocationDAO {
 	}
 
 	public HashMap<String, Searchable> getAllData() throws DAOException {
+	    System.out.println("SUPER TEST "+data.values()+"");
 		if(data !=null)
 			return data;
 		else

@@ -4,15 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.arvid.dtuguide.Main2Activity;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
 import com.arvid.dtuguide.data.Person;
 import com.arvid.dtuguide.data.Searchable;
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,7 +43,6 @@ import static com.arvid.dtuguide.Main2Activity.TAG;
 
 public class NavigationController implements Navigation{
 
-    private GeoPoint myLocation=new GeoPoint(12.395167,55.732010);
 
 
 
@@ -57,6 +57,8 @@ public class NavigationController implements Navigation{
     final String HISTORYPREF = "History_list";
     final String FAVORITEPREF = "Favorite_list";
 
+    static Main2Activity ui;
+
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
     SharedPreferences mySharedPreferencesFav;
@@ -69,6 +71,22 @@ public class NavigationController implements Navigation{
     public NavigationController(LocationDAO dao, Context context){
         this.dao = dao;
         this.context = context;
+
+        mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
+        mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
+
+        //savePrefs();
+
+        updateDataFromFireBase();
+
+        System.out.println("NAVCONTROLLER FAVORITE LIST:");
+        System.out.println(favorite);
+    }
+
+    public NavigationController(LocationDAO dao, Context context, Main2Activity ui){
+        this.dao = dao;
+        this.context = context;
+        this.ui=ui;
 
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
         mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
@@ -96,23 +114,23 @@ public class NavigationController implements Navigation{
                 //    dao.saveLocation((dao.parseToDTO(location)));
                 //}
 
-                System.out.println("TEST DEBUG : "+map+"");
+                System.out.println("TEST DEBUG : " + map + "");
 
                 HashMap<String, HashMap<String, Object>> locations = map.get("Locations");
                 HashMap<String, HashMap<String, Object>> persons = map.get("Persons");
 
-                for(HashMap<String, Object> location:locations.values()) {
+                for (HashMap<String, Object> location : locations.values()) {
 
-                    LatLng geo = new LatLng(
-                            ((HashMap<String, Double>) location.get("position")).get("latitude"),
-                            ((HashMap<String, Double>) location.get("position")).get("longitude")
-                    );
+                        LatLng geo = new LatLng(
+                                ((HashMap<String, Double>) location.get("position")).get("latitude"),
+                                ((HashMap<String, Double>) location.get("position")).get("longitude")
+                        );
 
                     LocationDTO dto = (LocationDTO) new LocationDTO()
                             .setPosition(geo)
-                            .setFloor(Integer.parseInt((String)location.get("floor")))
-                            .setDescription((String)location.get("description"))
-                            .setLandmark(MARKTYPE.valueOf((String)location.get("landmark")))
+                            .setFloor(Integer.parseInt((String) location.get("floor")))
+                            .setDescription((String) location.get("description"))
+                            .setLandmark(MARKTYPE.valueOf((String) location.get("landmark")))
                             .setTags((ArrayList<String>) location.get("tags"))
                             .setName((String) location.get("name"));
 
@@ -124,13 +142,17 @@ public class NavigationController implements Navigation{
                 for(HashMap<String, Object> person:persons.values()){
                     Person dto = null;
                     try {
+                        LocationDTO room = (LocationDTO) dao.getData((String)person.get("roomName"));
+
                         dto = (Person) new Person()
                                 .setdescription((String)person.get("description"))
                                 .setEmail((String)person.get("email"))
                                 .setPictureURL((String)person.get("pictureURL"))
                                 .setRole((String)person.get("role"))
-                                .setRoom((LocationDTO) dao.getData((String)person.get("roomName")))
+                                .setRoom(room)
                                 .setName((String)person.get("name"));
+
+                        room.addPerson(dto);
 
                         dao.saveData(dto);
                     } catch (LocationDAO.DAOException e) {
@@ -147,8 +169,12 @@ public class NavigationController implements Navigation{
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
+                if (ui != null) {
+                    ui.generateLandmarks();
 
+                }
             }
+
 
             @Override
             public void onCancelled(DatabaseError error) {
@@ -228,13 +254,22 @@ public class NavigationController implements Navigation{
         saveFavorite();
     }
 
-    public boolean isFavorite(Searchable item) {
-        if(favorite.contains(item)) {
-            return true;
+    public boolean checkFavorite(Searchable item) {
+        for (Searchable fav : favorite) {
+            if (fav.equals(item)) {
+                return true;
+            }
         }
-        else {
-            return false;
+        return false;
+    }
+
+    public boolean checkHistory(Searchable item) {
+        for (Searchable hist : historyList) {
+            if (hist.equals(item)) {
+                return true;
+            }
         }
+        return false;
     }
 
     public List<Searchable> getFavorite(){
@@ -312,7 +347,9 @@ public class NavigationController implements Navigation{
     public List<LocationDTO> getLandmarks() throws Exception {
         ArrayList<LocationDTO> Landmarks = new ArrayList<LocationDTO>();
 
+
         for(Searchable item:dao.getAllData().values()){
+
             if(item.getClass().isAssignableFrom(LocationDTO.class)){
                 if(!(((LocationDTO) item).getLandmark().equals(MARKTYPE.NONE))){
                     Landmarks.add((LocationDTO) item);

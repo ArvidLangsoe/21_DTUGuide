@@ -2,10 +2,10 @@ package com.arvid.dtuguide.data;
 
 import android.support.annotation.NonNull;
 
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class LocationDTO extends Searchable implements Serializable{
 
@@ -15,10 +15,23 @@ public class LocationDTO extends Searchable implements Serializable{
     private int floor;
     private String description;
     private MARKTYPE landmark;
+    private ArrayList<Person> persons = new ArrayList<Person>();
 
+    public ArrayList<Person> getPersons() {
+        return persons;
+    }
+
+    public LocationDTO setPersons(ArrayList<Person> persons) {
+        this.persons = persons;
+        return this;
+    }
+
+    public void addPerson(Person person){
+        persons.add(person);
+    }
 
     public String toString(){
-        return "(Name:"+this.getName()+" - Pos:"+position+" - Stage:"+floor+" - Desc:'"+description+"\n";
+        return "(Name:"+this.getName()+" - Pos:"+position+" - Stage:"+floor+" - Desc:'"+description+"\n"+" - Persons:'"+persons+"\n";
     }
 
     public int getFloor() {
