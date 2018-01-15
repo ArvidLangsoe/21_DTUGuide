@@ -255,12 +255,12 @@ public class NavigationController implements Navigation{
     }
 
     public boolean checkFavorite(Searchable item) {
-        if(favorite.contains(item)) {
-            return true;
+        for (Searchable fav : favorite) {
+            if (fav.equals(item)) {
+                return true;
+            }
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     public List<Searchable> getFavorite(){
