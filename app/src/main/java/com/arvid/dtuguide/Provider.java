@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.arvid.dtuguide.data.Location;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
@@ -80,6 +81,17 @@ public class Provider extends ContentProvider {
                 }
                 else {
                     subText = item.getDescription();
+                    if(subText.isEmpty()){
+                        ArrayList<Person> people=((LocationDTO)item).getPersons();
+                        subText="";
+                        for(Person p : people){
+                            subText+=" "+p.getName()+",";
+                        }
+                        if(!subText.isEmpty()) {
+                            subText = subText.substring(0, subText.length() - 1);
+                        }
+
+                    }
                 }
                 Object[] obj = {id, item.getName(), item.getType(), subText, true, controller.checkFavorite(item) };
                 id++;
@@ -98,6 +110,18 @@ public class Provider extends ContentProvider {
                     }
                     else {
                         subString = item.getDescription();
+                        if(subString.isEmpty()){
+                            ArrayList<Person> people=((LocationDTO)item).getPersons();
+                            subString="";
+                            for(Person p : people){
+                                subString+=" "+p.getName()+",";
+
+                            }
+                            if(!subString.isEmpty()) {
+                                subString = subString.substring(0, subString.length() - 1);
+                            }
+
+                        }
                     }
                     Object[] obj = {id, item.getName(), item.getType(), subString, controller.checkHistory(item), controller.checkFavorite(item) };
                     id++;
