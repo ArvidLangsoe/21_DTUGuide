@@ -43,8 +43,14 @@ public class Provider extends ContentProvider {
     public static final String TAG = "";
     private static LocationDAO dao;
     private static NavigationController controller;
-    private List<Searchable> historyList;
-    private List<Searchable> favoriteList;
+
+    public enum CURSOR_COLUMNS {
+        _ID,
+        NAME,
+        SUBTEXT,
+        RECENT,
+        FAVORITE
+    }
 
     @Override
     public boolean onCreate() {
@@ -57,25 +63,24 @@ public class Provider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
-        historyList = controller.getHistoryList();
-        favoriteList = controller.getFavorite();
-
         String search = selectionArgs[0];
         int id = 0;
 
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{"_id", "name", "type", "recent", "favorite"});
+        MatrixCursor suggestionsCursor =
+                new MatrixCursor(new String[]{ CURSOR_COLUMNS._ID.toString() , CURSOR_COLUMNS.NAME.toString(),
+                        CURSOR_COLUMNS.SUBTEXT.toString(), CURSOR_COLUMNS.RECENT.toString(), CURSOR_COLUMNS.FAVORITE.toString()});
 
         if(search.isEmpty()) {
-            for (Searchable item : historyList) {
+            for (Searchable item : controller.getHistoryList()) {
                 String type = item.getType();
-                String subString = "";
+                String subText = "";
                 if(type.equals("Person")) {
-                    subString = ((Person) item).getRole();
+                    subText = ((Person) item).getRole();
                 }
                 else {
-                    subString = item.getDescription();
+                    subText = item.getDescription();
                 }
-                Object[] obj = {id, item.getName(), subString, true, favoriteList.contains(item) };
+                Object[] obj = {id, item.getName(), subText, true, controller.checkFavorite(item) };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -93,7 +98,7 @@ public class Provider extends ContentProvider {
                     else {
                         subString = item.getDescription();
                     }
-                    Object[] obj = {id, item.getName(), subString, historyList.contains(item), favoriteList.contains(item) };
+                    Object[] obj = {id, item.getName(), subString, controller.getHistoryList().contains(item), controller.checkFavorite(item) };
                     id++;
                     suggestionsCursor.addRow(obj);
                 }

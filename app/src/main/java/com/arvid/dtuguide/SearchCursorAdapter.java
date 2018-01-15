@@ -28,19 +28,19 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         ImageView iconV = (ImageView) view.findViewById(R.id.search_item_icon);
         ImageView favoriteV = (ImageView) view.findViewById(R.id.search_item_favorite);
 
-        String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-        String type = cursor.getString(cursor.getColumnIndex("type"));
-        boolean recent = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("recent")));
-        boolean favorite = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("favorite")));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(Provider.CURSOR_COLUMNS.NAME.toString()));
+        String subText = cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.SUBTEXT.toString()));
+        boolean recent = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.RECENT.toString())));
+        boolean favorite = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.FAVORITE.toString())));
 
         nameTV.setText(name);
-        typeTV.setText(type);
+        typeTV.setText(subText);
 
         if(recent) {
             iconV.setImageResource(R.drawable.ic_history_black_24dp);
         }
         else {
-            switch (type) {
+            switch (subText) {
                 case "Person":
                     iconV.setImageResource(R.drawable.ic_perm_identity_black_24dp);
                     break;
