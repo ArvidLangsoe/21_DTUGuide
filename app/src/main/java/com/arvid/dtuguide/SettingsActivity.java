@@ -40,11 +40,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         View favoriteButton = findViewById(R.id.reset_fav_button);
         View historyButton = findViewById(R.id.reset_hist_button);
-        Button testButton = (Button) findViewById(R.id.button2);
+        View zoomLevelButton = findViewById(R.id.zoom_level_button);
 
         favoriteButton.setOnClickListener(this);
         historyButton.setOnClickListener(this);
-        testButton.setOnClickListener(this);
+        zoomLevelButton.setOnClickListener(this);
     }
 
 
@@ -87,7 +87,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 dialog = builder.create();
                 dialog.show();
                 break;
-            case R.id.button2:
+            case R.id.zoom_level_button:
                 View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null);
                 final SeekBar seekBar = (SeekBar) dialogView.findViewById(R.id.zoom_level_seekbar);
                 // TODO: max and min value defined in Settings class
