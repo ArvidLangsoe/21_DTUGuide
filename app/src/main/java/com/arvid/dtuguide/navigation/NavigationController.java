@@ -142,13 +142,17 @@ public class NavigationController implements Navigation{
                 for(HashMap<String, Object> person:persons.values()){
                     Person dto = null;
                     try {
+                        LocationDTO room = (LocationDTO) dao.getData((String)person.get("roomName"));
+
                         dto = (Person) new Person()
                                 .setdescription((String)person.get("description"))
                                 .setEmail((String)person.get("email"))
                                 .setPictureURL((String)person.get("pictureURL"))
                                 .setRole((String)person.get("role"))
-                                .setRoom((LocationDTO) dao.getData((String)person.get("roomName")))
+                                .setRoom(room)
                                 .setName((String)person.get("name"));
+
+                        room.addPerson(dto);
 
                         dao.saveData(dto);
                     } catch (LocationDAO.DAOException e) {
@@ -251,12 +255,21 @@ public class NavigationController implements Navigation{
     }
 
     public boolean checkFavorite(Searchable item) {
-        if(favorite.contains(item)) {
-            return true;
+        for (Searchable fav : favorite) {
+            if (fav.equals(item)) {
+                return true;
+            }
         }
-        else {
-            return false;
+        return false;
+    }
+
+    public boolean checkHistory(Searchable item) {
+        for (Searchable hist : historyList) {
+            if (hist.equals(item)) {
+                return true;
+            }
         }
+        return false;
     }
 
     public List<Searchable> getFavorite(){
