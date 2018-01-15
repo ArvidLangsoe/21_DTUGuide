@@ -8,8 +8,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
@@ -43,7 +45,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.myDialog));
         AlertDialog dialog;
         switch (v.getId()){
             case R.id.reset_favorite:
@@ -69,7 +71,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 toast.show();
                 break;
             case R.id.button2:
-                builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.dialog_fav_title);
+                builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         return;
                     }
@@ -79,9 +82,14 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         return;
                     }
                 });
-                builder.setView(getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null));
+                View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null);
+                SeekBar seekBar = (SeekBar) dialogView.findViewById(R.id.zoom_level_seekbar);
+                //seekBar.setProgress();
+
+                builder.setView(dialogView);
                 dialog = builder.create();
                 dialog.show();
+                break;
         }
     }
 }

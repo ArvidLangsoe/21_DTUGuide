@@ -41,5 +41,6 @@
     <string name="dialog_fav_message">Are you sure you want to clear your favorites?</string>
     <string name="clear">Clear</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
 </resources>

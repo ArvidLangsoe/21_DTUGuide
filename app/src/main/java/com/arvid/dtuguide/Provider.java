@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
+import com.arvid.dtuguide.data.Person;
 import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.firebase.database.DataSnapshot;
@@ -66,7 +67,15 @@ public class Provider extends ContentProvider {
 
         if(search.isEmpty()) {
             for (Searchable item : historyList) {
-                Object[] obj = {id, item.getName(), item.getDescription(), true, favoriteList.contains(item) };
+                String type = item.getType();
+                String subString = "";
+                if(type.equals("Person")) {
+                    subString = ((Person) item).getRole();
+                }
+                else {
+                    subString = item.getDescription();
+                }
+                Object[] obj = {id, item.getName(), subString, true, favoriteList.contains(item) };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -76,8 +85,15 @@ public class Provider extends ContentProvider {
                 List<Searchable> suggestionsList = controller.searchMatch(search);
 
                 for (Searchable item :  suggestionsList) {
-
-                    Object[] obj = {id, item.getName(), item.getDescription(), historyList.contains(item), favoriteList.contains(item) };
+                    String type = item.getType();
+                    String subString = "";
+                    if(type.equals("Person")) {
+                        subString = ((Person) item).getRole();
+                    }
+                    else {
+                        subString = item.getDescription();
+                    }
+                    Object[] obj = {id, item.getName(), subString, historyList.contains(item), favoriteList.contains(item) };
                     id++;
                     suggestionsCursor.addRow(obj);
                 }
