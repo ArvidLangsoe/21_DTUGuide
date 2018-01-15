@@ -47,6 +47,7 @@ public class Provider extends ContentProvider {
     public enum CURSOR_COLUMNS {
         _ID,
         NAME,
+        TYPE,
         SUBTEXT,
         RECENT,
         FAVORITE
@@ -67,7 +68,7 @@ public class Provider extends ContentProvider {
         int id = 0;
 
         MatrixCursor suggestionsCursor =
-                new MatrixCursor(new String[]{ CURSOR_COLUMNS._ID.toString() , CURSOR_COLUMNS.NAME.toString(),
+                new MatrixCursor(new String[]{ CURSOR_COLUMNS._ID.toString() , CURSOR_COLUMNS.NAME.toString(), CURSOR_COLUMNS.TYPE.toString(),
                         CURSOR_COLUMNS.SUBTEXT.toString(), CURSOR_COLUMNS.RECENT.toString(), CURSOR_COLUMNS.FAVORITE.toString()});
 
         if(search.isEmpty()) {
@@ -80,7 +81,7 @@ public class Provider extends ContentProvider {
                 else {
                     subText = item.getDescription();
                 }
-                Object[] obj = {id, item.getName(), subText, true, controller.checkFavorite(item) };
+                Object[] obj = {id, item.getName(), item.getType(), subText, true, controller.checkFavorite(item) };
                 id++;
                 suggestionsCursor.addRow(obj);
             }
@@ -98,7 +99,7 @@ public class Provider extends ContentProvider {
                     else {
                         subString = item.getDescription();
                     }
-                    Object[] obj = {id, item.getName(), subString, controller.getHistoryList().contains(item), controller.checkFavorite(item) };
+                    Object[] obj = {id, item.getName(), item.getType(), subString, controller.checkHistory(item), controller.checkFavorite(item) };
                     id++;
                     suggestionsCursor.addRow(obj);
                 }

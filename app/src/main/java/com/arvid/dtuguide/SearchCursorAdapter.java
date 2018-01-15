@@ -30,6 +30,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
 
         String name = cursor.getString(cursor.getColumnIndexOrThrow(Provider.CURSOR_COLUMNS.NAME.toString()));
         String subText = cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.SUBTEXT.toString()));
+        String type = cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.TYPE.toString()));
         boolean recent = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.RECENT.toString())));
         boolean favorite = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(Provider.CURSOR_COLUMNS.FAVORITE.toString())));
 
@@ -40,7 +41,7 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
             iconV.setImageResource(R.drawable.ic_history_black_24dp);
         }
         else {
-            switch (subText) {
+            switch (type) {
                 case "Person":
                     iconV.setImageResource(R.drawable.ic_perm_identity_black_24dp);
                     break;
@@ -50,6 +51,9 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         }
         if(favorite) {
             favoriteV.setImageResource(R.drawable.ic_favorite_black_24dp);
+        }
+        else {
+            favoriteV.setImageResource(0);
         }
     }
 
