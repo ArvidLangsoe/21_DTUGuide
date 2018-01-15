@@ -263,6 +263,15 @@ public class NavigationController implements Navigation{
         return false;
     }
 
+    public boolean checkHistory(Searchable item) {
+        for (Searchable hist : historyList) {
+            if (hist.equals(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Searchable> getFavorite(){
         return favorite;
     }
