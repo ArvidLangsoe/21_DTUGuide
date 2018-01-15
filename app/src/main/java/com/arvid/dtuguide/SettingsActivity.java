@@ -12,6 +12,7 @@ import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arvid.dtuguide.data.LocationDAO;
@@ -71,10 +72,42 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 toast.show();
                 break;
             case R.id.button2:
-                builder.setTitle(R.string.dialog_fav_title);
+                View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null);
+                final SeekBar seekBar = (SeekBar) dialogView.findViewById(R.id.zoom_level_seekbar);
+                // TODO: max and min value defined in Settings class
+                final int MAX = 20;
+                final int MIN = 10;
+                final int STEP = 1;
+                int currentValue = (int)(Settings.getInstance(getApplicationContext()).getZoom());
+                seekBar.setMax(MAX);
+                seekBar.setProgress(calculateProgress(currentValue, MIN, MAX, STEP));
+
+                final TextView zoomLevelTV = (TextView) dialogView.findViewById(R.id.zoom_level_value);
+                zoomLevelTV.setText(seekBar.getProgress() + "");
+
+                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        double value = Math.round((progress * (MAX - MIN)) / 100);
+                        int displayValue = (((int) value + MIN) / STEP) * STEP;
+
+                        
+                    }
+                });
+
+
+                builder.setTitle(R.string.dialog_zoom_title);
                 builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        return;
+                        Settings.getInstance(getApplicationContext()).setZoom((float)seekBar.getProgress());
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -82,14 +115,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         return;
                     }
                 });
-                View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null);
-                SeekBar seekBar = (SeekBar) dialogView.findViewById(R.id.zoom_level_seekbar);
-                //seekBar.setProgress();
 
                 builder.setView(dialogView);
                 dialog = builder.create();
                 dialog.show();
                 break;
         }
+    }
+
+    private int calculateProgress(int value, int MIN, int MAX, int STEP) {
+        return (100 * (value - MIN)) / (MAX - MIN);
     }
 }

@@ -812,6 +812,7 @@ public class Main2Activity extends AppCompatActivity
 
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 3000, null);
         }
+    }
 
     @Override
     public void onCameraMove() {
