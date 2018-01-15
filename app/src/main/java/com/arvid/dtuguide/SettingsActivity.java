@@ -99,7 +99,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         double value = Math.round((progress * (MAX - MIN)) / 100);
                         int displayValue = (((int) value + MIN) / STEP) * STEP;
 
-                        
+
                     }
                 });
 
