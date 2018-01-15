@@ -54,6 +54,8 @@ import android.widget.Switch;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
+import com.arvid.dtuguide.data.Person;
+import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.Floor;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.android.gms.maps.CameraUpdate;
@@ -433,15 +435,22 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public boolean onSuggestionClick(int position) {
-                String roomName = adapter.getItemName(position);
+                String name = adapter.getItemName(position);
                 try {
-                    LocationDTO location = (LocationDTO) controller.getSearchableItem(roomName);
+                    Searchable item = controller.getSearchableItem(name);
 
-                    showLocation(location);
+                    if(item.getType().equals("Location")) {
+                        LocationDTO location = (LocationDTO) item;
+                        showLocation(location);
+                    }
+                    else if (item.getType().equals("Person")){
+                        Person person = (Person) item;
+                        showLocation(person.getRoom());
+                    }
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
-                searchView.setQuery(roomName, false);
+                searchView.setQuery(name, false);
                 onBackPressed();
                 return true;
             }
@@ -583,6 +592,67 @@ public class Main2Activity extends AppCompatActivity
 
         mMap.setOnCameraMoveListener(this);
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                LocationDTO localLocation = Floor.markerInfoLookup.get(marker).location;
+                if (controller.checkFavorite(localLocation)) {
+                    System.out.println("FAVVV : 1 "+controller.checkFavorite(localLocation));
+                    controller.removeFavorite(localLocation);
+                    Toast.makeText(getApplicationContext(), R.string.toast_rem_fav, Toast.LENGTH_SHORT).show();
+                    System.out.println("FAVVV : 1 "+controller.checkFavorite(localLocation));
+                } else {
+                    System.out.println("FAVVV : 2 "+controller.checkFavorite(localLocation));
+                    controller.addFavorite(localLocation);
+                    Toast.makeText(getApplicationContext(), R.string.toast_add_fav, Toast.LENGTH_SHORT).show();
+                    System.out.println("FAVVV : 2 "+controller.checkFavorite(localLocation));
+                }
+
+                marker.showInfoWindow();
+
+            }
+        });
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                LocationDTO localLocation = Floor.markerInfoLookup.get(marker).location;
+                View infoWindowContent = getLayoutInflater().inflate(R.layout.infowindow_content, null);
+                TextView nameTV = (TextView) infoWindowContent.findViewById(R.id.info_name);
+                nameTV.setText(localLocation.getName());
+
+                TextView descriptionTV = (TextView) infoWindowContent.findViewById(R.id.info_description);
+                descriptionTV.setText(localLocation.getDescription());
+
+
+                final ImageView favoriteIcon = (ImageView) infoWindowContent.findViewById(R.id.info_favorite);
+
+                if (controller.checkFavorite(localLocation)) {
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
+                } else {
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                }
+
+                RecyclerView recyclerView = (RecyclerView) infoWindowContent.findViewById(R.id.info_tags_recyclerview);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+                TagsAdapter recAdapter = new TagsAdapter(localLocation.getTags(), R.layout.recycler_item_tag);
+                recyclerView.setAdapter(recAdapter);
+
+
+                return infoWindowContent;
+            }
+        });
+
     }
 
     public void showFloor(FloorHeight floor){
@@ -712,82 +782,20 @@ public class Main2Activity extends AppCompatActivity
 
         switch(location.getFloor()){
             case 0:
-                maps.get(FloorHeight.basement).addMarker(currentMarker).showFloor();
+                maps.get(FloorHeight.basement).addMarker(currentMarker,location).showFloor();
                 currentMap=FloorHeight.basement;
                 break;
             case 1:
-                maps.get(FloorHeight.ground_floor).addMarker(currentMarker).showFloor();
+                maps.get(FloorHeight.ground_floor).addMarker(currentMarker,location).showFloor();
                 currentMap=FloorHeight.ground_floor;
                 break;
             case 2:
-                maps.get(FloorHeight.first_floor).addMarker(currentMarker).showFloor();
+                maps.get(FloorHeight.first_floor).addMarker(currentMarker,location).showFloor();
                 currentMap=FloorHeight.first_floor;
                 break;
         }
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17.5f),1500,null);
-
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-
-                if (controller.checkFavorite(location)) {
-                    System.out.println("FAVVV : 1 "+controller.checkFavorite(location));
-                    controller.removeFavorite(location);
-                    Toast.makeText(getApplicationContext(), R.string.toast_rem_fav, Toast.LENGTH_SHORT).show();
-                    System.out.println("FAVVV : 1 "+controller.checkFavorite(location));
-                } else {
-                    System.out.println("FAVVV : 2 "+controller.checkFavorite(location));
-                    controller.addFavorite(location);
-                    Toast.makeText(getApplicationContext(), R.string.toast_add_fav, Toast.LENGTH_SHORT).show();
-                    System.out.println("FAVVV : 2 "+controller.checkFavorite(location));
-                }
-
-                marker.showInfoWindow();
-
-            }
-        });
-
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
-            @Override
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
-
-            @Override
-            public View getInfoContents(Marker marker) {
-                View infoWindowContent = getLayoutInflater().inflate(R.layout.infowindow_content, null);
-                TextView nameTV = (TextView) infoWindowContent.findViewById(R.id.info_name);
-                nameTV.setText(location.getName());
-
-                TextView descriptionTV = (TextView) infoWindowContent.findViewById(R.id.info_description);
-                descriptionTV.setText(location.getDescription());
-
-
-                final ImageView favoriteIcon = (ImageView) infoWindowContent.findViewById(R.id.info_favorite);
-
-                if (controller.checkFavorite(location)) {
-                    favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
-                } else {
-                    favoriteIcon.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                }
-
-                RecyclerView recyclerView = (RecyclerView) infoWindowContent.findViewById(R.id.info_tags_recyclerview);
-
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
-
-                recyclerView.setLayoutManager(linearLayoutManager);
-
-                TagsAdapter recAdapter = new TagsAdapter(location.getTags(), R.layout.recycler_item_tag);
-                recyclerView.setAdapter(recAdapter);
-
-
-                return infoWindowContent;
-            }
-        });
-
-        currentMarker.showInfoWindow();
 
     }
 
