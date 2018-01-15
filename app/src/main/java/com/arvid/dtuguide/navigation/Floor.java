@@ -4,8 +4,6 @@ import android.content.Context;
 
 import com.arvid.dtuguide.R;
 import com.arvid.dtuguide.Settings;
-import com.arvid.dtuguide.data.Landmark;
-import com.arvid.dtuguide.data.Location;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,8 +12,8 @@ import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by arvid on 11-01-2018.
@@ -24,25 +22,17 @@ import java.util.ArrayList;
 public class Floor {
 
     ArrayList<GroundOverlay> mapOverlay;
-    ArrayList<LandMarkInfo> landMarks;
+    ArrayList<MarkerInfo> landMarks;
     ArrayList<Marker> activeMarkers;
     GoogleMap map;
     Context appContext;
+
+    public static HashMap<Marker,MarkerInfo> markerInfoLookup;
 
     public Floor(Context appContext){
         this.appContext=appContext;
     }
 
-    class LandMarkInfo{
-        public LocationDTO location;
-        public Marker marker;
-
-        public LandMarkInfo(LocationDTO location, Marker marker){
-            this.location=location;
-            this.marker=marker;
-
-        }
-    }
 
     public void showFloor(){
         if(map==null){
@@ -58,7 +48,7 @@ public class Floor {
         if(landMarks!=null) {
             Settings settings = Settings.getInstance(appContext);
             if(map.getCameraPosition().zoom> settings.getGoogleZoom()) {
-                for (LandMarkInfo l : landMarks) {
+                for (MarkerInfo l : landMarks) {
                     System.out.println("LANDMARK: " + l.location.getLandmark());
                     if (settings.isVisible(l.location.getLandmark()))
                         l.marker.setVisible(true);
@@ -79,7 +69,7 @@ public class Floor {
         }
 
         if(landMarks!=null) {
-            for (LandMarkInfo l : landMarks)
+            for (MarkerInfo l : landMarks)
                 l.marker.setVisible(false);
         }
 
@@ -87,11 +77,12 @@ public class Floor {
 
     }
 
-    public Floor addMarker(Marker activeMarker){
+    public Floor addMarker(Marker activeMarker,LocationDTO location){
         if(activeMarkers==null){
             activeMarkers=new ArrayList<Marker>();
         }
         activeMarkers.add(activeMarker);
+        markerInfoLookup.put(activeMarker,new MarkerInfo(location, activeMarker));
         return this;
     }
 
@@ -99,6 +90,7 @@ public class Floor {
         if(activeMarkers!=null) {
             for (Marker m : activeMarkers) {
                 m.remove();
+                markerInfoLookup.remove(m);
             }
             activeMarkers=null;
         }
@@ -112,15 +104,21 @@ public class Floor {
             return null;
         }
         if(landMarks==null){
-            landMarks = new ArrayList<LandMarkInfo>();
+            landMarks = new ArrayList<MarkerInfo>();
         }
+        if(markerInfoLookup==null){
+            markerInfoLookup = new HashMap<Marker, MarkerInfo>();
+        }
+
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(loc.getPosition())
                 .title(loc.getName())
                 .icon(BitmapDescriptorFactory.fromResource(getPictureId(loc.getLandmark()))).alpha(0.9f)
         );
         marker.setVisible(false);
-        landMarks.add(new LandMarkInfo(loc,marker));
+        MarkerInfo landMark = new MarkerInfo(loc,marker);
+        landMarks.add(new MarkerInfo(loc,marker));
+        markerInfoLookup.put(marker,landMark);
         return this;
     }
 
