@@ -14,7 +14,7 @@
             android:title="Navigate to DTU" />
 
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_drawer_change_campus"
             android:icon="@drawable/ic_place_black_24dp"
             android:title="@string/campus" />
 

@@ -4,32 +4,131 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.arvid.dtuguide.SettingsActivity">
+    tools:context="com.arvid.dtuguide.SettingsActivity"
+    tools:layout_editor_absoluteY="25dp">
 
     <include
         android:id="@+id/toolbar_settings"
         layout="@layout/toolbar_simple" />
 
 
-    <Button
-        android:id="@+id/reset_favorite"
-        android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/reset_fav_button"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:text="Reset Favorite"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_settings" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_settings"
+        app:layout_constraintVertical_bias="0.0">
 
-    <Button
-        android:id="@+id/reset_recent"
-        android:layout_width="wrap_content"
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/divider_color"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/fav_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_fav_title"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/fav_sub_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/fav_title_text"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/button_fav_sub"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fav_title_text" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/divider_color"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/reset_hist_button"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:text="Reset Recent"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reset_favorite" />
+        app:layout_constraintTop_toBottomOf="@+id/reset_fav_button"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TextView
+            android:id="@+id/hist_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_hist_title"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/hist_sub_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/hist_title_text"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/button_hist_sub"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/hist_title_text" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/divider_color"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <!--
     <fragment

@@ -48,28 +48,22 @@
             android:name=".NavigateToDTUActivity"
             android:label="@string/navigate_to_dtu"
             android:parentActivityName=".Main2Activity" />
-        <!-- Parent activity meta-data to support 4.0 and lower -->
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".Main2Activity" />
-        />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/settings"
             android:parentActivityName=".Main2Activity" />
-        <!-- Parent activity meta-data to support 4.0 and lower -->
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".Main2Activity" />
-
         <activity
             android:name=".FavoriteActivity"
             android:label="@string/favorite_title"
             android:parentActivityName=".Main2Activity" />
-        <!-- Parent activity meta-data to support 4.0 and lower -->
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".Main2Activity" />
+        <activity
+            android:name=".NotImplementedActivity"
+            android:label="@string/campus"
+            android:parentActivityName=".Main2Activity" />
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/about"
+            android:parentActivityName=".Main2Activity"/>
     </application>
 
 </manifest>

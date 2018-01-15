@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.TextView;
 
 import com.arvid.dtuguide.data.LocationDAO;
+import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.NavigationController;
 
 import java.util.ArrayList;
@@ -28,21 +31,21 @@ public class FavoriteActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recView = (RecyclerView) findViewById(R.id.favorite_recycler);
+        TextView emptyView = (TextView) findViewById(R.id.empty_view);
+
+        List<Searchable> favorites = controller.getFavorite();
+        if(favorites.isEmpty()) {
+            recView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         recView.setLayoutManager(linearLayoutManager);
-        /*
-        List<String> list = new ArrayList<String>();
-        list.add("test1");
-        list.add("test2");
-        */
 
-        FavoritesAdapter recAdapter = new FavoritesAdapter(controller.getFavorite(), R.layout.recycler_item_favorite);
-
-        System.out.println("**FAVORITES**");
-        System.out.println(controller.getFavorite());
-
-
-        recView.setAdapter(recAdapter);
+        recView.setAdapter(new FavoritesAdapter(getApplicationContext(), favorites, R.layout.recycler_item_favorite));
     }
 }

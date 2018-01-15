@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -42,6 +44,7 @@ import android.widget.TextView;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.navigation.NavigationController;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -213,8 +216,7 @@ public class Main2Activity extends AppCompatActivity
 
             switch (item.getItemId()) {
                 case R.id.map_navigate_button:
-                    //TODO: What to happen when the bottom menu is clicked
-                    //mTextMessage.setText(R.string.title_home);
+                    // TODO: get device location and animate on map
                     return true;
                 case R.id.map_layers_button:
                     popupLayerView = layoutInflater.inflate(R.layout.map_layers_popup_layout, null);
@@ -500,6 +502,12 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_drawer_favorite:
                 startActivity(new Intent(this, FavoriteActivity.class));
                 break;
+            case R.id.nav_drawer_change_campus:
+                startActivity(new Intent(this, NotImplementedActivity.class));
+                break;
+            case R.id.nav_drawer_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -643,10 +651,7 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void onInfoWindowClick(Marker marker) {
 
-                System.out.println("IS IT FAVORITE");
-                System.out.println(controller.checkFavorite(location));
-
-                if(controller.checkFavorite(location)) {
+                if(controller.isFavorite(location)) {
                     controller.removeFavorite(location);
                 }
                 else {
@@ -677,7 +682,7 @@ public class Main2Activity extends AppCompatActivity
 
                 final ImageView favoriteIcon = (ImageView)infoWindowContent.findViewById(R.id.info_favorite);
 
-                if(controller.checkFavorite(location)) {
+                if(controller.isFavorite(location)) {
                     favoriteIcon.setImageResource(R.drawable.ic_favorite_black_24dp);
                 }
                 else {
@@ -709,15 +714,5 @@ public class Main2Activity extends AppCompatActivity
         System.out.println("UserClick: "+ latLng);
         bottomNavigationItemSelected = null;
         getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-    }
-
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-        //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-    }
-
-    public NavigationController getController() {
-        return controller;
     }
 }
