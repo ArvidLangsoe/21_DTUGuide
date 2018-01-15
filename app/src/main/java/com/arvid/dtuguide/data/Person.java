@@ -11,6 +11,10 @@ public class Person extends Searchable {
     private String description;
     private String pictureURL;
 
+    public String toString(){
+        return "Person name:"+getName()+", role:"+role+", email: "+email+", desc:"+description+", room:"+room.getName();
+    }
+
     public String getPictureURL() {
         return pictureURL;
     }

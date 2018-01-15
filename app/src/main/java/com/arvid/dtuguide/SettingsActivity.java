@@ -108,9 +108,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 });
 
 
-                builder.setTitle(R.string.dialog_zoom_title);
+                builder.setTitle(R.string.dialog_zoom_title).setMessage(R.string.dialog_zoom_message);
                 builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
                         currentSettings.setZoom(Integer.parseInt((String)zoomLevelTV.getText()));
                     }
                 });
