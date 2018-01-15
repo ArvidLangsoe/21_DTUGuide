@@ -35,6 +35,9 @@
     <string name="toast_rem_fav">Removed from favorites</string>
 
     <string name="landmark_zoom_setting">Landmark zoom level appearance</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="food">Canteen and Kitchens</string>
+    <string name="movement">Stairs, elevators and entrances</string>
 
     <!-- Strings related to Settings -->
     <string name="dialog_fav_title">Clear Favorites</string>

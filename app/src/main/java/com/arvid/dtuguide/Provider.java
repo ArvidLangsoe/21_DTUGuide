@@ -49,7 +49,7 @@ public class Provider extends ContentProvider {
     @Override
     public boolean onCreate() {
         dao = new LocationDAO();
-        controller = new NavigationController(dao, getContext());
+        controller = new NavigationController(dao, getContext(),null);
         return true;
     }
 

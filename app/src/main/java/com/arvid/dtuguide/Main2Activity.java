@@ -10,11 +10,13 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.VectorDrawable;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -41,13 +43,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
+import com.arvid.dtuguide.data.MARKTYPE;
+import com.arvid.dtuguide.navigation.Floor;
 import com.arvid.dtuguide.navigation.NavigationController;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -66,11 +73,14 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener, GoogleMap.OnMarkerClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
+        GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener, GoogleMap.OnMarkerClickListener,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener {
 
 
     @Override
@@ -80,22 +90,22 @@ public class Main2Activity extends AppCompatActivity
                 checkBoxMapBasement.setChecked(true);
                 checkBoxMapFirst.setChecked(false);
                 checkBoxMapSecond.setChecked(false);
-                showFloor(Floor.basement);
-                currentMap = Floor.basement;
+                showFloor(FloorHeight.basement);
+                currentMap = FloorHeight.basement;
                 break;
             case R.id.map_layers_checkbox_1:
                 checkBoxMapFirst.setChecked(true);
                 checkBoxMapBasement.setChecked(false);
                 checkBoxMapSecond.setChecked(false);
-                showFloor(Floor.ground_floor);
-                currentMap = Floor.ground_floor;
+                showFloor(FloorHeight.ground_floor);
+                currentMap = FloorHeight.ground_floor;
                 break;
             case R.id.map_layers_checkbox_2:
                 checkBoxMapSecond.setChecked(true);
                 checkBoxMapBasement.setChecked(false);
                 checkBoxMapFirst.setChecked(false);
-                showFloor(Floor.first_floor);
-                currentMap = Floor.first_floor;
+                showFloor(FloorHeight.first_floor);
+                currentMap = FloorHeight.first_floor;
                 break;
         }
     }
@@ -125,14 +135,13 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    public enum Floor {basement, ground_floor, first_floor}
-
+    private double cameraZoom=0;
     private GoogleMap mMap;
 
     private Marker currentMarker;
 
-    private static ArrayList<GroundOverlay> currentMaps;
-    private static HashMap<Floor, ArrayList<GroundOverlay>> maps = new HashMap<Floor, ArrayList<GroundOverlay>>();
+    HashMap<Switch,String> switches= new HashMap<Switch,String>();
+    private static HashMap<FloorHeight,Floor> maps=new HashMap<FloorHeight,Floor>();
 
 
     private int LOCATION_REQUEST_CODE = 4565;
@@ -143,7 +152,7 @@ public class Main2Activity extends AppCompatActivity
     NavigationController controller;
     LocationDAO dao;
 
-    private Floor currentMap;
+    private FloorHeight currentMap;
 
     private CheckBox checkBoxMapBasement, checkBoxMapFirst, checkBoxMapSecond;
 
@@ -195,8 +204,7 @@ public class Main2Activity extends AppCompatActivity
             showInternetWarning();
 
         dao = new LocationDAO();
-        controller = new NavigationController(dao, getApplicationContext());
-
+        controller = new NavigationController(dao, getApplicationContext(),this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -231,7 +239,7 @@ public class Main2Activity extends AppCompatActivity
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //bottomNavigationView.setSelectedItemId(R.id.map_layers_button);
 
-        currentMap = Floor.ground_floor;
+        currentMap = FloorHeight.ground_floor;
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
@@ -304,6 +312,17 @@ public class Main2Activity extends AppCompatActivity
                 case R.id.map_filter_button:
                     popupFilterView = layoutInflater.inflate(R.layout.map_filter_popup_layout, null);
 
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_cantine,"cantine",MARKTYPE.CANTEEN);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_movement,"movement",MARKTYPE.STAIRS_UP);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_public,"public",MARKTYPE.LIBRARY);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_toilet,"toilet",MARKTYPE.WC);
+                    readyFilterSwitch(popupFilterView,R.id.map_filter_water,"water",MARKTYPE.WATER_FOUNTAIN);
+
+                    int i=0;
+                    for(Switch s: switches.keySet()) {
+                        s.setOnCheckedChangeListener(Main2Activity.this);
+                    }
+
                     PopupWindow popupWindowFilter = new PopupWindow(popupFilterView,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -314,7 +333,7 @@ public class Main2Activity extends AppCompatActivity
                     displayMetrics = new DisplayMetrics();
                     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     width = displayMetrics.widthPixels;
-                    popupWindowFilter.update(findViewById(R.id.navigation), width, 300);
+                    popupWindowFilter.update(findViewById(R.id.navigation),width,600);
 
                     return true;
 
@@ -323,36 +342,13 @@ public class Main2Activity extends AppCompatActivity
             return false;
         }
     };
-    /*
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch (buttonView.getId()){
-            case R.id.map_layers_checkbox_0:
-                checkBoxMapBasement.setChecked(true);
-                checkBoxMapFirst.setChecked(false);
-                checkBoxMapSecond.setChecked(false);
-                showFloor(Floor.basement);
 
-                break;
-            case R.id.map_layers_checkbox_1:
-                if (isChecked) {
-                    checkBoxMapBasement.setChecked(false);
-                    checkBoxMapSecond.setChecked(false);
-                    showFloor(Floor.ground_floor);
-                }
-                break;
-            case R.id.map_layers_checkbox_2:
-                if (isChecked) {
-                    checkBoxMapBasement.setChecked(false);
-                    checkBoxMapFirst.setChecked(false);
-                    showFloor(Floor.first_floor);
-                }
-                break;
-        }
-
+    private void readyFilterSwitch(View filterView,int id, String nameCheck, MARKTYPE filterSettingCheck){
+        com.arvid.dtuguide.Settings currentSettings = com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
+        Switch mySwitch =(Switch)filterView.findViewById(id);
+        switches.put(mySwitch,nameCheck);
+        mySwitch.setChecked( currentSettings.isVisible(filterSettingCheck));
     }
-    */
-
 
     @Override
     public void onBackPressed() {
@@ -566,42 +562,44 @@ public class Main2Activity extends AppCompatActivity
         LatLngBounds BALLERUP = new LatLngBounds(new LatLng(55.730067, 12.393402), new LatLng(55.733131, 12.402851));
         mMap.setLatLngBoundsForCameraTarget(BALLERUP);
 
-        Bitmap basement = BitmapFactory.decodeResource(getResources(), R.drawable.basement);
-        generateGroundOverlay(basement, Floor.basement, ballerupSW, ballerupNE);
-        Bitmap groundFloor = BitmapFactory.decodeResource(getResources(), R.drawable.ground_floor);
-        generateGroundOverlay(groundFloor, Floor.ground_floor, ballerupSW, ballerupNE);
-        Bitmap firstFloor = BitmapFactory.decodeResource(getResources(), R.drawable.first_floor);
-        generateGroundOverlay(firstFloor, Floor.first_floor, ballerupSW, ballerupNE);
+        Bitmap basement = BitmapFactory.decodeResource(getResources(),R.drawable.basement);
+        generateGroundOverlay(basement,FloorHeight.basement,ballerupSW, ballerupNE);
 
-        showFloor(Floor.ground_floor);
+        Bitmap groundFloor = BitmapFactory.decodeResource(getResources(),R.drawable.ground_floor);
+        generateGroundOverlay(groundFloor,FloorHeight.ground_floor,ballerupSW, ballerupNE);
+
+        Bitmap firstFloor = BitmapFactory.decodeResource(getResources(),R.drawable.first_floor);
+        generateGroundOverlay(firstFloor,FloorHeight.first_floor,ballerupSW, ballerupNE);
+
+
+
+        showFloor(FloorHeight.ground_floor);
         enableGPS();
+        generateLandmarks();
 
+        mMap.setOnCameraMoveListener(this);
 
     }
 
-    public void showFloor(Floor floor) {
-        if (null != currentMaps) {
-            for (GroundOverlay o : currentMaps) {
-                o.setVisible(false);
-            }
+    public void showFloor(FloorHeight floor){
+        for(Floor f : maps.values()){
+            f.hideFloor();
         }
 
-        for (GroundOverlay o : maps.get(floor)) {
-            o.setVisible(true);
-        }
-
-        currentMaps = maps.get(floor);
+        maps.get(floor).showFloor();
     }
 
-    private void generateGroundOverlay(Bitmap dtuMap, Floor floor, LatLng swCorner, LatLng neCorner) {
+    private void generateGroundOverlay(Bitmap dtuMap,FloorHeight floor,LatLng swCorner, LatLng neCorner){
         int height = dtuMap.getHeight();
         int width = dtuMap.getWidth();
         int heightTiles = 2;
         int widthTiles = 4;
 
-        double tileSizeLat = (neCorner.latitude - swCorner.latitude) / heightTiles;
-        double tileSizeLong = (neCorner.longitude - swCorner.longitude) / widthTiles;
-        maps.put(floor, new ArrayList<GroundOverlay>());
+        double tileSizeLat=(neCorner.latitude-swCorner.latitude)/heightTiles;
+        double tileSizeLong=(neCorner.longitude-swCorner.longitude)/widthTiles;
+
+        Floor floorObj = new Floor(getApplicationContext());
+        maps.put(floor,floorObj);
 
         for (int heightTile = 0; heightTile < heightTiles; heightTile++) {
             for (int widthTile = 0; widthTile < widthTiles; widthTile++) {
@@ -619,11 +617,13 @@ public class Main2Activity extends AppCompatActivity
 
                 GroundOverlay overlay = mMap.addGroundOverlay(options);
 
-                maps.get(floor).add(overlay);
+                floorObj.addOverlay(overlay);
                 overlay.setVisible(false);
+
 
             }
         }
+
     }
 
     private void enableGPS() {
@@ -641,6 +641,39 @@ public class Main2Activity extends AppCompatActivity
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             }
         }
+    }
+
+    public void generateLandmarks(){
+       if(maps==null){
+           return;
+       }
+       if(maps.size()<3){
+           return;
+       }
+        List<LocationDTO> landmarks;
+        try {
+            landmarks = controller.getLandmarks();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        System.out.println("LANDMARK: " + landmarks);
+        for(LocationDTO landMark : landmarks){
+            switch (landMark.getFloor()){
+                case 0:
+                    maps.get(FloorHeight.basement).addLandmark(mMap,landMark);
+                    break;
+                case 1:
+                    maps.get(FloorHeight.ground_floor).addLandmark(mMap,landMark);
+                    break;
+                case 2:
+                    maps.get(FloorHeight.first_floor).addLandmark(mMap,landMark);
+                    break;
+            }
+        }
+        showFloor(currentMap);
+
     }
 
     @Override
@@ -663,15 +696,32 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    public void showLocation(final LocationDTO location) {
-        if (currentMarker != null) {
-            currentMarker.remove();
+    public void showLocation(final LocationDTO location){
+        for(Floor f:maps.values()){
+            f.removeMarkers();
+            f.hideFloor();
         }
 
-        //TODO: Remember to change to the floor.
         LatLng myPoint = location.getPosition();
-        currentMarker = mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint, 19f), 3000, null);
+        currentMarker=mMap.addMarker(new MarkerOptions().position(myPoint).title(location.getName()));
+        currentMarker.setVisible(false);
+
+        switch(location.getFloor()){
+            case 0:
+                maps.get(FloorHeight.basement).addMarker(currentMarker).showFloor();
+                currentMap=FloorHeight.basement;
+                break;
+            case 1:
+                maps.get(FloorHeight.ground_floor).addMarker(currentMarker).showFloor();
+                currentMap=FloorHeight.ground_floor;
+                break;
+            case 2:
+                maps.get(FloorHeight.first_floor).addMarker(currentMarker).showFloor();
+                currentMap=FloorHeight.first_floor;
+                break;
+        }
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17.5f),1500,null);
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -762,6 +812,58 @@ public class Main2Activity extends AppCompatActivity
 
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 3000, null);
         }
+
+    @Override
+    public void onCameraMove() {
+        Float zoomSetting = com.arvid.dtuguide.Settings.getInstance(getApplicationContext()).getZoom();
+        double tolerance= zoomSetting;
+        double newZoom=mMap.getCameraPosition().zoom;
+        if(cameraZoom>tolerance){
+            if(newZoom<=tolerance){
+                showFloor(currentMap);
+            }
+        }else{
+            if(newZoom>tolerance){
+                showFloor(currentMap);
+            }
+        }
+
+        cameraZoom= newZoom;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        System.out.println("TEST"+ isChecked);
+        String filterChanged = switches.get(buttonView);
+        com.arvid.dtuguide.Settings mySettings= com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
+
+        switch(filterChanged){
+            case "cantine":
+                mySettings.setFilter(MARKTYPE.CANTEEN,isChecked);
+                mySettings.setFilter(MARKTYPE.KITCHEN,isChecked);
+                break;
+            case "movement":
+                mySettings.setFilter(MARKTYPE.STAIRS_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.STAIRS_UP,isChecked);
+                mySettings.setFilter(MARKTYPE.STAIRS_UP_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.ELEVATOR_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.ELEVATOR_UP,isChecked);
+                mySettings.setFilter(MARKTYPE.ELEVATOR_UP_DOWN,isChecked);
+                mySettings.setFilter(MARKTYPE.ENTRANCE,isChecked);
+                break;
+            case "public":
+                mySettings.setFilter(MARKTYPE.LIBRARY,isChecked);
+                mySettings.setFilter(MARKTYPE.SHOP,isChecked);
+                break;
+            case "toilet":
+                mySettings.setFilter(MARKTYPE.WC,isChecked);
+                mySettings.setFilter(MARKTYPE.WC_HANDICAP,isChecked);
+                break;
+            case "water":
+                mySettings.setFilter(MARKTYPE.WATER_FOUNTAIN,isChecked);
+                break;
+        }
+        showFloor(currentMap);
 
     }
 }

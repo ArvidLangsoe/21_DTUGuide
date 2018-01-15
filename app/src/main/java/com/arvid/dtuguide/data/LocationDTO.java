@@ -2,7 +2,6 @@ package com.arvid.dtuguide.data;
 
 import android.support.annotation.NonNull;
 
-import com.arvid.dtuguide.navigation.coordinates.GeoPoint;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
