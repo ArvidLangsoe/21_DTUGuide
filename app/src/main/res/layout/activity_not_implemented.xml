@@ -6,4 +6,15 @@
     android:layout_height="match_parent"
     tools:context="com.arvid.dtuguide.NotImplementedActivity">
 
+    <include
+        android:id="@+id/toolbar_nyi"
+        layout="@layout/toolbar_simple" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/not_implemented" />
+
 </android.support.constraint.ConstraintLayout>

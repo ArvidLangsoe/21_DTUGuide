@@ -38,22 +38,22 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        Button resetFavButton = (Button) findViewById(R.id.reset_favorite);
-        Button resetRecButton = (Button) findViewById(R.id.reset_recent);
+        View favoriteButton = findViewById(R.id.reset_fav_button);
+        View historyButton = findViewById(R.id.reset_hist_button);
         Button testButton = (Button) findViewById(R.id.button2);
 
-        resetFavButton.setOnClickListener(this);
-        resetRecButton.setOnClickListener(this);
+        favoriteButton.setOnClickListener(this);
+        historyButton.setOnClickListener(this);
         testButton.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.myDialog));
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.SettingsDialog));
         AlertDialog dialog;
         switch (v.getId()){
-            case R.id.reset_favorite:
+            case R.id.reset_fav_button:
                 builder.setMessage(R.string.dialog_fav_message).setTitle(R.string.dialog_fav_title);
                 builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -70,10 +70,22 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 dialog = builder.create();
                 dialog.show();
                 break;
-            case R.id.reset_recent:
-                controller.clearHistory();
-                Toast toast = Toast.makeText(this, "Recent history has been removed", Toast.LENGTH_SHORT);
-                toast.show();
+            case R.id.reset_hist_button:
+                builder.setMessage(R.string.dialog_hist_message).setTitle(R.string.dialog_hist_title);
+                builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        controller.clearHistory();
+                        Toast toast = Toast.makeText(getApplicationContext(), "Recent history has been removed", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        return;
+                    }
+                });
+                dialog = builder.create();
+                dialog.show();
                 break;
             case R.id.button2:
                 View dialogView = getLayoutInflater().inflate(R.layout.settings_dialog_map_zoom, null);

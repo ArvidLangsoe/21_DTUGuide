@@ -541,6 +541,12 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_drawer_favorite:
                 startActivity(new Intent(this, FavoriteActivity.class));
                 break;
+            case R.id.nav_drawer_change_campus:
+                startActivity(new Intent(this, NotImplementedActivity.class));
+                break;
+            case R.id.nav_drawer_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -806,12 +812,6 @@ public class Main2Activity extends AppCompatActivity
         System.out.println("UserClick: " + latLng);
         bottomNavigationItemSelected = null;
         getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-    }
-
-    private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-        //getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     public void getMyLocation() {

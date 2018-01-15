@@ -13,6 +13,37 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/placeholder_text"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toEndOf="@+id/recycler_item_fav_icon"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/recycler_item_fav_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_place_black_24dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/divider_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/recycler_item_fav_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/placeholder_text"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/recycler_item_fav_name"
+        app:layout_constraintTop_toBottomOf="@+id/recycler_item_fav_name" />
 </android.support.constraint.ConstraintLayout>

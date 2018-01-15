@@ -17,6 +17,7 @@
     <string name="settings">Settings</string>
     <string name="navigate_to_dtu">Navigate to DTU</string>
     <string name="favorite_title">Favorites</string>
+    <string name="not_implemented_title">Not Implemented</string>
 
     <string name="basement_floor">Basement</string>
     <string name="first_floor">First floor</string>
@@ -40,9 +41,18 @@
     <string name="food">Canteen and Kitchens</string>
     <string name="movement">Stairs, elevators and entrances</string>
 
+    <string name="no_favorites">You do not have any favorites</string>
+    <string name="not_implemented">Activity not implemented yet</string>
+
     <!-- Strings related to Settings -->
+    <string name="button_fav_title">Slet hele placeringshistorikken</string>
+    <string name="button_fav_sub">Slet permanent hele Placeringshistorikken</string>
+    <string name="button_hist_title">Slet hele historikken</string>
+    <string name="button_hist_sub">Slet permanent hele historikken</string>
     <string name="dialog_fav_title">Clear Favorites</string>
     <string name="dialog_fav_message">Are you sure you want to clear your favorites?</string>
+    <string name="dialog_hist_title">Clear Recent History</string>
+    <string name="dialog_hist_message">Are you sure you want to clear your recent history?</string>
     <string name="clear">Clear</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>

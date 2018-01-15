@@ -36,7 +36,7 @@ public class TagsAdapter extends RecyclerView.Adapter<RecViewHolder>{
     }
 
     public void onBindViewHolder(RecViewHolder holder, int i){
-        holder.tagText.setText(mList.get(i));
+        holder.text.setText(mList.get(i));
     }
 
     @Override
