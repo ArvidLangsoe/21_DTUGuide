@@ -41,18 +41,21 @@ public class Floor {
         for(GroundOverlay o : mapOverlay)
             o.setVisible(true);
 
-        if(activeMarkers!=null) {
-            for(Marker m : activeMarkers)
-                m.setVisible(true);
-        }
+
         if(landMarks!=null) {
             Settings settings = Settings.getInstance(appContext);
             if(map.getCameraPosition().zoom> settings.getGoogleZoom()) {
                 for (MarkerInfo l : landMarks) {
-                    System.out.println("LANDMARK: " + l.location.getLandmark());
+
                     if (settings.isVisible(l.location.getLandmark()))
                         l.marker.setVisible(true);
                 }
+            }
+        }
+        if(activeMarkers!=null) {
+            for(Marker m : activeMarkers) {
+                m.setZIndex(10000);
+                m.setVisible(true);
             }
         }
 

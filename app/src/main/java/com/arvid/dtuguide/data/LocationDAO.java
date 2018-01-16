@@ -25,7 +25,6 @@ public class LocationDAO {
 	}
 
 	public HashMap<String, Searchable> getAllData() throws DAOException {
-	    System.out.println("SUPER TEST "+data.values()+"");
 		if(data !=null)
 			return data;
 		else
