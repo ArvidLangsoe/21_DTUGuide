@@ -114,8 +114,6 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onBackStackChanged() {
-        System.out.println("### BACKSTACK COUNT ###");
-        System.out.println(getSupportFragmentManager().getBackStackEntryCount());
 
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             toggle.setDrawerIndicatorEnabled(false);
@@ -141,6 +139,7 @@ public class Main2Activity extends AppCompatActivity
     private GoogleMap mMap;
 
     private Marker currentMarker;
+    private int requestCode;
 
     HashMap<Switch,String> switches= new HashMap<Switch,String>();
     private static HashMap<FloorHeight,Floor> maps=new HashMap<FloorHeight,Floor>();
@@ -405,11 +404,10 @@ public class Main2Activity extends AppCompatActivity
                             .addToBackStack(BACK_STACK_ROOT_TAG)
                             .commit();
 
-                    System.out.println("***SEARCHVIEW FOCUS***");
+
 
                 } else {
                     getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    System.out.println("***SEARCHVIEW _NOT_ FOCUS***");
                 }
             }
         });
@@ -539,7 +537,8 @@ public class Main2Activity extends AppCompatActivity
                 break;
 
             case R.id.nav_drawer_favorite:
-                startActivity(new Intent(this, FavoriteActivity.class));
+                requestCode=456;
+                startActivityForResult(new Intent(this, FavoriteActivity.class),requestCode);
                 break;
             case R.id.nav_drawer_change_campus:
                 startActivity(new Intent(this, NotImplementedActivity.class));
@@ -552,6 +551,21 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == this.requestCode) {
+            if (resultCode == RESULT_OK) {
+                String returnedResult = data.getData().toString();
+                try {
+                    showLocation((LocationDTO) controller.getSearchableItem(returnedResult));
+
+                } catch (LocationDAO.DAOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -603,15 +617,15 @@ public class Main2Activity extends AppCompatActivity
             public void onInfoWindowClick(Marker marker) {
                 LocationDTO localLocation = Floor.markerInfoLookup.get(marker).location;
                 if (controller.checkFavorite(localLocation)) {
-                    System.out.println("FAVVV : 1 "+controller.checkFavorite(localLocation));
+
                     controller.removeFavorite(localLocation);
                     Toast.makeText(getApplicationContext(), R.string.toast_rem_fav, Toast.LENGTH_SHORT).show();
-                    System.out.println("FAVVV : 1 "+controller.checkFavorite(localLocation));
+
                 } else {
-                    System.out.println("FAVVV : 2 "+controller.checkFavorite(localLocation));
+
                     controller.addFavorite(localLocation);
                     Toast.makeText(getApplicationContext(), R.string.toast_add_fav, Toast.LENGTH_SHORT).show();
-                    System.out.println("FAVVV : 2 "+controller.checkFavorite(localLocation));
+
                 }
 
                 marker.showInfoWindow();
@@ -690,7 +704,6 @@ public class Main2Activity extends AppCompatActivity
                 LatLng sw = new LatLng(neCorner.latitude - (heightTile + 1) * tileSizeLat, swCorner.longitude + widthTile * tileSizeLong);
                 LatLng ne = new LatLng(neCorner.latitude - (heightTile) * tileSizeLat, swCorner.longitude + (widthTile + 1) * tileSizeLong);
 
-                System.out.println("Coor: " + sw + " " + ne);
                 LatLngBounds tempBounds = new LatLngBounds(sw, ne);
 
                 options.image(BitmapDescriptorFactory.fromBitmap(bm)).positionFromBounds(tempBounds);
@@ -738,7 +751,7 @@ public class Main2Activity extends AppCompatActivity
             e.printStackTrace();
             return;
         }
-        System.out.println("LANDMARK: " + landmarks);
+
         for(LocationDTO landMark : landmarks){
             switch (landMark.getFloor()){
                 case 0:
@@ -850,7 +863,7 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        System.out.println("TEST"+ isChecked);
+
         String filterChanged = switches.get(buttonView);
         com.arvid.dtuguide.Settings mySettings= com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
 
