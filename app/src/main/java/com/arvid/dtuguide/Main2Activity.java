@@ -141,6 +141,7 @@ public class Main2Activity extends AppCompatActivity
     private GoogleMap mMap;
 
     private Marker currentMarker;
+    private int requestCode;
 
     HashMap<Switch,String> switches= new HashMap<Switch,String>();
     private static HashMap<FloorHeight,Floor> maps=new HashMap<FloorHeight,Floor>();
@@ -539,7 +540,8 @@ public class Main2Activity extends AppCompatActivity
                 break;
 
             case R.id.nav_drawer_favorite:
-                startActivity(new Intent(this, FavoriteActivity.class));
+                requestCode=456;
+                startActivityForResult(new Intent(this, FavoriteActivity.class),requestCode);
                 break;
             case R.id.nav_drawer_change_campus:
                 startActivity(new Intent(this, NotImplementedActivity.class));
@@ -552,6 +554,21 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == this.requestCode) {
+            if (resultCode == RESULT_OK) {
+                String returnedResult = data.getData().toString();
+                try {
+                    showLocation((LocationDTO) controller.getSearchableItem(returnedResult));
+
+                } catch (LocationDAO.DAOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override

@@ -46,6 +46,6 @@ public class FavoriteActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         recView.setLayoutManager(linearLayoutManager);
 
-        recView.setAdapter(new FavoritesAdapter(getApplicationContext(), favorites, R.layout.recycler_item_favorite));
+        recView.setAdapter(new FavoritesAdapter(getApplicationContext(), favorites, R.layout.recycler_item_favorite,this));
     }
 }
