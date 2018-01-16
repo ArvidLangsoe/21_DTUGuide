@@ -48,10 +48,10 @@
     <string name="not_implemented">Activity not implemented yet</string>
 
     <!-- Strings related to Settings -->
-    <string name="button_fav_title">Slet hele placeringshistorikken</string>
-    <string name="button_fav_sub">Slet permanent hele Placeringshistorikken</string>
-    <string name="button_hist_title">Slet hele historikken</string>
-    <string name="button_hist_sub">Slet permanent hele historikken</string>
+    <string name="button_fav_title">Clear the favorite list</string>
+    <string name="button_fav_sub">Permanently delete all favorites</string>
+    <string name="button_hist_title">Clear the recent history list</string>
+    <string name="button_hist_sub">Permanently delete all entries in the recent history list</string>
     <string name="dialog_fav_title">Clear Favorites</string>
     <string name="dialog_fav_message">Are you sure you want to clear your favorites?</string>
     <string name="dialog_hist_title">Clear Recent History</string>

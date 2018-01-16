@@ -12,138 +12,156 @@
         android:id="@+id/toolbar_navigate"
         layout="@layout/toolbar_simple" />
 
-    <TextView
-        android:id="@+id/NavigateDisc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:shadowColor="@color/cards_and_dialogs_color"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="0"
-        android:text="Tryk på det campus du skal finde vej til!"
-        android:textColor="@android:color/black"
-        android:textColorLink="@color/colorPrimary"
-        android:textSize="18sp"
-        android:textStyle="bold"
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dtu_logo" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_navigate">
 
-    <ImageView
-        android:id="@+id/red_circle_lyngby"
-        android:layout_width="130dp"
-        android:layout_height="118dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
-        app:srcCompat="@drawable/red_circle" />
+        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/red_circle_ballerup"
-        android:layout_width="130dp"
-        android:layout_height="118dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
-        app:srcCompat="@drawable/red_circle" />
+            <ImageView
+                android:id="@+id/dtu_logo"
+                android:layout_width="106dp"
+                android:layout_height="137dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/dtu_logo" />
 
-    <ImageView
-        android:id="@+id/red_circle_risoo"
-        android:layout_width="130dp"
-        android:layout_height="118dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_lyngby"
-        app:srcCompat="@drawable/red_circle" />
+            <TextView
+                android:id="@+id/NavigateDisc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:shadowColor="@color/cards_and_dialogs_color"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="0"
+                android:text="Tryk på det campus du skal finde vej til!"
+                android:textColor="@android:color/black"
+                android:textColorLink="@color/colorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dtu_logo" />
 
-    <ImageView
-        android:id="@+id/image_ballerup"
-        android:layout_width="131dp"
-        android:layout_height="114dp"
-        android:layout_marginEnd="23dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
-        app:srcCompat="@drawable/ballerup_icon" />
+            <ImageView
+                android:id="@+id/red_circle_lyngby"
+                android:layout_width="130dp"
+                android:layout_height="118dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
+                app:srcCompat="@drawable/red_circle" />
 
-    <ImageView
-        android:id="@+id/image_lyngby"
-        android:layout_width="132dp"
-        android:layout_height="114dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="10dp"
-        android:elevation="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
-        app:srcCompat="@drawable/lyngby_icon" />
+            <ImageView
+                android:id="@+id/red_circle_ballerup"
+                android:layout_width="130dp"
+                android:layout_height="118dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
+                app:srcCompat="@drawable/red_circle" />
 
-    <ImageView
-        android:id="@+id/image_risoo"
-        android:layout_width="130dp"
-        android:layout_height="114dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:elevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_lyngby"
-        app:srcCompat="@drawable/risoo_icon" />
+            <ImageView
+                android:id="@+id/red_circle_risoo"
+                android:layout_width="130dp"
+                android:layout_height="118dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_lyngby"
+                app:srcCompat="@drawable/red_circle" />
 
-    <ImageView
-        android:id="@+id/dtu_logo"
-        android:layout_width="106dp"
-        android:layout_height="137dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_navigate"
-        app:srcCompat="@drawable/dtu_logo" />
+            <ImageView
+                android:id="@+id/image_ballerup"
+                android:layout_width="131dp"
+                android:layout_height="114dp"
+                android:layout_marginEnd="23dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
+                app:srcCompat="@drawable/ballerup_icon" />
 
-    <TextView
-        android:id="@+id/text_lyngby"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Lyngby"
-        app:layout_constraintEnd_toEndOf="@+id/image_lyngby"
-        app:layout_constraintStart_toStartOf="@+id/image_lyngby"
-        app:layout_constraintTop_toBottomOf="@+id/image_lyngby" />
+            <ImageView
+                android:id="@+id/image_lyngby"
+                android:layout_width="132dp"
+                android:layout_height="114dp"
+                android:layout_marginStart="23dp"
+                android:layout_marginTop="10dp"
+                android:elevation="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/NavigateDisc"
+                app:srcCompat="@drawable/lyngby_icon" />
 
-    <TextView
-        android:id="@+id/text_risoo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Risø"
-        app:layout_constraintEnd_toEndOf="@+id/image_risoo"
-        app:layout_constraintStart_toStartOf="@+id/image_risoo"
-        app:layout_constraintTop_toBottomOf="@+id/image_risoo" />
+            <ImageView
+                android:id="@+id/image_risoo"
+                android:layout_width="130dp"
+                android:layout_height="114dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:elevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_lyngby"
+                app:srcCompat="@drawable/risoo_icon" />
 
-    <TextView
-        android:id="@+id/text_ballerup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Ballerup"
-        app:layout_constraintEnd_toEndOf="@+id/image_ballerup"
-        app:layout_constraintStart_toStartOf="@+id/image_ballerup"
-        app:layout_constraintTop_toBottomOf="@+id/image_ballerup" />
+            <TextView
+                android:id="@+id/text_lyngby"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Lyngby"
+                app:layout_constraintEnd_toEndOf="@+id/image_lyngby"
+                app:layout_constraintStart_toStartOf="@+id/image_lyngby"
+                app:layout_constraintTop_toBottomOf="@+id/image_lyngby" />
+
+            <TextView
+                android:id="@+id/text_risoo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Risø"
+                app:layout_constraintEnd_toEndOf="@+id/image_risoo"
+                app:layout_constraintStart_toStartOf="@+id/image_risoo"
+                app:layout_constraintTop_toBottomOf="@+id/image_risoo" />
+
+            <TextView
+                android:id="@+id/text_ballerup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Ballerup"
+                app:layout_constraintEnd_toEndOf="@+id/image_ballerup"
+                app:layout_constraintStart_toStartOf="@+id/image_ballerup"
+                app:layout_constraintTop_toBottomOf="@+id/image_ballerup" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
