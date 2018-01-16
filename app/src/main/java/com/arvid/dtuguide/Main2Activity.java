@@ -825,14 +825,23 @@ public class Main2Activity extends AppCompatActivity
             LocationManager locationManager = (LocationManager)
                     getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
 
             Location location = locationManager.getLastKnownLocation(locationManager
                     .getBestProvider(criteria, false));
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            LatLng latLng = new LatLng(latitude, longitude);
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 500, null);
+
+            if(location!=null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                System.out.println("LOCATION: " + latitude + ", " + longitude);
+                LatLng latLng = new LatLng(latitude, longitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 500, null);
+            }
+            else{
+                Toast.makeText(this, "Could not find your location.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
