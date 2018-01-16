@@ -804,7 +804,7 @@ public class Main2Activity extends AppCompatActivity
         }
 
         Settings currentSettings=Settings.getInstance(getApplicationContext());
-        Float zoom =currentSettings.getGoogleZoom();
+        Float zoom =(float)cameraZoom;
         int animationTime = currentSettings.animationTimer;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,zoom),animationTime,null);
 
@@ -832,7 +832,7 @@ public class Main2Activity extends AppCompatActivity
             double longitude = location.getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 3000, null);
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 500, null);
         }
     }
 
