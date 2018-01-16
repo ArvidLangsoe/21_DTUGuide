@@ -63,12 +63,6 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
 
-        //Cursor cursorRecent = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
-        //Cursor cursorRooms = context.getContentResolver().query(SearchSuggestionProvider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase() }, null);
-        //Cursor mergedCursor = new MergeCursor(new Cursor[] { cursorRecent, cursorRooms });
-
-        //Cursor cursor = context.getContentResolver().query(RecentSearchSuggestionProvider.CONTENT_URI, null,
-        //    null, new String[] { constraint.toString().toLowerCase() }, null);
         cursor = context.getContentResolver().query(Provider.CONTENT_URI, null, null, new String[] { constraint.toString().toLowerCase()}, null);
 
         return cursor;
@@ -79,5 +73,5 @@ public class SearchCursorAdapter extends ResourceCursorAdapter {
         return cursor.getString(cursor.getColumnIndex("name"));
     }
 
-    
+
 }
