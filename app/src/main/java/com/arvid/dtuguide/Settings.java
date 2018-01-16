@@ -16,6 +16,7 @@ public class Settings {
     private static Settings settings;
     private SharedPreferences pref;
     private float zoomSetting=18f;
+    public final int animationTimer = 500;
 
     private HashMap<MARKTYPE,Boolean> filterSettings;
 

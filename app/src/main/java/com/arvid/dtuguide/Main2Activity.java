@@ -491,43 +491,6 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-    /*
-    @Override
-    public void onBackStackChanged() {
-        shouldDisplayHomeUp();
-    }
-
-    public void shouldDisplayHomeUp(){
-        //Enable Up button only  if there are entries in the back stack
-        boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
-    }
-
-*/
-    /*
-    @Override
-    public boolean onSupportNavigateUp() {
-        //This method is called when the up button is pressed. Just the pop back stack.
-        //getSupportFragmentManager().popBackStack();
-        return false;
-    }
-    */
-
-
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -573,9 +536,16 @@ public class Main2Activity extends AppCompatActivity
             }
         }
 
+
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(maps.get(currentMap)!=null) {
+            showFloor(currentMap);
+        }
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -657,7 +627,23 @@ public class Main2Activity extends AppCompatActivity
                 nameTV.setText(localLocation.getName());
 
                 TextView descriptionTV = (TextView) infoWindowContent.findViewById(R.id.info_description);
-                descriptionTV.setText(localLocation.getDescription());
+                if(localLocation.getDescription().isEmpty()){
+                    if(!localLocation.getPersons().isEmpty()){
+                        String disc = "";
+                        for(Person p: localLocation.getPersons()){
+                            disc+=p.getName()+", ";
+                        }
+                        disc=disc.substring(0,disc.length()-2);
+                        descriptionTV.setText(disc);
+                    }
+                    else{
+                        descriptionTV.setText("");
+                    }
+                }
+                else{
+                    descriptionTV.setText(localLocation.getDescription());
+                }
+
 
 
                 final ImageView favoriteIcon = (ImageView) infoWindowContent.findViewById(R.id.info_favorite);
@@ -823,7 +809,10 @@ public class Main2Activity extends AppCompatActivity
                 break;
         }
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17.5f),1500,null);
+        Settings currentSettings=Settings.getInstance(getApplicationContext());
+        Float zoom =(float)cameraZoom;
+        int animationTime = currentSettings.animationTimer;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,zoom),animationTime,null);
 
     }
 
@@ -842,13 +831,23 @@ public class Main2Activity extends AppCompatActivity
             LocationManager locationManager = (LocationManager)
                     getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+
             Location location = locationManager.getLastKnownLocation(locationManager
                     .getBestProvider(criteria, false));
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            LatLng latLng = new LatLng(latitude, longitude);
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 3000, null);
+
+            if(location!=null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                System.out.println("LOCATION: " + latitude + ", " + longitude);
+                LatLng latLng = new LatLng(latitude, longitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 500, null);
+            }
+            else{
+                Toast.makeText(this, "Could not find your location.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
