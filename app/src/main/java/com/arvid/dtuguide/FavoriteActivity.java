@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,5 +48,15 @@ public class FavoriteActivity extends AppCompatActivity {
         recView.setLayoutManager(linearLayoutManager);
 
         recView.setAdapter(new FavoritesAdapter(getApplicationContext(), favorites, R.layout.recycler_item_favorite,this));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
