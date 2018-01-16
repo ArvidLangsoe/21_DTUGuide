@@ -79,8 +79,6 @@ public class NavigationController implements Navigation{
 
         updateDataFromFireBase();
 
-        System.out.println("NAVCONTROLLER FAVORITE LIST:");
-        System.out.println(favorite);
     }
 
     public NavigationController(LocationDAO dao, Context context, Main2Activity ui){
@@ -95,8 +93,7 @@ public class NavigationController implements Navigation{
 
         updateDataFromFireBase();
 
-        System.out.println("NAVCONTROLLER FAVORITE LIST:");
-        System.out.println(favorite);
+
     }
 
 
@@ -114,7 +111,7 @@ public class NavigationController implements Navigation{
                 //    dao.saveLocation((dao.parseToDTO(location)));
                 //}
 
-                System.out.println("TEST DEBUG : " + map + "");
+
 
                 HashMap<String, HashMap<String, Object>> locations = map.get("Locations");
                 HashMap<String, HashMap<String, Object>> persons = map.get("Persons");
@@ -187,9 +184,6 @@ public class NavigationController implements Navigation{
     private void retrievePrefs() throws LocationDAO.DAOException{
         historyList.clear();
 
-        System.out.println("WARN "+mySharedPreferences.getAll().values());
-
-        System.out.println("WARN 2 :"+mySharedPreferences.getString("0",""));
 
         for(int i=0;i<mySharedPreferences.getAll().values().size();++i)
             historyList.add(dao.getData(mySharedPreferences.getString(i+"","")));
@@ -209,7 +203,6 @@ public class NavigationController implements Navigation{
     private void retrieveFavorite() throws LocationDAO.DAOException{
         favorite.clear();
 
-        System.out.println("WARN 3 :"+mySharedPreferencesFav.getString("0",""));
 
         for(int i=0;i<mySharedPreferencesFav.getAll().values().size();++i)
             favorite.add(dao.getData(mySharedPreferencesFav.getString(i+"","")));
@@ -288,7 +281,6 @@ public class NavigationController implements Navigation{
 
         historyList.add(dto);
         savePrefs();
-        System.out.println("HISTORYLIST: " + historyList);
         return dto;
     }
 
