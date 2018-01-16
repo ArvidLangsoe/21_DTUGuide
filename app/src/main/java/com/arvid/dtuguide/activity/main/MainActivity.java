@@ -486,7 +486,6 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
-
         return true;
     }
 
@@ -812,6 +811,7 @@ public class MainActivity extends AppCompatActivity
         Float zoom =(float)cameraZoom;
         int animationTime = currentSettings.animationTimer;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,zoom),animationTime,null);
+
 
     }
 

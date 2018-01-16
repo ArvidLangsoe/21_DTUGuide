@@ -56,7 +56,9 @@ public class Floor {
             for(Marker m : activeMarkers) {
                 m.setZIndex(10000);
                 m.setVisible(true);
+
             }
+            activeMarkers.get(0).showInfoWindow();
         }
 
     }
