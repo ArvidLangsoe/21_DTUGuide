@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/app_bar_search"
-        android:title="@string/topbar_searchview_hint"
+        android:title=""
         app:actionLayout="@layout/top_searchview"
         app:showAsAction="always" />
 </menu>

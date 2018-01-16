@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
@@ -207,6 +208,7 @@ public class Main2Activity extends AppCompatActivity
         dao = new LocationDAO();
         controller = new NavigationController(dao, getApplicationContext(),this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -383,6 +385,10 @@ public class Main2Activity extends AppCompatActivity
 
         searchView.setSuggestionsAdapter(adapter);
         searchView.setFocusable(false);
+        int options = searchView.getImeOptions();
+        searchView.setImeOptions(options| EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+
+        searchView.setMaxWidth(Integer.MAX_VALUE);
 
 
         // Remove underline on search view
