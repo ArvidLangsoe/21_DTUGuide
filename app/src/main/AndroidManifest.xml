@@ -25,12 +25,12 @@
             android:value="@string/google_maps_key" />
         <!-- START Content Providers -->
         <provider
-            android:name=".Provider"
-            android:authorities="com.arvid.dtuguide.Provider" />
+            android:name=".activity.main.Provider"
+            android:authorities="com.arvid.dtuguide.activity.main.Provider" />
 
         <!-- END Content Providers -->
 
-        <activity android:name=".Main2Activity">
+        <activity android:name=".activity.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH" />
@@ -45,25 +45,25 @@
         <activity android:name=".data.DataTestActivity" />
         <activity android:name=".data.FireBaseActivity" />
         <activity
-            android:name=".NavigateToDTUActivity"
+            android:name=".activity.NavigateToDTUActivity"
             android:label="@string/navigate_to_dtu"
-            android:parentActivityName=".Main2Activity" />
+            android:parentActivityName=".activity.main.MainActivity" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activity.SettingsActivity"
             android:label="@string/settings"
-            android:parentActivityName=".Main2Activity" />
+            android:parentActivityName=".activity.main.MainActivity" />
         <activity
-            android:name=".FavoriteActivity"
+            android:name=".activity.favorite.FavoriteActivity"
             android:label="@string/favorite_title"
-            android:parentActivityName=".Main2Activity" />
+            android:parentActivityName=".activity.main.MainActivity" />
         <activity
-            android:name=".NotImplementedActivity"
+            android:name=".activity.NotImplementedActivity"
             android:label="@string/campus"
-            android:parentActivityName=".Main2Activity" />
+            android:parentActivityName=".activity.main.MainActivity" />
         <activity
-            android:name=".AboutActivity"
+            android:name=".activity.AboutActivity"
             android:label="@string/about"
-            android:parentActivityName=".Main2Activity"/>
+            android:parentActivityName=".activity.main.MainActivity"/>
     </application>
 
 </manifest>

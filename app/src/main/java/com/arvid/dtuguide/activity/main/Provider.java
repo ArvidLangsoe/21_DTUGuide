@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity.main;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 
 public class Provider extends ContentProvider {
-    public static final String AUTHORITY = "com.arvid.dtuguide.Provider";
+    public static final String AUTHORITY = "com.arvid.dtuguide.activity.main.Provider";
     public static final String CONTENT_URL = "content://" + AUTHORITY + "/rooms/";
     public static final Uri CONTENT_URI = Uri.parse(CONTENT_URL);
 

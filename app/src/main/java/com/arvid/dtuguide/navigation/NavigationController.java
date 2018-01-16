@@ -2,13 +2,9 @@ package com.arvid.dtuguide.navigation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.location.Location;
-import android.net.ConnectivityManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.arvid.dtuguide.Main2Activity;
+import com.arvid.dtuguide.activity.main.MainActivity;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
@@ -19,23 +15,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.internal.ObjectConstructor;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
-import static com.arvid.dtuguide.Main2Activity.TAG;
+import static com.arvid.dtuguide.activity.main.MainActivity.TAG;
 
 /**
  * Created by arvid on 01-11-2017.
@@ -54,7 +41,7 @@ public class NavigationController implements Navigation{
     final String HISTORYPREF = "History_list";
     final String FAVORITEPREF = "Favorite_list";
 
-    static Main2Activity ui;
+    static MainActivity ui;
 
     // create a reference to the shared preferences object
     SharedPreferences mySharedPreferences;
@@ -78,7 +65,7 @@ public class NavigationController implements Navigation{
 
     }
 
-    public NavigationController(LocationDAO dao, Context context, Main2Activity ui){
+    public NavigationController(LocationDAO dao, Context context, MainActivity ui){
         this.dao = dao;
         this.context = context;
         this.ui=ui;

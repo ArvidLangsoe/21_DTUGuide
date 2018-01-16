@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity.main;
 
 import android.content.Context;
 import android.net.Uri;

@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity.favorite;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,11 +9,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.arvid.dtuguide.R;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.NavigationController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FavoriteActivity extends AppCompatActivity {

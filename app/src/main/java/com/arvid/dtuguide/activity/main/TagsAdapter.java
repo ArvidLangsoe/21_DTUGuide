@@ -1,9 +1,11 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity.main;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.arvid.dtuguide.R;
 
 import java.util.List;
 

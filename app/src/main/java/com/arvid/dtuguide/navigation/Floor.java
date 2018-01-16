@@ -3,7 +3,7 @@ package com.arvid.dtuguide.navigation;
 import android.content.Context;
 
 import com.arvid.dtuguide.R;
-import com.arvid.dtuguide.Settings;
+import com.arvid.dtuguide.data.Settings;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
 import com.google.android.gms.maps.GoogleMap;

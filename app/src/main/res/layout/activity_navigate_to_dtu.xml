@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="com.arvid.dtuguide.NavigateToDTUActivity"
+    tools:context="com.arvid.dtuguide.activity.NavigateToDTUActivity"
     tools:layout_editor_absoluteY="25dp">
 
     <include

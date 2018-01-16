@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity.main;
 
 import android.Manifest;
 import android.app.FragmentManager;
@@ -10,13 +10,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.VectorDrawable;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -49,17 +47,23 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 
+import com.arvid.dtuguide.activity.AboutActivity;
+import com.arvid.dtuguide.activity.favorite.FavoriteActivity;
+import com.arvid.dtuguide.activity.NavigateToDTUActivity;
+import com.arvid.dtuguide.activity.NotImplementedActivity;
+import com.arvid.dtuguide.R;
+import com.arvid.dtuguide.data.Settings;
+import com.arvid.dtuguide.activity.SettingsActivity;
 import com.arvid.dtuguide.data.LocationDAO;
 import com.arvid.dtuguide.data.LocationDTO;
 import com.arvid.dtuguide.data.MARKTYPE;
 import com.arvid.dtuguide.data.Person;
 import com.arvid.dtuguide.data.Searchable;
 import com.arvid.dtuguide.navigation.Floor;
+import com.arvid.dtuguide.navigation.FloorHeight;
 import com.arvid.dtuguide.navigation.NavigationController;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -74,67 +78,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
-public class Main2Activity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMapClickListener, View.OnClickListener, android.support.v4.app.FragmentManager.OnBackStackChangedListener, GoogleMap.OnMarkerClickListener,GoogleMap.OnCameraMoveListener,CompoundButton.OnCheckedChangeListener {
-
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.map_layers_checkbox_0:
-                checkBoxMapBasement.setChecked(true);
-                checkBoxMapFirst.setChecked(false);
-                checkBoxMapSecond.setChecked(false);
-                showFloor(FloorHeight.basement);
-                currentMap = FloorHeight.basement;
-                break;
-            case R.id.map_layers_checkbox_1:
-                checkBoxMapFirst.setChecked(true);
-                checkBoxMapBasement.setChecked(false);
-                checkBoxMapSecond.setChecked(false);
-                showFloor(FloorHeight.ground_floor);
-                currentMap = FloorHeight.ground_floor;
-                break;
-            case R.id.map_layers_checkbox_2:
-                checkBoxMapSecond.setChecked(true);
-                checkBoxMapBasement.setChecked(false);
-                checkBoxMapFirst.setChecked(false);
-                showFloor(FloorHeight.first_floor);
-                currentMap = FloorHeight.first_floor;
-                break;
-        }
-    }
-
-    @Override
-    public void onBackStackChanged() {
-
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            toggle.setDrawerIndicatorEnabled(false);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            toggle.setDrawerIndicatorEnabled(true);
-            getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            searchView.clearFocus();
-        }
-
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        marker.showInfoWindow();
-        return false;
-    }
-
 
     private double cameraZoom=0;
     private GoogleMap mMap;
@@ -195,6 +145,55 @@ public class Main2Activity extends AppCompatActivity
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.map_layers_checkbox_0:
+                checkBoxMapBasement.setChecked(true);
+                checkBoxMapFirst.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(FloorHeight.basement);
+                currentMap = FloorHeight.basement;
+                break;
+            case R.id.map_layers_checkbox_1:
+                checkBoxMapFirst.setChecked(true);
+                checkBoxMapBasement.setChecked(false);
+                checkBoxMapSecond.setChecked(false);
+                showFloor(FloorHeight.ground_floor);
+                currentMap = FloorHeight.ground_floor;
+                break;
+            case R.id.map_layers_checkbox_2:
+                checkBoxMapSecond.setChecked(true);
+                checkBoxMapBasement.setChecked(false);
+                checkBoxMapFirst.setChecked(false);
+                showFloor(FloorHeight.first_floor);
+                currentMap = FloorHeight.first_floor;
+                break;
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            toggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toggle.setDrawerIndicatorEnabled(true);
+            getSupportFragmentManager().popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            searchView.clearFocus();
+        }
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return false;
     }
 
     @Override
@@ -278,9 +277,9 @@ public class Main2Activity extends AppCompatActivity
                     checkBoxMapFirst = (CheckBox) popupLayerView.findViewById(R.id.map_layers_checkbox_1);
                     checkBoxMapSecond = (CheckBox) popupLayerView.findViewById(R.id.map_layers_checkbox_2);
 
-                    checkBoxMapFirst.setOnClickListener(Main2Activity.this);
-                    checkBoxMapBasement.setOnClickListener(Main2Activity.this);
-                    checkBoxMapSecond.setOnClickListener(Main2Activity.this);
+                    checkBoxMapFirst.setOnClickListener(MainActivity.this);
+                    checkBoxMapBasement.setOnClickListener(MainActivity.this);
+                    checkBoxMapSecond.setOnClickListener(MainActivity.this);
 
                     switch (currentMap) {
                         case basement:
@@ -323,7 +322,7 @@ public class Main2Activity extends AppCompatActivity
 
                     int i=0;
                     for(Switch s: switches.keySet()) {
-                        s.setOnCheckedChangeListener(Main2Activity.this);
+                        s.setOnCheckedChangeListener(MainActivity.this);
                     }
 
                     PopupWindow popupWindowFilter = new PopupWindow(popupFilterView,
@@ -347,7 +346,7 @@ public class Main2Activity extends AppCompatActivity
     };
 
     private void readyFilterSwitch(View filterView,int id, String nameCheck, MARKTYPE filterSettingCheck){
-        com.arvid.dtuguide.Settings currentSettings = com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
+        Settings currentSettings = Settings.getInstance(getApplicationContext());
         Switch mySwitch =(Switch)filterView.findViewById(id);
         switches.put(mySwitch,nameCheck);
         mySwitch.setChecked( currentSettings.isVisible(filterSettingCheck));
@@ -853,7 +852,7 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onCameraMove() {
-        Float zoomSetting = com.arvid.dtuguide.Settings.getInstance(getApplicationContext()).getGoogleZoom();
+        Float zoomSetting = Settings.getInstance(getApplicationContext()).getGoogleZoom();
         double tolerance= zoomSetting;
         double newZoom=mMap.getCameraPosition().zoom;
         if(cameraZoom>tolerance){
@@ -873,7 +872,7 @@ public class Main2Activity extends AppCompatActivity
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
         String filterChanged = switches.get(buttonView);
-        com.arvid.dtuguide.Settings mySettings= com.arvid.dtuguide.Settings.getInstance(getApplicationContext());
+        Settings mySettings= Settings.getInstance(getApplicationContext());
 
         switch(filterChanged){
             case "cantine":

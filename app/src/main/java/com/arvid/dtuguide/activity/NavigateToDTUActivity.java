@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity;
 
 import android.content.Intent;
 import android.media.Image;
@@ -13,6 +13,8 @@ import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.arvid.dtuguide.R;
 
 public class NavigateToDTUActivity extends AppCompatActivity implements View.OnClickListener {
     private ImageView lyngbyImage, ballerupImage, risooImage, lyngbyCircle, ballerupCircle, risooCircle;

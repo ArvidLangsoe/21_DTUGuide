@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.navigation;
 
 /**
  * Created by arvid on 11-01-2018.

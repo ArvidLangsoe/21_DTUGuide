@@ -5,6 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/search_fragment_background"
-    tools:context="com.arvid.dtuguide.SearchFragment">
+    tools:context="com.arvid.dtuguide.activity.main.SearchFragment">
 
 </android.support.constraint.ConstraintLayout>

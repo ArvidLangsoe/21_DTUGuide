@@ -1,9 +1,7 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.arvid.dtuguide.data.MARKTYPE;
 
 import java.util.HashMap;
 

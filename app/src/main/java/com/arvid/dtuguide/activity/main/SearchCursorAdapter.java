@@ -1,4 +1,4 @@
-package com.arvid.dtuguide;
+package com.arvid.dtuguide.activity.main;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,6 +6,8 @@ import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.arvid.dtuguide.R;
 
 /**
  * Created by Jeppe on 27-11-2017.
