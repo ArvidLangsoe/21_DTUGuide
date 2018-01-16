@@ -803,7 +803,10 @@ public class Main2Activity extends AppCompatActivity
                 break;
         }
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,17.5f),1500,null);
+        Settings currentSettings=Settings.getInstance(getApplicationContext());
+        Float zoom =currentSettings.getGoogleZoom();
+        int animationTime = currentSettings.animationTimer;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPoint,zoom),animationTime,null);
 
     }
 
@@ -822,6 +825,7 @@ public class Main2Activity extends AppCompatActivity
             LocationManager locationManager = (LocationManager)
                     getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
+
             Location location = locationManager.getLastKnownLocation(locationManager
                     .getBestProvider(criteria, false));
             double latitude = location.getLatitude();
