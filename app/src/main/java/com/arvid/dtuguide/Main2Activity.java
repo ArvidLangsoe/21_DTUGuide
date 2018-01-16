@@ -566,7 +566,10 @@ public class Main2Activity extends AppCompatActivity
                 }
             }
         }
+
     }
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

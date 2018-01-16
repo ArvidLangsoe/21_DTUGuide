@@ -43,9 +43,6 @@ import static com.arvid.dtuguide.Main2Activity.TAG;
 
 public class NavigationController implements Navigation{
 
-
-
-
     private LocationDAO dao;
     private static List<Searchable> historyList = new ArrayList<Searchable>();
     private static List<Searchable> favorite = new ArrayList<Searchable>();
