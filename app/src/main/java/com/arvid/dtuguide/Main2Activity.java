@@ -485,43 +485,6 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-    /*
-    @Override
-    public void onBackStackChanged() {
-        shouldDisplayHomeUp();
-    }
-
-    public void shouldDisplayHomeUp(){
-        //Enable Up button only  if there are entries in the back stack
-        boolean canback = getSupportFragmentManager().getBackStackEntryCount()>0;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(canback);
-    }
-
-*/
-    /*
-    @Override
-    public boolean onSupportNavigateUp() {
-        //This method is called when the up button is pressed. Just the pop back stack.
-        //getSupportFragmentManager().popBackStack();
-        return false;
-    }
-    */
-
-
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -567,9 +530,16 @@ public class Main2Activity extends AppCompatActivity
             }
         }
 
+
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(maps.get(currentMap)!=null) {
+            showFloor(currentMap);
+        }
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -651,7 +621,23 @@ public class Main2Activity extends AppCompatActivity
                 nameTV.setText(localLocation.getName());
 
                 TextView descriptionTV = (TextView) infoWindowContent.findViewById(R.id.info_description);
-                descriptionTV.setText(localLocation.getDescription());
+                if(localLocation.getDescription().isEmpty()){
+                    if(!localLocation.getPersons().isEmpty()){
+                        String disc = "";
+                        for(Person p: localLocation.getPersons()){
+                            disc+=p.getName()+", ";
+                        }
+                        disc=disc.substring(0,disc.length()-2);
+                        descriptionTV.setText(disc);
+                    }
+                    else{
+                        descriptionTV.setText("");
+                    }
+                }
+                else{
+                    descriptionTV.setText(localLocation.getDescription());
+                }
+
 
 
                 final ImageView favoriteIcon = (ImageView) infoWindowContent.findViewById(R.id.info_favorite);
