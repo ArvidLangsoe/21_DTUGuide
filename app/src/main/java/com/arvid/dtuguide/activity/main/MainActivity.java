@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,6 +32,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Visibility;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -239,7 +241,8 @@ public class MainActivity extends AppCompatActivity
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        //bottomNavigationView.setSelectedItemId(R.id.map_layers_button);
+
+        BottomNavigationViewHelper.changeMenuItemCheckedStateColor(bottomNavigationView, "#737373", "#737373");
 
         currentMap = FloorHeight.ground_floor;
 
@@ -255,10 +258,10 @@ public class MainActivity extends AppCompatActivity
 
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View popupLayerView, popupFilterView;
+            item.setCheckable(false);
 
             if (bottomNavigationItemSelected == item) {
                 bottomNavigationItemSelected = null;
-                item.setChecked(false);
                 return true;
             }
 
@@ -493,6 +496,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle bottom_navigation view item clicks here.
+        item.setCheckable(false);
 
         switch (item.getItemId()) {
             case R.id.navigate_to_dtu:
