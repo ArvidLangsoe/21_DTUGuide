@@ -119,6 +119,78 @@ public class MainActivity extends AppCompatActivity
     private final String BACK_STACK_ROOT_TAG = "search_fragment";
     private MenuItem bottomNavigationItemSelected;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main2);
+
+
+
+        if(!isConnectedToInternet())
+            showInternetWarning();
+
+        dao = new LocationDAO();
+        controller = new NavigationController(dao, getApplicationContext(),this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerClosed(View view) {
+                view.requestFocus();
+                super.onDrawerClosed(view);
+            }
+        };
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        BottomNavigationViewHelper.changeMenuItemCheckedStateColor(bottomNavigationView, "#737373", "#737373");
+
+        currentMap = FloorHeight.ground_floor;
+
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        //Handle when activity is recreated like on orientation Change
+
+        if(savedInstanceState!=null){
+            String name = savedInstanceState.getString("currentSelection");
+            try {
+                currentSelection=controller.getSearchableItem(name);
+            } catch (LocationDAO.DAOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if(currentSelection!=null) {
+            outState.putString("currentSelection", currentSelection.getName());
+        }
+
+        super.onSaveInstanceState(outState);
+    }
+
     public boolean isConnectedToInternet() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -201,77 +273,7 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
 
-
-
-        if(!isConnectedToInternet())
-            showInternetWarning();
-
-        dao = new LocationDAO();
-        controller = new NavigationController(dao, getApplicationContext(),this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            @Override
-            public void onDrawerClosed(View view) {
-                view.requestFocus();
-                super.onDrawerClosed(view);
-            }
-        };
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        BottomNavigationViewHelper.changeMenuItemCheckedStateColor(bottomNavigationView, "#737373", "#737373");
-
-        currentMap = FloorHeight.ground_floor;
-
-        getSupportFragmentManager().addOnBackStackChangedListener(this);
-        //Handle when activity is recreated like on orientation Change
-
-        if(savedInstanceState!=null){
-            String name = savedInstanceState.getString("currentSelection");
-            try {
-                currentSelection=controller.getSearchableItem(name);
-            } catch (LocationDAO.DAOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if(currentSelection!=null) {
-            outState.putString("currentSelection", currentSelection.getName());
-        }
-
-        super.onSaveInstanceState(outState);
-    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
