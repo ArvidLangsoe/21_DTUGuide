@@ -34,7 +34,7 @@
     <string name="placeholder_text">Placeholder</string>
     <string name="toast_add_fav">Added to favorites</string>
     <string name="toast_rem_fav">Removed from favorites</string>
-    <string name="about_text">DTU Guide is currently in beta. Features will continue to be added and improved as the product matures. \n\nThe applications purpose is to help you navigate the DTU campus by showing where specific places are located. It is also possible to search for things like \'water\', \'projectors\' etc. and the application will show you where these things are available.</string>
+    <string name="about_text">DTU Guide is currently in beta. Features will continue to be added and improved as the product matures. \n\nThe applications purpose is to help you navigate the DTU campus by showing where specific places are located. It is also possible to search for things like \'water\', \'projectors\' etc. and the application will show you where these things are available.\n\nCreated by:\nArvid Kappelhøj Langsø\nJeppe Thougaard Nielsen\nPeter Issam El-Habr</string>
 
     <string name="dialog_zoom_message">At what zoom level landmarks are visible</string>
     <string name="dialog_zoom_title">Landmark zoom level</string>
