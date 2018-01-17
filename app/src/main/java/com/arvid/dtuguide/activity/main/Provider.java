@@ -76,7 +76,7 @@ public class Provider extends ContentProvider {
                         ArrayList<Person> people=((LocationDTO)item).getPersons();
                         subText="";
                         for(Person p : people){
-                            subText+=" "+p.getName()+",";
+                            subText+=""+p.getName()+",";
                         }
                         if(!subText.isEmpty()) {
                             subText = subText.substring(0, subText.length() - 1);
@@ -105,7 +105,7 @@ public class Provider extends ContentProvider {
                             ArrayList<Person> people=((LocationDTO)item).getPersons();
                             subString="";
                             for(Person p : people){
-                                subString+=" "+p.getName()+",";
+                                subString+=""+p.getName()+",";
 
                             }
                             if(!subString.isEmpty()) {
