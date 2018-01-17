@@ -17,6 +17,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -93,6 +94,8 @@ public class MainActivity extends AppCompatActivity
 
     private Marker currentMarker;
     private int requestCode;
+
+    Searchable currentSelection=null;
 
     HashMap<Switch,String> switches= new HashMap<Switch,String>();
     private static HashMap<FloorHeight,Floor> maps=new HashMap<FloorHeight,Floor>();
@@ -203,6 +206,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+
+
         if(!isConnectedToInternet())
             showInternetWarning();
 
@@ -248,6 +253,24 @@ public class MainActivity extends AppCompatActivity
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change
+
+        if(savedInstanceState!=null){
+            String name = savedInstanceState.getString("currentSelection");
+            try {
+                currentSelection=controller.getSearchableItem(name);
+            } catch (LocationDAO.DAOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if(currentSelection!=null) {
+            outState.putString("currentSelection", currentSelection.getName());
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -382,8 +405,13 @@ public class MainActivity extends AppCompatActivity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
 
+
         Cursor c = getContentResolver().query(Provider.CONTENT_URI, null, null, new String[]{""}, null);
         final SearchCursorAdapter adapter = new SearchCursorAdapter(this, R.layout.searchview_suggestions_item, c, 0);
+
+        if(currentSelection!=null) {
+            showSearchable(currentSelection);
+        }
 
         searchView.setSuggestionsAdapter(adapter);
         searchView.setFocusable(false);
@@ -429,6 +457,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onQueryTextChange(String query) {
                 adapter.runQueryOnBackgroundThread(query);
+
                 return true;
             }
         });
@@ -442,21 +471,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public boolean onSuggestionClick(int position) {
                 String name = adapter.getItemName(position);
+                Searchable item=null;
                 try {
-                    Searchable item = controller.getSearchableItem(name);
-
-                    if(item.getType().equals("Location")) {
-                        LocationDTO location = (LocationDTO) item;
-                        showLocation(location);
-                    }
-                    else if (item.getType().equals("Person")){
-                        Person person = (Person) item;
-                        showLocation(person.getRoom());
-                    }
+                    item = controller.getSearchableItem(name);
                 } catch (LocationDAO.DAOException e) {
                     e.printStackTrace();
                 }
-                searchView.setQuery(name, false);
+                showSearchable(item);
                 onBackPressed();
                 return true;
             }
@@ -492,6 +513,19 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void showSearchable(Searchable item){
+        if(item.getType().equals("Location")) {
+            LocationDTO location = (LocationDTO) item;
+            showLocation(location);
+        }
+        else if (item.getType().equals("Person")){
+            Person person = (Person) item;
+            showLocation(person.getRoom());
+        }
+
+        searchView.setQuery(item.getName(), false);
+        currentSelection=item;
+    }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
