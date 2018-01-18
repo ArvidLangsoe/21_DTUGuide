@@ -42,8 +42,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".data.DataTestActivity" />
-        <activity android:name=".data.FireBaseActivity" />
         <activity
             android:name=".activity.NavigateToDTUActivity"
             android:label="@string/navigate_to_dtu"

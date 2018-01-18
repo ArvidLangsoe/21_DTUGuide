@@ -59,8 +59,6 @@ public class NavigationController implements Navigation{
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
         mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
 
-        //savePrefs();
-
         updateDataFromFireBase();
 
     }
@@ -72,8 +70,6 @@ public class NavigationController implements Navigation{
 
         mySharedPreferences = context.getSharedPreferences(HISTORYPREF, 0);
         mySharedPreferencesFav = context.getSharedPreferences(FAVORITEPREF, 0);
-
-        //savePrefs();
 
         updateDataFromFireBase();
 
@@ -90,12 +86,6 @@ public class NavigationController implements Navigation{
                 HashMap<String, HashMap<String, HashMap<String, Object>>> map = (HashMap<String, HashMap<String, HashMap<String, Object>>>) dataSnapshot.getValue();
 
                 dao.setData(new HashMap<String, Searchable>());
-
-                //for(String location : map){
-                //    dao.saveLocation((dao.parseToDTO(location)));
-                //}
-
-
 
                 HashMap<String, HashMap<String, Object>> locations = map.get("Locations");
                 HashMap<String, HashMap<String, Object>> persons = map.get("Persons");
