@@ -262,21 +262,7 @@ public class NavigationController implements Navigation{
         List<Searchable> searchData = new ArrayList<Searchable>();
         matchString = matchString.replace(" ", "");
 
-        //Search with name
-        for(Searchable dto : dao.getAllData().values()){
-            if(dto.getName().replace(".", "").toLowerCase().matches("(.*)"+matchString+"(.*)")
-                    || dto.getName().replace(".", "").toLowerCase().matches("(.*)"+matchString+"(.*)")
-                    || dto.getName().replace(" ", "").toLowerCase().matches("(.*)"+matchString+"(.*)")){
-                searchData.add(dto);
-            }
-        }
-
-        //If nothing is found, search with tag
-        if(searchData.size()==0)
-            searchData=searchWithTag(matchString);
-
-        Collections.sort(searchData);
-        return searchData;
+        return dao.searchData(matchString);
     }
 
     public ArrayList<Searchable> searchWithTag(String tag) throws LocationDAO.DAOException {
